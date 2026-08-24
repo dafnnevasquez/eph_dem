@@ -1,0 +1,15 @@
+// main.scss - Archivo principal de estilos
+
+// 1. Importar variables y mixins (si los tuvieras)
+@import 'variables';
+
+// 2. Importar estilos base (reseteos, tipografía, etc.)
+@import 'base';
+
+// 3. Importar estilos de componentes reutilizables
+@import 'cards';
+
+// Puedes agregar más imports aquí a medida que crees más archivos
+// ej: @import 'buttons';
+// ej: @import 'forms';
+

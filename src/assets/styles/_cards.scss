@@ -1,0 +1,57 @@
+// _cards.scss
+@import 'variables';
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.card {
+  background: $color-blanco;
+  border-radius: $border-radius-tarjeta;
+  padding: 24px;
+  width: 280px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 18px $color-sombra-suave;
+  border: 1px solid $color-borde;
+  border-top: 4px solid $color-borde; /* Borde superior sutil por defecto */
+  
+  // Flexbox para alinear contenido verticalmente
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px $color-sombra-fuerte;
+    border-top-color: $color-primario; /* Borde superior cambia a color primario en hover */
+  }
+}
+
+/* Se eliminan .card-icon-wrap y .card-icon */
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: $color-texto-principal;
+  margin-bottom: 8px;
+  margin-top: 12px; /* Añadido para compensar la falta del ícono */
+}
+
+.card-desc {
+  font-size: 0.9rem;
+  color: $color-texto-secundario;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  flex-grow: 1; // Hace que la descripción ocupe el espacio disponible
+}
+
+.card-hint {
+  font-size: 0.8rem;
+  color: #9db0be;
+  font-weight: 500;
+}

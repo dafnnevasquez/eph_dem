@@ -1,0 +1,27 @@
+// _variables.scss
+
+// Paleta de Colores (basada en general.css)
+$color-primario: #003c58;
+$color-secundario: #43708a;
+$color-exito: #317e7a;
+$color-advertencia: #f25619;
+$color-peligro: #a52935;
+$color-info: #899ea3;
+$color-claro: #f8f9fa;
+$color-oscuro: #212529;
+
+// Colores de la aplicación
+$color-fondo: #f0f4f7;
+$color-texto-principal: $color-oscuro;
+$color-texto-secundario: $color-secundario;
+$color-blanco: #fff;
+$color-borde: #e6eef3;
+$color-sombra-suave: rgba(0, 47, 75, 0.08);
+$color-sombra-fuerte: rgba(0, 47, 75, 0.15);
+
+// Tipografía
+$fuente-principal: inherit;
+
+// Tamaños
+$border-radius-tarjeta: 20px;
+$border-radius-icono: 18px;

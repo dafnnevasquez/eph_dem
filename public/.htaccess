@@ -1,0 +1,20 @@
+Options -MultiViews
+RewriteEngine On
+
+RewriteBase /__v2/modulo_eph/front/
+
+# Servir archivos y directorios reales directamente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Todo lo demas va a index.html (es Vue, no PHP)
+RewriteRule ^ index.html [L]
+
+# Evitar caché en index.html para que los cambios de versión se reflejen inmediatamente
+<FilesMatch "\.(html)$">
+    FileETag None
+    Header unset ETag
+    Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+</FilesMatch>

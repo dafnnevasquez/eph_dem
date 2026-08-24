@@ -1,0 +1,19 @@
+// _base.scss
+
+// Importar siempre las variables primero
+@import 'variables';
+
+body {
+  font-family: $fuente-principal;
+  background-color: $color-fondo;
+  color: $color-texto-principal;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Estilos generales para títulos, párrafos, etc. si es necesario
+h1, h2, h3 {
+  color: $color-texto-principal;
+}

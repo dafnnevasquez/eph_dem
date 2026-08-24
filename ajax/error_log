@@ -1,0 +1,1 @@
+[09-Jun-2026 12:54:54 America/Santiago] PHP Warning:  mysqli_connect(): (HY000/1045): Access denied for user 'USUARIO'@'localhost' (using password: YES) in /home4/csi84990/public_html/__v2/modulo_eph/ajax/get_prestaciones.php on line 11
