@@ -378,3 +378,145 @@ function cerrarSesion() {
   router.push('/login')
 }
 </script>
+<style lang="scss" scoped>
+@import '@/assets/styles/variables';
+
+.manual-page { background: $color-fondo; flex: 1; }
+.manual-content { max-width: 1100px; margin: 32px auto 72px auto; padding: 0 24px; display: flex; flex-direction: column; gap: 32px; }
+
+.hero { background: $color-secundario; position: relative; padding: 38px 48px; overflow: hidden; text-align: center; }
+.hero-compact { padding: 28px 48px; }
+.hero-bg { position: absolute; inset: 0; background: url('@/assets/img/mac.jpg') center/cover no-repeat; }
+.hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.hero-tag { font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 2.5px; text-transform: uppercase; }
+.hero-title { font-size: 26px; font-weight: 500; color: #fff; margin: 0; }
+.hero-sub { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 700px; line-height: 1.5; margin: 0; }
+
+.nav-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.nav-buttons { display: flex; gap: 10px; }
+.session-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: rgba(0,60,88,0.06); border: 1.5px solid rgba(0,60,88,0.18); border-radius: 999px; color: $color-primario; font-size: 0.88rem; font-weight: 600; }
+.session-nombre { white-space: nowrap; }
+.btn-logout { background: none; border: none; color: $color-primario; cursor: pointer; padding: 2px 4px; opacity: 0.7; &:hover { opacity: 1; color: #c62828; } }
+.btn-back { background: $color-primario; color: #fff; border: 1px solid $color-primario; border-radius: 999px; padding: 6px 12px; font-weight: 600; cursor: pointer; &:hover { background: mix(#fff, $color-primario, 6%); } }
+
+.manual-intro { display: flex; align-items: flex-start; gap: 20px; background: #fff; border-radius: 16px; padding: 24px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.intro-icon { font-size: 2rem; color: $color-primario; flex: 0 0 auto; }
+.intro-title { font-size: 1.4rem; font-weight: 700; color: $color-primario; margin: 0 0 8px; }
+.intro-desc { margin: 0; color: $color-texto-secundario; line-height: 1.6; }
+
+.flujo-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; background: #fff; border-radius: 16px; padding: 20px 24px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.flujo-step { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.flujo-num { width: 28px; height: 28px; border-radius: 50%; background: $color-primario; color: #fff; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.flujo-icon { font-size: 1.1rem; color: $color-primario; }
+.flujo-label { font-size: 0.9rem; font-weight: 600; color: $color-primario; }
+.flujo-label-link { &:hover { text-decoration: underline; } }
+.flujo-arrow { color: $color-borde; font-size: 0.8rem; }
+
+.paso-card { background: #fff; border-radius: 16px; padding: 28px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; display: flex; flex-direction: column; gap: 20px; }
+.paso-header { display: flex; align-items: flex-start; gap: 16px; }
+.paso-num { background: $color-primario; color: #fff; border-radius: 8px; padding: 4px 12px; font-weight: 700; font-size: 0.85rem; flex: 0 0 auto; }
+.paso-icon { font-size: 1.8rem; color: $color-primario; flex: 0 0 auto; }
+.paso-title { font-size: 1.2rem; font-weight: 700; color: $color-primario; margin: 0 0 6px; }
+.paso-desc { margin: 0; color: $color-texto-secundario; line-height: 1.6; }
+.paso-body { display: flex; flex-direction: column; gap: 16px; }
+.paso-tips { display: flex; flex-direction: column; gap: 8px; }
+.tip { display: flex; align-items: flex-start; gap: 8px; font-size: 0.9rem; color: $color-texto-secundario; line-height: 1.5; }
+.tip-icon { color: $color-primario; flex: 0 0 auto; margin-top: 2px; }
+.tip-warn { color: #d97706; }
+
+// Mockups
+.mockup-nuevo-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.mockup-btn-nuevo { background: $color-primario; color: #fff; border-radius: 10px; padding: 10px 18px; font-weight: 700; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; }
+.mockup-submenu { display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid $color-borde; border-radius: 12px; padding: 10px; box-shadow: 0 8px 20px rgba(0,30,45,0.12); }
+.mockup-submenu-item { padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: $color-texto-secundario; cursor: pointer; }
+.mockup-submenu-active { background: rgba(0,60,88,0.08); color: $color-primario; }
+.mockup-form-proyecto { display: flex; flex-direction: column; gap: 10px; background: $color-claro; border-radius: 12px; padding: 16px; border: 1px solid $color-borde; max-width: 400px; }
+.mockup-label { font-size: 0.85rem; font-weight: 600; color: $color-primario; }
+.mockup-input { background: #fff; border: 1.5px solid $color-borde; border-radius: 8px; padding: 10px 14px; font-size: 0.95rem; color: $color-texto-principal; }
+.mockup-placeholder { color: $color-texto-secundario; }
+.mockup-btn-row { display: flex; gap: 10px; }
+.mockup-btn { padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.mockup-btn-primary { background: $color-primario; color: #fff; }
+.mockup-btn-out { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); }
+.mockup-btn-sm { padding: 6px 12px; font-size: 0.82rem; }
+.mockup-btn-excel { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+.mockup-btn-pdf { background: #ffebee; color: #b71c1c; border: 1px solid #ef9a9a; }
+.mockup-input-sm { background: #fff; border: 1px solid $color-borde; border-radius: 6px; padding: 6px 10px; font-size: 0.85rem; text-align: center; }
+
+.instruccion-indicator { display: flex; align-items: center; gap: 10px; background: rgba(0,60,88,0.06); border: 1px solid rgba(0,60,88,0.14); border-radius: 10px; padding: 10px 16px; }
+.instruccion-icon-circle { display: flex; align-items: center; justify-content: center; color: $color-primario; font-size: 1.4rem; flex: 0 0 auto; }
+.instruccion-texto { font-size: 1rem; color: $color-primario; line-height: 1.8; strong { font-weight: 700; } }
+.instruccion-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 6px; font-size: 0.88rem; font-weight: 700; vertical-align: middle; }
+.instruccion-badge--agregar { background: $color-exito; color: #fff; }
+.instruccion-badge--quitar { background: $color-peligro; color: #fff; }
+
+.filtros-panel-mockup { display: flex; gap: 12px; flex-wrap: wrap; background: $color-claro; border-radius: 10px; padding: 12px; border: 1px solid $color-borde; }
+.filtro-mockup { display: flex; flex-direction: column; gap: 4px; }
+.filtro-buscar-mockup { flex: 2; min-width: 160px; }
+.filtro-label-mockup { font-size: 0.75rem; font-weight: 600; color: $color-primario; text-transform: uppercase; }
+.mockup-select { background: #fff; border: 1px solid $color-borde; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: $color-texto-principal; min-width: 120px; }
+
+.prestaciones-grid-mockup { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.prestaciones-panel-mockup { background: $color-claro; border-radius: 12px; padding: 14px; border: 1px solid $color-borde; }
+.panel-title-mockup { font-weight: 700; color: $color-primario; margin-bottom: 10px; font-size: 0.95rem; }
+.prestaciones-lista-mockup { display: flex; flex-direction: column; gap: 8px; }
+.prestacion-item-mockup { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff; border: 1px solid $color-borde; border-radius: 8px; padding: 8px 10px; }
+.prestacion-seleccionada-mockup { background: rgba(0,60,88,0.04); border-color: rgba(0,60,88,0.2); }
+.prestacion-info-mockup { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.prestacion-codigo-mockup { font-size: 0.75rem; font-weight: 700; color: $color-primario; }
+.prestacion-nombre-mockup { font-size: 0.85rem; color: $color-texto-principal; }
+.accion-mockup { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff; flex: 0 0 auto; }
+.accion-agregar-mockup { background: $color-exito; }
+.accion-quitar-mockup { background: $color-peligro; }
+.lista-vacia-mockup { font-size: 0.82rem; color: $color-texto-secundario; padding: 8px 0; }
+.acciones-finales-mockup { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: $color-claro; border-radius: 10px; padding: 12px 16px; border: 1px solid $color-borde; }
+.acciones-resumen-mockup { font-size: 0.9rem; color: $color-texto-secundario; }
+
+.mockup-params-table { overflow-x: auto; }
+.mockup-params-head { display: grid; background: #e9f1f6; padding: 8px 12px; border-radius: 8px 8px 0 0; font-size: 0.78rem; font-weight: 700; color: $color-primario; gap: 8px; }
+.mockup-params-head-real { grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; }
+.mockup-params-row { display: grid; background: $color-claro; padding: 8px 12px; border: 1px solid $color-borde; border-top: none; border-radius: 0 0 8px 8px; gap: 8px; align-items: center; font-size: 0.85rem; }
+.mockup-params-row-real { grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; }
+.mockup-row-name { font-weight: 600; color: $color-texto-principal; }
+
+.mockup-calc-toggle-row { display: flex; flex-direction: column; gap: 6px; }
+.mockup-calc-toggle { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1.5px solid $color-primario; border-radius: 999px; background: rgba(0,60,88,0.06); color: $color-primario; font-weight: 700; font-size: 0.93rem; max-width: 400px; cursor: pointer; }
+.mockup-calc-icono { font-size: 1rem; }
+.mockup-calc-texto { flex: 1; }
+.mockup-calc-chevron { font-size: 0.8rem; opacity: 0.6; }
+.mockup-calc-desc { font-size: 0.85rem; color: $color-texto-secundario; margin: 0; padding-left: 4px; }
+
+.mockup-resultados { display: flex; flex-direction: column; gap: 14px; }
+.mockup-banner-res { background: $color-primario; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+.mockup-metric-val { font-size: 1.6rem; font-weight: 700; color: #fff; margin-right: 8px; }
+.mockup-metric-lab { font-size: 0.85rem; color: rgba(255,255,255,0.7); }
+.mockup-res-block { background: $color-claro; border-radius: 10px; padding: 12px 16px; border: 1px solid $color-borde; }
+.mockup-section-title { font-weight: 700; color: $color-primario; font-size: 0.9rem; margin-bottom: 10px; }
+.mockup-pill-container { display: flex; flex-wrap: wrap; gap: 8px; }
+.mockup-pill { display: flex; align-items: center; gap: 6px; background: #eef5f9; border: 1px solid $color-borde; border-radius: 999px; padding: 6px 14px; font-size: 0.85rem; color: $color-primario; }
+.mockup-acc-grid { display: flex; flex-direction: column; gap: 8px; }
+.mockup-accordion { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid $color-borde; border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; font-weight: 600; color: $color-primario; cursor: pointer; }
+.mockup-accordion-small { font-size: 0.85rem; }
+.acc-num { font-weight: 400; color: $color-texto-secundario; }
+.dropdown-chev { font-size: 0.8rem; opacity: 0.6; }
+.mockup-export-row { display: flex; gap: 10px; }
+
+.mockup-table { display: flex; flex-direction: column; border: 1px solid $color-borde; border-radius: 10px; overflow: hidden; }
+.mockup-table-head { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; background: #e9f1f6; padding: 8px 12px; font-size: 0.78rem; font-weight: 700; color: $color-primario; gap: 8px; }
+.mockup-table-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; padding: 10px 12px; gap: 8px; align-items: center; border-top: 1px solid $color-borde; font-size: 0.85rem; }
+.mockup-actions { display: flex; gap: 6px; }
+.mockup-chip { background: rgba(0,60,88,0.08); color: $color-primario; border-radius: 999px; padding: 4px 10px; font-size: 0.78rem; font-weight: 600; }
+
+.mockup-action-cards { display: flex; gap: 16px; flex-wrap: wrap; }
+.mockup-action-card { display: flex; flex-direction: column; gap: 8px; background: $color-claro; border-radius: 12px; padding: 16px; border: 1px solid $color-borde; max-width: 260px; p { margin: 0; font-size: 0.85rem; color: $color-texto-secundario; } }
+
+.sub-title-mockup { font-size: 1rem; font-weight: 700; color: $color-primario; margin: 8px 0 4px; display: flex; align-items: center; gap: 8px; }
+
+.manual-navbar-guide { background: #fff; border-radius: 16px; padding: 28px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.guide-title { font-size: 1.2rem; font-weight: 700; color: $color-primario; margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+.guide-desc { margin: 0 0 20px; color: $color-texto-secundario; }
+.navbar-guide-row { display: flex; align-items: flex-start; gap: 32px; flex-wrap: wrap; }
+.navbar-guide-item { display: flex; flex-direction: column; gap: 8px; p { margin: 0; font-size: 0.85rem; color: $color-texto-secundario; } }
+.mockup-session { display: flex; align-items: center; gap: 8px; background: rgba(0,60,88,0.06); border: 1.5px solid rgba(0,60,88,0.18); border-radius: 999px; padding: 6px 14px 6px 10px; color: $color-primario; font-size: 0.88rem; font-weight: 600; }
+.mockup-btn-logout { background: none; border: none; color: $color-primario; cursor: pointer; font-size: 0.95rem; opacity: 0.7; }
+</style>

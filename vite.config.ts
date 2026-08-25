@@ -7,7 +7,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/__v2/modulo_eph/front/',
+  base: '/__v2/modulo_eph/pruebas/',
   plugins: [
     vue(),
     vueDevTools(),
