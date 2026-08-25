@@ -47,7 +47,7 @@
   <footer class="sigem-bottomline" id="footer">
     <div class="sigem-bottomline-content">
       <div class="sigem-bottomline-left">
-        <img src="https://sigem-uv.cl/_general/logos/LOGO_SIGEM-UV_HORIZONTAL-BLANCO.png" alt="SIGEM-UV" height="48" />
+        <img src="https://sigem-uv.cl/_general/logos/LOGO_SIGEM-UV_HORIZONTAL-BLANCO.png" alt="SIGEM-UV" height="60" />
       </div>
       <div class="sigem-bottomline-center">
         <div>Gral. Cruz 222, Valparaíso ::: +56 32 2603662</div>
@@ -64,7 +64,7 @@
         <div class="sigem-bottomline-copy">&copy; 2026 <b>SIGEM-UV</b> | Todos los Derechos Reservados</div>
       </div>
       <div class="sigem-bottomline-right">
-        <img src="https://sigem-uv.cl/_general/logos/uv_blanco.png" alt="UV" height="48" />
+        <img src="@/assets/img/logouv.png" alt="Universidad de Valparaíso" height="170" />
       </div>
     </div>
   </footer>
@@ -122,30 +122,31 @@
   margin-top: 48px;
 }
 .sigem-bottomline-content {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 12px 24px;
-  flex-wrap: wrap;
+  padding: 24px 32px;
+  gap: 32px;
 }
 .sigem-bottomline-left,
 .sigem-bottomline-right {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 .sigem-bottomline-center {
-  flex: 1 1 400px;
   text-align: center;
   font-size: 1.05rem;
+  line-height: 1.8;
 }
 .sigem-bottomline-social {
   margin: 8px 0;
   display: flex;
   gap: 10px;
   justify-content: center;
+  align-items: center;
 }
 .sigem-bottomline-copy {
   font-size: 0.95rem;
