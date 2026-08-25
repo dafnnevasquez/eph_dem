@@ -87,7 +87,8 @@ PHP_LEGACY_URL=https://sigem-uv.cl/__v2/modulo_eph/ajax
 
 ---
 
-## Autores
+## Autor
+Dafnne Vásquez Villalón
 EPH DEM: "Escalamiento del módulo"
 Proyecto de Título (PIB) — Universidad de Valparaíso  
 Escuela de Ingeniería Biomédica · SIGEM-UV · 2026
