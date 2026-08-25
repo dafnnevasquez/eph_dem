@@ -1,0 +1,76 @@
+[09-Jun-2026 12:54:54 America/Santiago] PHP Warning:  mysqli_connect(): (HY000/1045): Access denied for user 'USUARIO'@'localhost' (using password: YES) in /home4/csi84990/public_html/__v2/modulo_eph/ajax/get_prestaciones.php on line 11
+[11-Jun-2026 13:31:29 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 125
+[11-Jun-2026 13:31:29 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 125
+[11-Jun-2026 13:32:39 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 125
+[11-Jun-2026 13:32:39 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 125
+[11-Jun-2026 13:34:12 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 125
+[11-Jun-2026 13:34:12 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 125
+[07-Jul-2026 13:34:05 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../config/database.local.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 121
+[07-Jul-2026 13:34:05 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../config/database.local.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 121
+[07-Jul-2026 13:36:31 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../config/database.local.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 121
+[07-Jul-2026 13:36:31 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../config/database.local.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/calcular_demanda.php on line 121
+[07-Jul-2026 14:24:46 America/Santiago] EPHDEM JSON encode fallo: Malformed UTF-8 characters, possibly incorrectly encoded
+[13-Jul-2026 14:12:45 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:12:45 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:13:02 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:13:02 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:15:32 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:15:32 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:15:43 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:15:43 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:15:56 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:15:56 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:17:59 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:17:59 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../lib/simplexlsxgen/SimpleXLSXGen.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_xls_cerrada.php on line 77
+[13-Jul-2026 14:43:54 America/Santiago] PHP Warning:  file_get_contents(/home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 1147
+[13-Jul-2026 14:43:54 America/Santiago] PHP Fatal error:  Uncaught Exception: FPDF error: Could not load font definition file: /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php:267
+Stack trace:
+#0 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1149): FPDF->Error('Could not load ...')
+#1 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1138): FPDF->_loadjsonfont('/home4/csi84990...')
+#2 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(461): FPDF->_loadfont('/home4/csi84990...')
+#3 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(510): FPDF->AddFont('helvetica', 'B')
+#4 /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_pdf_cerrada.php(138): FPDF->SetFont('helvetica', 'B', 16)
+#5 {main}
+  thrown in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 267
+[13-Jul-2026 14:44:07 America/Santiago] PHP Warning:  file_get_contents(/home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 1147
+[13-Jul-2026 14:44:07 America/Santiago] PHP Fatal error:  Uncaught Exception: FPDF error: Could not load font definition file: /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php:267
+Stack trace:
+#0 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1149): FPDF->Error('Could not load ...')
+#1 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1138): FPDF->_loadjsonfont('/home4/csi84990...')
+#2 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(461): FPDF->_loadfont('/home4/csi84990...')
+#3 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(510): FPDF->AddFont('helvetica', 'B')
+#4 /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_pdf_cerrada.php(138): FPDF->SetFont('helvetica', 'B', 16)
+#5 {main}
+  thrown in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 267
+[13-Jul-2026 14:45:06 America/Santiago] PHP Warning:  file_get_contents(/home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 1147
+[13-Jul-2026 14:45:06 America/Santiago] PHP Fatal error:  Uncaught Exception: FPDF error: Could not load font definition file: /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php:267
+Stack trace:
+#0 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1149): FPDF->Error('Could not load ...')
+#1 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1138): FPDF->_loadjsonfont('/home4/csi84990...')
+#2 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(461): FPDF->_loadfont('/home4/csi84990...')
+#3 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(510): FPDF->AddFont('helvetica', 'B')
+#4 /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_pdf_cerrada.php(138): FPDF->SetFont('helvetica', 'B', 16)
+#5 {main}
+  thrown in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 267
+[13-Jul-2026 14:46:19 America/Santiago] PHP Warning:  file_get_contents(/home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 1147
+[13-Jul-2026 14:46:19 America/Santiago] PHP Fatal error:  Uncaught Exception: FPDF error: Could not load font definition file: /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php:267
+Stack trace:
+#0 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1149): FPDF->Error('Could not load ...')
+#1 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1138): FPDF->_loadjsonfont('/home4/csi84990...')
+#2 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(461): FPDF->_loadfont('/home4/csi84990...')
+#3 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(510): FPDF->AddFont('helvetica', 'B')
+#4 /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_pdf_cerrada.php(138): FPDF->SetFont('helvetica', 'B', 16)
+#5 {main}
+  thrown in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 267
+[13-Jul-2026 14:46:27 America/Santiago] PHP Warning:  file_get_contents(/home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 1147
+[13-Jul-2026 14:46:27 America/Santiago] PHP Fatal error:  Uncaught Exception: FPDF error: Could not load font definition file: /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/font/helveticab.json in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php:267
+Stack trace:
+#0 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1149): FPDF->Error('Could not load ...')
+#1 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(1138): FPDF->_loadjsonfont('/home4/csi84990...')
+#2 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(461): FPDF->_loadfont('/home4/csi84990...')
+#3 /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php(510): FPDF->AddFont('helvetica', 'B')
+#4 /home4/csi84990/public_html/__v2/modulo_eph/ajax/generar_pdf_cerrada.php(138): FPDF->SetFont('helvetica', 'B', 16)
+#5 {main}
+  thrown in /home4/csi84990/public_html/__v2/modulo_eph/lib/fpdf/fpdf.php on line 267
+[15-Jul-2026 00:52:11 America/Santiago] PHP Warning:  require_once(/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php): failed to open stream: No such file or directory in /home4/csi84990/public_html/__v2/modulo_eph/ajax/get_prestaciones_demanda.php on line 105
+[15-Jul-2026 00:52:11 America/Santiago] PHP Fatal error:  require_once(): Failed opening required '/home4/csi84990/public_html/__v2/modulo_eph/ajax/../funciones_sigemuv_Modulo_EPHDEM_Cerrada.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home4/csi84990/public_html/__v2/modulo_eph/ajax/get_prestaciones_demanda.php on line 105
