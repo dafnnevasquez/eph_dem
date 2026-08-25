@@ -342,3 +342,39 @@
     </div>
   </AppLayout>
 </template>
+<script setup>
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import AppLayout from '@/layouts/AppLayout.vue'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+const flujoGeneral = [
+  { icon: 'fa-solid fa-plus-circle',  label: 'Crear proyecto',           id: 'paso-1' },
+  { icon: 'fa-solid fa-list-check',   label: 'Selección de prestaciones', id: 'paso-2' },
+  { icon: 'fa-solid fa-sliders',      label: 'Parámetros',               id: 'paso-3' },
+  { icon: 'fa-solid fa-chart-bar',    label: 'Resultados',               id: 'paso-4' },
+  { icon: 'fa-solid fa-folder-open',  label: 'Gestión de proyectos',     id: 'paso-5' },
+]
+
+function scrollToPaso(id) {
+  const el = document.getElementById(id)
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  const topbarOffset = 110
+  const viewportCenter = (window.innerHeight - topbarOffset) / 2
+  const elCenter = rect.top + rect.height / 2
+  window.scrollBy({ top: elCenter - viewportCenter - topbarOffset / 2, behavior: 'smooth' })
+}
+
+function volverAtras() {
+  router.back()
+  setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }), 0)
+}
+
+function cerrarSesion() {
+  authStore.logout()
+  router.push('/login')
+}
+</script>
