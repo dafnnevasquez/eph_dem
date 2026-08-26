@@ -125,7 +125,7 @@ async function cargarDesdeServidor(proyectoId) {
         return;
     }
     try {
-        const url = `${import.meta.env.VITE_API_BASE}/obtener_resultados_proyecto.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`;
+        const url = `${import.meta.env.VITE_API_BASE}/get/obtener_resultados_proyecto.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`;
         const resp = await fetch(url);
         const json = await resp.json();
         if (!resp.ok || !json.ok) {

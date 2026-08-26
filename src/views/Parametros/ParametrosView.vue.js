@@ -162,8 +162,8 @@ function cerrarCalculadoraSiCorresponde(event) {
 async function cargarDesdeServidor(proyectoId) {
     try {
         const [respDemanda, respPrestaciones] = await Promise.all([
-            fetch(`${import.meta.env.VITE_API_BASE}/get_prestaciones_demanda.php?proyecto_id=${proyectoId}`),
-            fetch(`${import.meta.env.VITE_API_BASE}/get_prestaciones.php`),
+            fetch(`${import.meta.env.VITE_API_BASE}/get/get_prestaciones_demanda.php?proyecto_id=${proyectoId}`),
+            fetch(`${import.meta.env.VITE_API_BASE}/get/get_prestaciones.php`),
         ]);
         const json = await respDemanda.json();
         const jsonPrestaciones = await respPrestaciones.json();
