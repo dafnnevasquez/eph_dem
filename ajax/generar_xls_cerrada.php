@@ -73,7 +73,7 @@ if (!isset($conn) || !($conn instanceof \mysqli)) {
 mysqli_set_charset($conn, 'utf8mb4');
 
 /* --- Carga de funciones del modulo y libreria XLSX --------------------- */
-require_once __DIR__ . '/../calculo_equipamiento.php';
+require_once __DIR__ . '/calculo_equipamiento.php';
 require_once __DIR__ . '/../lib/simplexlsxgen/SimpleXLSXGen.php';
 
 /* --- Recalculo ----------------------------------------------------- */

@@ -71,21 +71,33 @@ class PabellonesBoxesService
                 WHERE pd.proyecto_id = ? AND p.area_hospitalaria <> ?";
 
         $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, 'is', $proyectoId, self::AREA_UPC);
+        $areaUpc = self::AREA_UPC;
+        mysqli_stmt_bind_param($stmt, 'is', $proyectoId, $areaUpc);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
 
-        $detalle = []; $suma = ['urgencia' => 0.0, 'electivo' => 0.0]; $sumaPorRecinto = [];
+        $detalle        = [];
+        $suma           = ['urgencia' => 0.0, 'electivo' => 0.0];
+        $sumaPorRecinto = [];
 
         while ($row = mysqli_fetch_assoc($result)) {
-            $req = $this->formulaEEMM((float)$row['demanda_anual'], (float)$row['dias_laborales'],
-                (float)$row['tiempo_procedimiento'], (float)$row['disponibilidad'], (float)$row['jornada_efectiva']);
+            $req = $this->formulaEEMM(
+                (float)$row['demanda_anual'],
+                (float)$row['dias_laborales'],
+                (float)$row['tiempo_procedimiento'],
+                (float)$row['disponibilidad'],
+                (float)$row['jornada_efectiva']
+            );
 
             $pid = (int)$row['prestacion_id'];
             $cat = in_array($pid, self::IDS_URGENCIA, true) ? 'urgencia' : 'electivo';
             $suma[$cat] += $req;
+
             $rec = (int)$row['recinto_base_id'];
-            $sumaPorRecinto[$rec] = ($sumaPorRecinto[$rec] ?? 0.0) + $req;
+            if (!isset($sumaPorRecinto[$rec])) {
+                $sumaPorRecinto[$rec] = 0.0;
+            }
+            $sumaPorRecinto[$rec] += $req;
 
             $upd = mysqli_prepare($this->conn, "UPDATE " . self::TBL_DEMANDA . " SET requerimiento_calculado = ? WHERE id_registro = ?");
             mysqli_stmt_bind_param($upd, 'di', $req, $row['id_registro']);
@@ -121,22 +133,37 @@ class PabellonesBoxesService
                 WHERE pd.proyecto_id = ? AND p.area_hospitalaria = ?";
 
         $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, 'is', $proyectoId, self::AREA_UPC);
+        $areaUpc = self::AREA_UPC;
+        mysqli_stmt_bind_param($stmt, 'is', $proyectoId, $areaUpc);
         mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+        $result = mysqli_stmt_get_result($stmt);    
 
-        $detalle = []; $suma = []; $sumaPorRecinto = [];
+        $detalle        = [];
+        $suma           = [];
+        $sumaPorRecinto = [];
 
         while ($row = mysqli_fetch_assoc($result)) {
-            $req = $this->formulaEEMM((float)$row['demanda_anual'], (float)$row['dias_laborales'],
-                (float)self::TP_DIA_CAMA, (float)$row['disponibilidad'], (float)$row['jornada_efectiva']);
+            $req = $this->formulaEEMM(
+                (float)$row['demanda_anual'],
+                (float)self::TP_DIA_CAMA,
+                (float)self::TP_DIA_CAMA,
+                (float)$row['disponibilidad'],
+                (float)$row['jornada_efectiva']
+            );
 
             $sub = ($row['subarea_hospitalaria'] !== null && $row['subarea_hospitalaria'] !== '') ? $row['subarea_hospitalaria'] : 'UPC';
 
             if (in_array((int)$row['prestacion_id'], self::IDS_DIA_CAMA, true)) {
-                $suma[$sub] = ($suma[$sub] ?? 0.0) + $req;
+                if (!isset($suma[$sub])) {
+                    $suma[$sub] = 0.0;
+                }
+                $suma[$sub] += $req;
+
                 $rec = (int)$row['recinto_base_id'];
-                $sumaPorRecinto[$rec] = ($sumaPorRecinto[$rec] ?? 0.0) + $req;
+                if (!isset($sumaPorRecinto[$rec])) {
+                    $sumaPorRecinto[$rec] = 0.0;
+                }
+                $sumaPorRecinto[$rec] += $req;
             }
 
             $upd = mysqli_prepare($this->conn, "UPDATE " . self::TBL_DEMANDA . " SET requerimiento_calculado = ? WHERE id_registro = ?");
@@ -148,7 +175,8 @@ class PabellonesBoxesService
         }
         mysqli_stmt_close($stmt);
 
-        $boxesPorSubarea = []; $total = 0;
+        $boxesPorSubarea = [];
+        $total = 0;
         foreach ($suma as $sub => $frac) {
             $b = (int)ceil($frac);
             $boxesPorSubarea[$sub] = ['fraccion' => round($frac, 4), 'boxes' => $b];
@@ -160,7 +188,12 @@ class PabellonesBoxesService
             $boxesPorRecinto[$rec] = ['fraccion' => round($frac, 4), 'boxes' => (int)ceil($frac)];
         }
 
-        return ['detalle' => $detalle, 'boxes_por_subarea' => $boxesPorSubarea, 'boxes_total' => $total, 'boxes_por_recinto' => $boxesPorRecinto];
+        return [
+            'detalle'           => $detalle,
+            'boxes_por_subarea' => $boxesPorSubarea,
+            'boxes_total'       => $total,
+            'boxes_por_recinto' => $boxesPorRecinto,
+        ];
     }
 
     public function conteoRecintosPorId(int $proyectoId): array
