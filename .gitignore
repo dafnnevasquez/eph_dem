@@ -40,3 +40,8 @@ __screenshots__/
 
 # Archivos SIGEM-UV con credenciales (no subir al repo)
 funciones_sigemuv_C_BaseDatos.php
+
+# Variables de entorno con datos sensibles
+.env.production
+.env.development
+.env
