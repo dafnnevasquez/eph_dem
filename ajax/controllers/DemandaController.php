@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-
 ini_set('display_errors', '1');
 error_reporting(E_ALL);
+
 
 require_once __DIR__ . '/../helpers/Response.php';
 require_once __DIR__ . '/../services/PabellonesBoxesService.php';
@@ -92,7 +92,7 @@ class DemandaController
 
         // Verificar que el proyecto pertenece al usuario
         $stmt = mysqli_prepare($this->conn,
-            "SELECT nombre_proyecto FROM EPHAC_Proyectos WHERE id_proyecto = ? AND id_usuario = ? LIMIT 1"
+            "SELECT nombre_proyecto FROM EPHAC_Proyectos WHERE id_proyecto = ? AND usuario_id = ? LIMIT 1"
         );
         mysqli_stmt_bind_param($stmt, 'ii', $proyectoId, $usuarioId);
         mysqli_stmt_execute($stmt);
