@@ -159,7 +159,7 @@ function exportarExcel() {
         return;
     }
     const nombre = encodeURIComponent(nombreProyecto.value || 'Proyecto');
-    window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar_xls_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank');
+    window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_xls_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank');
 }
 function exportarPdf() {
     if (!proyectoIdActivo.value) {
@@ -167,7 +167,7 @@ function exportarPdf() {
         return;
     }
     const nombre = encodeURIComponent(nombreProyecto.value || 'Proyecto');
-    window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank');
+    window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank');
 }
 const __VLS_ctx = {
     ...{},

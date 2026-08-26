@@ -1,6 +1,7 @@
 <?php
-
 declare(strict_types=1);
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 
 /**
  * =====================================================================
@@ -70,7 +71,7 @@ mysqli_set_charset($conn, 'utf8mb4');
 
 /* --- Carga de funciones del modulo y libreria PDF ----------------------- */
 require_once __DIR__ . '/../calculo/calculo_equipamiento.php';
-require_once __DIR__ . '/../lib/fpdf/fpdf.php';
+require_once __DIR__ . '/../../lib/fpdf/fpdf.php';
 
 /* --- Recalculo ----------------------------------------------------- */
 try {
