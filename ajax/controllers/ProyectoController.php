@@ -23,10 +23,14 @@ class ProyectoController
         if ($usuarioId <= 0) Response::error('usuario_id es requerido.', 400);
 
         $stmt = mysqli_prepare($this->conn,
-            "SELECT id_proyecto, nombre_proyecto, tipo_proyecto, fecha_creacion
+            "SELECT 
+                id_proyecto,
+                Nombre_proyecto AS nombre_proyecto,
+                tipo_proyecto,
+                DATE_FORMAT(fecha_creacion, '%d/%m/%Y') AS fecha_creacion
              FROM EPHAC_Proyectos
-             WHERE id_usuario = ?
-             ORDER BY id_proyecto DESC"
+             WHERE usuario_id = ?
+             ORDER BY fecha_creacion DESC"
         );
         mysqli_stmt_bind_param($stmt, 'i', $usuarioId);
         mysqli_stmt_execute($stmt);
@@ -34,6 +38,7 @@ class ProyectoController
 
         $proyectos = [];
         while ($row = mysqli_fetch_assoc($result)) {
+            $row['id'] = (int)$row['id_proyecto'];
             $proyectos[] = $row;
         }
         mysqli_stmt_close($stmt);
@@ -48,15 +53,14 @@ class ProyectoController
 
         $input          = Response::input();
         $nombreProyecto = trim($input['nombre_proyecto'] ?? '');
-        $tipoProyecto   = trim($input['tipo_proyecto']   ?? 'Atención cerrada');
-        $usuarioId      = (int)($input['usuario_id']     ?? 0);
+        $tipoProyecto   = $input['tipo_proyecto']        ?? 'Atencion cerrada';
+        $usuarioId      = isset($input['usuario_id']) ? (int)$input['usuario_id'] : null;
 
-        if ($nombreProyecto === '') Response::error('El nombre del proyecto es requerido.', 400);
-        if ($usuarioId <= 0)       Response::error('usuario_id es requerido.', 400);
+        if ($nombreProyecto === '') Response::error('El nombre del proyecto es requerido', 400);
 
         // Validar unicidad
         $stmt = mysqli_prepare($this->conn,
-            "SELECT id_proyecto FROM EPHAC_Proyectos WHERE nombre_proyecto = ? AND id_usuario = ? LIMIT 1"
+            "SELECT id_proyecto FROM EPHAC_Proyectos WHERE Nombre_proyecto = ? AND usuario_id = ?"
         );
         mysqli_stmt_bind_param($stmt, 'si', $nombreProyecto, $usuarioId);
         mysqli_stmt_execute($stmt);
@@ -65,22 +69,30 @@ class ProyectoController
         if (mysqli_stmt_num_rows($stmt) > 0) {
             mysqli_stmt_close($stmt);
             mysqli_close($this->conn);
-            Response::error('Ya existe un proyecto con ese nombre.', 422);
+            Response::error('Ya tienes un proyecto con este nombre. Por favor, elige otro.', 409);
         }
         mysqli_stmt_close($stmt);
 
         // Insertar
         $stmt = mysqli_prepare($this->conn,
-            "INSERT INTO EPHAC_Proyectos (nombre_proyecto, tipo_proyecto, id_usuario, fecha_creacion)
-             VALUES (?, ?, ?, CURDATE())"
+            "INSERT INTO EPHAC_Proyectos (Nombre_proyecto, fecha_creacion, usuario_id, Datos_Json) VALUES (?, NOW(), ?, NULL)"
         );
-        mysqli_stmt_bind_param($stmt, 'ssi', $nombreProyecto, $tipoProyecto, $usuarioId);
-        mysqli_stmt_execute($stmt);
-        $idProyecto = (int)mysqli_insert_id($this->conn);
-        mysqli_stmt_close($stmt);
-        mysqli_close($this->conn);
+        mysqli_stmt_bind_param($stmt, 'si', $nombreProyecto, $usuarioId);
 
-        Response::ok(['id_proyecto' => $idProyecto], 201);
+        if (mysqli_stmt_execute($stmt)) {
+            $id = (int)mysqli_insert_id($this->conn);
+            mysqli_stmt_close($stmt);
+            mysqli_close($this->conn);
+            Response::ok([
+                'id_proyecto'     => $id,
+                'nombre_proyecto' => $nombreProyecto,
+                'tipo_proyecto'   => $tipoProyecto,
+            ], 201);
+        } else {
+            mysqli_stmt_close($stmt);
+            mysqli_close($this->conn);
+            Response::error('Error al crear el proyecto.', 500);
+        }
     }
 }
 

@@ -19,28 +19,34 @@ class PrestacionController
     {
         Response::soloGet();
 
-        $sql = "SELECT
-                    p.id_prestacion,
-                    p.codigo_fonasa,
-                    p.nombre_prestacion,
-                    p.area_hospitalaria,
-                    p.subarea_hospitalaria,
-                    r.nombre_recinto,
-                    r.tiempo_procedimiento
+        $sql = "SELECT p.id_prestacion, p.codigo_fonasa, p.nombre_prestacion,
+                       p.area_hospitalaria, p.subarea_hospitalaria, p.recinto_base_id,
+                       r.nombre_recinto, p.tiempo_procedimiento
                 FROM EPHAC_Prestaciones p
-                JOIN EPHAC_Recinto_Estandar r ON p.id_recinto = r.id_recinto
-                ORDER BY p.nombre_prestacion";
+                LEFT JOIN EPHAC_Recinto_Estandar r ON r.id_recinto = p.recinto_base_id
+                ORDER BY p.nombre_prestacion ASC";
 
         $result = mysqli_query($this->conn, $sql);
-        if (!$result) Response::error('Error al obtener prestaciones.', 500);
+        if (!$result) Response::error(mysqli_error($this->conn), 500);
 
         $prestaciones = [];
         while ($row = mysqli_fetch_assoc($result)) {
-            $prestaciones[] = $row;
+            $prestaciones[] = [
+                'id_prestacion'        => (int)$row['id_prestacion'],
+                'codigo_fonasa'        => $row['codigo_fonasa'],
+                'nombre_prestacion'    => $row['nombre_prestacion'],
+                'area_hospitalaria'    => $row['area_hospitalaria'],
+                'subarea_hospitalaria' => $row['subarea_hospitalaria'],
+                'recinto_base_id'      => $row['recinto_base_id'] !== null ? (int)$row['recinto_base_id'] : null,
+                'nombre_recinto'       => $row['nombre_recinto'] ?? null,
+                'tiempo_procedimiento' => $row['tiempo_procedimiento'] !== null ? (int)$row['tiempo_procedimiento'] : null,
+            ];
         }
         mysqli_close($this->conn);
 
-        Response::ok($prestaciones);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => true, 'datos' => $prestaciones], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
     public function demanda(): void
