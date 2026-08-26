@@ -347,7 +347,7 @@ async function cargarDesdeServidor(proyectoId) {
   const usuarioId = authStore.usuarioId
   if (!usuarioId) { error.value = 'No hay sesión activa.'; cargando.value = false; return }
   try {
-    const url = `${import.meta.env.VITE_API_BASE}/obtener_resultados_proyecto.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`
+    const url = `${import.meta.env.VITE_API_BASE}/get/obtener_resultados_proyecto.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`
     const resp = await fetch(url)
     const json = await resp.json()
     if (!resp.ok || !json.ok) { error.value = json.error || 'Error al cargar resultados.'; cargando.value = false }
@@ -367,12 +367,12 @@ function cerrarSesion() { authStore.logout(); router.push('/login') }
 function exportarExcel() {
   if (!proyectoIdActivo.value) { alert('No se pudo identificar el proyecto activo.'); return }
   const nombre = encodeURIComponent(nombreProyecto.value || 'Proyecto')
-  window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar_xls_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank')
+  window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_xls_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank')
 }
 function exportarPdf() {
   if (!proyectoIdActivo.value) { alert('No se pudo identificar el proyecto activo.'); return }
   const nombre = encodeURIComponent(nombreProyecto.value || 'Proyecto')
-  window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank')
+  window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank')
 }
 </script>
 

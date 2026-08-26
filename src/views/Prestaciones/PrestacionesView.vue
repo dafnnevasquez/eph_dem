@@ -142,7 +142,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const STORAGE_KEY = 'ephdem_prestaciones_seleccionadas'
-const PRESTACIONES_URL = `${import.meta.env.VITE_API_BASE}/get_prestaciones.php`
+const PRESTACIONES_URL = `${import.meta.env.VITE_API_BASE}/get/get_prestaciones.php`
 const PRESTACIONES_PRIORITARIAS = [
   'Día Cama de Hospitalización Integral Adulto en Unidad de Cuidado Intensivo (U.C.I.)',
   'Día Cama de Hospitalización Integral Adulto en Unidad de Tratamiento Intermedio (U.T.I.)',
@@ -221,8 +221,8 @@ onBeforeUnmount(() => {
 async function cargarDesdeServidor(proyectoId) {
   try {
     const [resp, respBase] = await Promise.all([
-      fetch(`${import.meta.env.VITE_API_BASE}/get_prestaciones_demanda.php?proyecto_id=${proyectoId}`),
-      fetch(`${import.meta.env.VITE_API_BASE}/get_prestaciones.php`),
+      fetch(`${import.meta.env.VITE_API_BASE}/get/get_prestaciones_demanda.php?proyecto_id=${proyectoId}`),
+      fetch(`${import.meta.env.VITE_API_BASE}/get/get_prestaciones.php`),
     ])
     const json = await resp.json()
     const jsonBase = await respBase.json()

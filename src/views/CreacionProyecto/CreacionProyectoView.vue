@@ -125,7 +125,7 @@ async function cargarProyectosPrevios() {
   if (!userId) return
   cargandoProyectos.value = true
   try {
-    const url = `${import.meta.env.VITE_API_BASE}/get_proyectos.php?usuario_id=${userId}`
+    const url = `${import.meta.env.VITE_API_BASE}/get/get_proyectos.php?usuario_id=${userId}`
     const response = await fetch(url, { method: 'GET', credentials: 'same-origin' })
     const result = await response.json()
     if (result.ok && Array.isArray(result.datos)) proyectosPrevios.value = result.datos
