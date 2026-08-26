@@ -50,38 +50,49 @@ class PrestacionController
     }
 
     public function demanda(): void
-    {
-        Response::soloGet();
+{
+    Response::soloGet();
 
-        $proyectoId = (int)($_GET['proyecto_id'] ?? 0);
-        if ($proyectoId <= 0) Response::error('proyecto_id es requerido.', 400);
+    $proyectoId = (int)($_GET['proyecto_id'] ?? 0);
+    if ($proyectoId <= 0) Response::error('proyecto_id es requerido.', 400);
 
-        $stmt = mysqli_prepare($this->conn,
-            "SELECT
-                p.id_prestacion,
-                p.codigo_fonasa,
-                p.nombre_prestacion,
-                pd.demanda_anual,
-                pd.dias_laborales,
-                pd.disponibilidad,
-                pd.jornada_efectiva
-             FROM EPHAC_Proyecto_Demanda pd
-             JOIN EPHAC_Prestaciones p ON p.id_prestacion = pd.prestacion_id
-             WHERE pd.proyecto_id = ?"
-        );
-        mysqli_stmt_bind_param($stmt, 'i', $proyectoId);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
+    $stmt = mysqli_prepare($this->conn,
+        "SELECT
+            p.id_prestacion,
+            p.codigo_fonasa,
+            p.nombre_prestacion,
+            pd.demanda_anual,
+            pd.dias_laborales,
+            pd.disponibilidad,
+            pd.jornada_efectiva
+         FROM EPHAC_Proyecto_Demanda pd
+         JOIN EPHAC_Prestaciones p ON p.id_prestacion = pd.prestacion_id
+         WHERE pd.proyecto_id = ?"
+    );
+    mysqli_stmt_bind_param($stmt, 'i', $proyectoId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-        $datos = [];
-        while ($row = mysqli_fetch_assoc($result)) {
-            $datos[] = $row;
-        }
-        mysqli_stmt_close($stmt);
-        mysqli_close($this->conn);
-
-        Response::ok($datos);
+    $datos = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $datos[] = [
+            'id_prestacion'     => (int)$row['id_prestacion'],
+            'codigo_fonasa'     => $row['codigo_fonasa'],
+            'nombre_prestacion' => $row['nombre_prestacion'],
+            'valores' => [
+                'demanda_anual'    => (float)$row['demanda_anual'],
+                'dias_laborales'   => (int)$row['dias_laborales'],
+                'disponibilidad'   => (float)$row['disponibilidad'],
+                'jornada_efectiva' => (float)$row['jornada_efectiva'],
+            ],
+            'defaults' => null,
+        ];
     }
+    mysqli_stmt_close($stmt);
+    mysqli_close($this->conn);
+
+    Response::ok($datos);
+}
 }
 
 // Despachar
