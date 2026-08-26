@@ -37,3 +37,6 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Archivos SIGEM-UV con credenciales (no subir al repo)
+funciones_sigemuv_C_BaseDatos.php

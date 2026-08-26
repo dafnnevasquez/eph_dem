@@ -12,25 +12,58 @@ Módulo web para la estimación de equipamiento médico necesario para satisface
 | Estado global | Pinia |
 | Enrutamiento | Vue Router (hash history) |
 | Estilos | SCSS + Bootstrap 5 |
-| Backend API | Laravel 13 (PHP 8.5) |
+| Backend | PHP 8 (organizado en Controllers y Services) |
 | Base de datos | MySQL (SIGEM-UV) |
-| Autenticación | Laravel Sanctum |
 
 ---
 
 ## Estructura del Repositorio
-eph_dem/ ← Frontend Vue (rama main)
-├── src/
+eph_dem/
+├── src/ ← Frontend Vue 3
 │ ├── layouts/ ← AppLayout.vue (topbar + footer compartido)
 │ ├── components/ ← Componentes reutilizables
 │ ├── views/ ← Vistas por módulo
+│ │ ├── Inicio/
+│ │ ├── Login/
+│ │ ├── Manual/
+│ │ ├── Proyectos/
+│ │ ├── CreacionProyecto/
+│ │ ├── Prestaciones/
+│ │ ├── Parametros/
+│ │ └── Resultados/
 │ ├── stores/ ← Pinia (auth)
 │ └── router/ ← Rutas protegidas
-├── ajax/ ← Scripts PHP legacy (SIGEM-UV)
-└── eph_dem_backend/ ← Backend Laravel (rama backend)
-├── app/Http/Controllers/
-├── routes/api.php
-└── .env
+│
+├── ajax/ ← Backend PHP
+│ ├── controllers/ ← Lógica de cada endpoint
+│ │ ├── AuthController.php
+│ │ ├── ProyectoController.php
+│ │ ├── PrestacionController.php
+│ │ └── DemandaController.php
+│ ├── services/ ← Lógica de cálculo de equipamiento
+│ │ ├── PabellonesBoxesService.php
+│ │ ├── EquipamientoKitService.php
+│ │ ├── EquipamientoTipo5Service.php
+│ │ ├── EquipamientoTipo6Service.php
+│ │ ├── EquipamientoAgregadorService.php
+│ │ ├── EquipamientoVistasService.php
+│ │ └── UrpaService.php
+│ ├── helpers/ ← Utilidades compartidas
+│ │ └── Response.php
+│ ├── login.php ← Puntos de entrada (endpoints)
+│ ├── get_proyectos.php
+│ ├── crear_proyecto.php
+│ ├── get_prestaciones.php
+│ ├── get_prestaciones_demanda.php
+│ ├── calcular_demanda.php
+│ ├── obtener_resultados_proyecto.php
+│ ├── generar_xls_cerrada.php
+│ └── generar_pdf_cerrada.php
+│
+├── produccion/ ← Copia de referencia del código en producción
+├── eph_dem_backend/ ← Backend (PHP puro en ajax/)
+└── README.md
+
 
 ---
 
@@ -56,25 +89,18 @@ npm run dev
 Variables de entorno necesarias (`.env.development`):
 VITE_API_BASE=/ajax
 
+
 ---
 
-## Instalación Backend
+## Arquitectura Backend PHP
 
-```bash
-cd eph_dem_backend
-composer install
-cp .env.example .env
-php artisan key:generate
-```
+El backend sigue el patrón **Controller → Service**:
 
-Configura la conexión a MySQL en `.env`:
-DB_CONNECTION=mysql
-DB_HOST=
-DB_PORT=3306
-DB_DATABASE=
-DB_USERNAME=
-DB_PASSWORD=
-PHP_LEGACY_URL=https://sigem-uv.cl/__v2/modulo_eph/ajax
+- Los **Controllers** reciben la petición HTTP, validan los datos y devuelven la respuesta JSON
+- Los **Services** contienen la lógica de negocio (cálculo de equipamiento)
+- El **helper Response** estandariza todas las respuestas JSON
+
+Los archivos PHP en la raíz de `ajax/` son puntos de entrada que delegan al controller correspondiente.
 
 ---
 
@@ -82,13 +108,13 @@ PHP_LEGACY_URL=https://sigem-uv.cl/__v2/modulo_eph/ajax
 
 | Rama | Contenido |
 |---|---|
-| `main` | Frontend Vue 3 |
-| `backend` | Backend Laravel 13 |
+| `main` | Código estable y funcional |
+| `develop` | Rama de desarrollo |
 
 ---
 
-## Autor
-Dafnne Vásquez Villalón
-EPH DEM: "Escalamiento del módulo"
-Proyecto de Título (PIB) — Universidad de Valparaíso  
+## Autores
+
+**Dafnne Vásquez Villalón**  
+Proyecto de Título(PIB) — Universidad de Valparaíso  
 Escuela de Ingeniería Biomédica · SIGEM-UV · 2026
