@@ -9,7 +9,7 @@ require_once __DIR__ . '/../services/EquipamientoTipo6Service.php';
 require_once __DIR__ . '/../services/EquipamientoAgregadorService.php';
 require_once __DIR__ . '/../services/EquipamientoVistasService.php';
 require_once __DIR__ . '/../services/UrpaService.php';
-require_once __DIR__ . '/../../funciones_sigemuv_C_BaseDatos.php';
+require_once __DIR__ . '/../../../funciones_sigemuv_C_BaseDatos.php';
 
 class DemandaController
 {
