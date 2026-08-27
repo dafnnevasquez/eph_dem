@@ -224,11 +224,41 @@
             </div>
           </div>
         </section>
+                </section>
+
+        <!-- SIGUIENTES PASOS -->
+        <section class="siguientes-pasos" v-if="!cargando && !error && proyectoIdActivo">
+          <div class="pasos-titulo">
+            <i class="fa-solid fa-circle-check" style="color: #1a9e5c"></i>
+            ¡Equipamiento calculado! ¿Qué sigue?
+          </div>
+          <div class="pasos-grid">
+            <div class="paso-card" @click="router.push(`/rrhh/${proyectoIdActivo}`)">
+              <div class="paso-num">Fase 2</div>
+              <div class="paso-icono"><i class="fa-solid fa-user-nurse"></i></div>
+              <div class="paso-info">
+                <div class="paso-nombre">Dotación de RRHH</div>
+                <div class="paso-desc">Ingresa el personal disponible para ajustar el equipamiento según tu dotación real.</div>
+              </div>
+              <i class="fa-solid fa-arrow-right paso-flecha"></i>
+            </div>
+            <div class="paso-card" @click="router.push(`/equipos-oportunidad/${proyectoIdActivo}`)">
+              <div class="paso-num">Fase 3</div>
+              <div class="paso-icono"><i class="fa-solid fa-boxes-stacked"></i></div>
+              <div class="paso-info">
+                <div class="paso-nombre">Equipos de Oportunidad</div>
+                <div class="paso-desc">Agrega equipos adicionales no contemplados en el cálculo estándar.</div>
+              </div>
+              <i class="fa-solid fa-arrow-right paso-flecha"></i>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   </AppLayout>
 </template>
-
+     
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
