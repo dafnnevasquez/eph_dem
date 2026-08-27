@@ -19,6 +19,12 @@
               <div class="nav-divider" v-if="proyectoIdActivo"></div>
               <button class="btn-back" type="button" @click="volverAParametros" v-if="proyectoIdActivo"><i class="fa-solid fa-sliders"></i> Editar parámetros</button>
               <button class="btn-back" type="button" @click="modificarPrestaciones" v-if="proyectoIdActivo"><i class="fa-solid fa-list-check"></i> Modificar prestaciones</button>
+              <button class="btn-back" type="button" @click="router.push(`/rrhh/${proyectoIdActivo}`)">
+              <i class="fa-solid fa-user-nurse"></i> Dotación RRHH
+              </button>
+              <button class="btn-back" type="button" @click="router.push(`/equipos-oportunidad/${proyectoIdActivo}`)">
+              <i class="fa-solid fa-boxes-stacked"></i> Equipos de Oportunidad
+              </button>
             </div>
             <div class="session-badge">
               <i class="fa-solid fa-circle-user"></i>
