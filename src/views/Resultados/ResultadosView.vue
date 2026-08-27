@@ -58,7 +58,20 @@
         <button class="btn-export btn-export-pdf" type="button" @click="exportarPdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
       </div>
     </div>
-  </header>
+   </header>
+
+        <section class="resumen-banner">
+          <div class="banner-left">
+            <h3>Proyecto</h3>
+            <p class="banner-sub">{{ nombreProyecto }}</p>
+          </div>
+          <div class="banner-total" v-if="cargando"><span class="metric-label">Cargando...</span></div>
+          <div class="banner-total" v-else-if="error"><span class="metric-label" style="color:#ffaaaa">{{ error }}</span></div>
+          <div class="banner-total" v-else>
+            <span class="metric-value">{{ totalUnidadesEquipos }}</span>
+            <span class="metric-label">Equipos (total)</span>
+          </div>
+        </section>
 
         <section v-if="!cargando && !error && (pabellonesPorRecinto.length || boxesPorRecinto.length)" class="recintos-conteo-panel">
           <div class="panel-title">Recintos requeridos</div>
