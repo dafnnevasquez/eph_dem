@@ -28,7 +28,7 @@
 
         <!-- Fase 2 -->
         <span class="fase-label" v-if="proyectoIdActivo">Fase 2</span>
-        <button class="btn-fase2" type="button" @click="router.push(`/rrhh/${proyectoIdActivo}`)" v-if="proyectoIdActivo">
+        <button class="btn-fase2" type="button" @click="() => { console.log('proyectoId:', proyectoIdActivo); router.push(`/rrhh/${proyectoIdActivo}`) }" v-if="proyectoIdActivo">
           <i class="fa-solid fa-user-nurse"></i> RRHH
         </button>
 

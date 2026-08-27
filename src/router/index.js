@@ -48,6 +48,18 @@ const router = createRouter({
             meta: { requiresAuth: true },
         },
         {
+            path: '/rrhh/:proyectoId?',
+            name: 'rrhh',
+            component: () => import('@/views/RRHH/RRHHView.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
+            path: '/equipos-oportunidad/:proyectoId?',
+            name: 'equipos-oportunidad',
+            component: () => import('@/views/EquiposOportunidad/EquiposOportunidadView.vue'),
+            meta: { requiresAuth: true },
+        },
+        {
             path: '/manual',
             name: 'manual',
             component: () => import('@/views/Manual/ManualView.vue'),

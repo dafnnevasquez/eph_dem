@@ -186,6 +186,7 @@ let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['resumen-row-head']} */ ;
 /** @type {__VLS_StyleScopedClasses['resumen-banner']} */ ;
 /** @type {__VLS_StyleScopedClasses['recintos-grid']} */ ;
+/** @type {__VLS_StyleScopedClasses['pasos-grid']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
 const __VLS_1 = __VLS_asFunctionalComponent1(__VLS_0, new __VLS_0({}));
@@ -270,6 +271,12 @@ if (__VLS_ctx.proyectoIdActivo) {
     /** @type {__VLS_StyleScopedClasses['nav-divider']} */ ;
 }
 if (__VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ class: "fase-label" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fase-label']} */ ;
+}
+if (__VLS_ctx.proyectoIdActivo) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
         ...{ onClick: (__VLS_ctx.volverAParametros) },
         ...{ class: "btn-back" },
@@ -294,6 +301,62 @@ if (__VLS_ctx.proyectoIdActivo) {
     });
     /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
     /** @type {__VLS_StyleScopedClasses['fa-list-check']} */ ;
+}
+if (__VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "nav-divider" },
+    });
+    /** @type {__VLS_StyleScopedClasses['nav-divider']} */ ;
+}
+if (__VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ class: "fase-label" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fase-label']} */ ;
+}
+if (__VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+        ...{ onClick: (() => { console.log('proyectoId:', __VLS_ctx.proyectoIdActivo); __VLS_ctx.router.push(`/rrhh/${__VLS_ctx.proyectoIdActivo}`); }) },
+        ...{ class: "btn-fase2" },
+        type: "button",
+    });
+    /** @type {__VLS_StyleScopedClasses['btn-fase2']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-user-nurse" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-user-nurse']} */ ;
+}
+if (__VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "nav-divider" },
+    });
+    /** @type {__VLS_StyleScopedClasses['nav-divider']} */ ;
+}
+if (__VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ class: "fase-label" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fase-label']} */ ;
+}
+if (__VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+        ...{ onClick: (...[$event]) => {
+                if (!(__VLS_ctx.proyectoIdActivo))
+                    return;
+                __VLS_ctx.router.push(`/equipos-oportunidad/${__VLS_ctx.proyectoIdActivo}`);
+                // @ts-ignore
+                [router, router, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, volverAParametros, modificarPrestaciones,];
+            } },
+        ...{ class: "btn-fase3" },
+        type: "button",
+    });
+    /** @type {__VLS_StyleScopedClasses['btn-fase3']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-boxes-stacked" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-boxes-stacked']} */ ;
 }
 __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
     ...{ class: "session-badge" },
@@ -443,7 +506,7 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error && (__VLS_ctx.pabellonesPorRecinto.l
         /** @type {__VLS_StyleScopedClasses['chip-valor']} */ ;
         (rec.cantidad);
         // @ts-ignore
-        [proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, volverAParametros, modificarPrestaciones, authStore, cerrarSesion, exportarExcel, exportarPdf, nombreProyecto, cargando, cargando, error, error, error, totalUnidadesEquipos, pabellonesPorRecinto, pabellonesPorRecinto, boxesPorRecinto,];
+        [authStore, cerrarSesion, exportarExcel, exportarPdf, nombreProyecto, cargando, cargando, error, error, error, totalUnidadesEquipos, pabellonesPorRecinto, pabellonesPorRecinto, boxesPorRecinto,];
     }
     for (const [rec] of __VLS_vFor((__VLS_ctx.boxesPorRecinto))) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
@@ -1241,6 +1304,110 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
             }
         }
     }
+}
+if (!__VLS_ctx.cargando && !__VLS_ctx.error && __VLS_ctx.proyectoIdActivo) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
+        ...{ class: "siguientes-pasos" },
+    });
+    /** @type {__VLS_StyleScopedClasses['siguientes-pasos']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "pasos-titulo" },
+    });
+    /** @type {__VLS_StyleScopedClasses['pasos-titulo']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-circle-check" },
+        ...{ style: {} },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-circle-check']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "pasos-grid" },
+    });
+    /** @type {__VLS_StyleScopedClasses['pasos-grid']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ onClick: (...[$event]) => {
+                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error && __VLS_ctx.proyectoIdActivo))
+                    return;
+                __VLS_ctx.router.push(`/rrhh/${__VLS_ctx.proyectoIdActivo}`);
+                // @ts-ignore
+                [router, proyectoIdActivo, proyectoIdActivo, cargando, error,];
+            } },
+        ...{ class: "paso-card" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-card']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-num" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-num']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-icono" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-icono']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-user-nurse" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-user-nurse']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-info" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-info']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-nombre" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-nombre']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-desc" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-desc']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-arrow-right paso-flecha" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-arrow-right']} */ ;
+    /** @type {__VLS_StyleScopedClasses['paso-flecha']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ onClick: (...[$event]) => {
+                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error && __VLS_ctx.proyectoIdActivo))
+                    return;
+                __VLS_ctx.router.push(`/equipos-oportunidad/${__VLS_ctx.proyectoIdActivo}`);
+                // @ts-ignore
+                [router, proyectoIdActivo,];
+            } },
+        ...{ class: "paso-card" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-card']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-num" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-num']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-icono" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-icono']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-boxes-stacked" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-boxes-stacked']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-info" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-info']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-nombre" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-nombre']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "paso-desc" },
+    });
+    /** @type {__VLS_StyleScopedClasses['paso-desc']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-arrow-right paso-flecha" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-arrow-right']} */ ;
+    /** @type {__VLS_StyleScopedClasses['paso-flecha']} */ ;
 }
 // @ts-ignore
 [];

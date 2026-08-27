@@ -56,7 +56,7 @@ define('BASE_URL',   '/__v2/modulo_eph/front');
 define('ASSETS_URL', BASE_URL . '/assets');
 
 // Archivos de entrada principal (hashes cambian con cada build)
-define('JS_MAIN', ASSETS_URL . '/js/index-Cb8tiAr6.js');
+define('JS_MAIN', ASSETS_URL . '/js/index-BlCYijrU.js');
 define('CSS_MAIN',  ASSETS_URL . '/css/index-Cnw3JLC4.css');
 
 // Chunk compartido de vue-router (preload para evitar waterfall)
