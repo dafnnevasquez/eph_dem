@@ -11,53 +11,54 @@
       </section>
 
       <main class="resultados-content">
-        <header class="resultados-header">
-          <div class="nav-bar">
-            <div class="nav-buttons">
-              <button class="btn-back" type="button" @click="volverAtras"><i class="fa-solid fa-arrow-left"></i> Volver</button>
-              <button class="btn-back" type="button" @click="router.push('/inicio')"><i class="fa-solid fa-house-user"></i> Inicio</button>
-              <div class="nav-divider" v-if="proyectoIdActivo"></div>
-              <button class="btn-back" type="button" @click="volverAParametros" v-if="proyectoIdActivo"><i class="fa-solid fa-sliders"></i> Editar parámetros</button>
-              <button class="btn-back" type="button" @click="modificarPrestaciones" v-if="proyectoIdActivo"><i class="fa-solid fa-list-check"></i> Modificar prestaciones</button>
-              <button class="btn-back" type="button" @click="router.push(`/rrhh/${proyectoIdActivo}`)">
-              <i class="fa-solid fa-user-nurse"></i> Dotación RRHH
-              </button>
-              <button class="btn-back" type="button" @click="router.push(`/equipos-oportunidad/${proyectoIdActivo}`)">
-              <i class="fa-solid fa-boxes-stacked"></i> Equipos de Oportunidad
-              </button>
-            </div>
-            <div class="session-badge">
-              <i class="fa-solid fa-circle-user"></i>
-              <span class="session-nombre">{{ authStore.correoUsuario }}</span>
-              <button class="btn-logout" type="button" @click="cerrarSesion" title="Cerrar sesión">
-                <i class="fa-solid fa-right-from-bracket"></i>
-              </button>
-            </div>
-          </div>
-          <div class="title-actions-row">
-            <div>
-              <h2 class="section-title">Resultados</h2>
-              <p class="section-subtitle">Resumen general y desglose por recinto del equipamiento.</p>
-            </div>
-            <div class="header-actions">
-              <button class="btn-export btn-export-excel" type="button" @click="exportarExcel"><i class="fa-solid fa-file-excel"></i> Excel</button>
-              <button class="btn-export btn-export-pdf" type="button" @click="exportarPdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-            </div>
-          </div>
-        </header>
+  <header class="resultados-header">
+    <div class="nav-bar">
+      <div class="nav-buttons">
+        <button class="btn-back" type="button" @click="volverAtras"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+        <button class="btn-back" type="button" @click="router.push('/inicio')"><i class="fa-solid fa-house-user"></i> Inicio</button>
 
-        <section class="resumen-banner">
-          <div class="banner-left">
-            <h3>Proyecto</h3>
-            <p class="banner-sub">{{ nombreProyecto }}</p>
-          </div>
-          <div class="banner-total" v-if="cargando"><span class="metric-label">Cargando...</span></div>
-          <div class="banner-total" v-else-if="error"><span class="metric-label" style="color:#ffaaaa">{{ error }}</span></div>
-          <div class="banner-total" v-else>
-            <span class="metric-value">{{ totalUnidadesEquipos }}</span>
-            <span class="metric-label">Equipos (total)</span>
-          </div>
-        </section>
+        <div class="nav-divider" v-if="proyectoIdActivo"></div>
+
+        <!-- Fase 1 -->
+        <span class="fase-label" v-if="proyectoIdActivo">Fase 1</span>
+        <button class="btn-back" type="button" @click="volverAParametros" v-if="proyectoIdActivo"><i class="fa-solid fa-sliders"></i> Editar parámetros</button>
+        <button class="btn-back" type="button" @click="modificarPrestaciones" v-if="proyectoIdActivo"><i class="fa-solid fa-list-check"></i> Modificar prestaciones</button>
+
+        <div class="nav-divider" v-if="proyectoIdActivo"></div>
+
+        <!-- Fase 2 -->
+        <span class="fase-label" v-if="proyectoIdActivo">Fase 2</span>
+        <button class="btn-fase2" type="button" @click="router.push(`/rrhh/${proyectoIdActivo}`)" v-if="proyectoIdActivo">
+          <i class="fa-solid fa-user-nurse"></i> RRHH
+        </button>
+
+        <div class="nav-divider" v-if="proyectoIdActivo"></div>
+
+        <!-- Fase 3 -->
+        <span class="fase-label" v-if="proyectoIdActivo">Fase 3</span>
+        <button class="btn-fase3" type="button" @click="router.push(`/equipos-oportunidad/${proyectoIdActivo}`)" v-if="proyectoIdActivo">
+          <i class="fa-solid fa-boxes-stacked"></i> Equipos
+        </button>
+      </div>
+      <div class="session-badge">
+        <i class="fa-solid fa-circle-user"></i>
+        <span class="session-nombre">{{ authStore.correoUsuario }}</span>
+        <button class="btn-logout" type="button" @click="cerrarSesion" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+    <div class="title-actions-row">
+      <div>
+        <h2 class="section-title">Resultados</h2>
+        <p class="section-subtitle">Resumen general y desglose por recinto del equipamiento.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-export btn-export-excel" type="button" @click="exportarExcel"><i class="fa-solid fa-file-excel"></i> Excel</button>
+        <button class="btn-export btn-export-pdf" type="button" @click="exportarPdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+      </div>
+    </div>
+  </header>
 
         <section v-if="!cargando && !error && (pabellonesPorRecinto.length || boxesPorRecinto.length)" class="recintos-conteo-panel">
           <div class="panel-title">Recintos requeridos</div>
@@ -224,7 +225,7 @@
             </div>
           </div>
         </section>
-                </section>
+              
 
         <!-- SIGUIENTES PASOS -->
         <section class="siguientes-pasos" v-if="!cargando && !error && proyectoIdActivo">
@@ -527,4 +528,19 @@ function exportarPdf() {
   .resumen-banner { flex-direction: column; align-items: flex-start; }
   .recintos-grid { columns: 1; }
 }
+
+.siguientes-pasos { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.pasos-titulo { font-size: 1.2rem; font-weight: 700; color: $color-primario; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.pasos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.paso-card { display: flex; align-items: center; gap: 16px; background: $color-claro; border: 1.5px solid $color-borde; border-radius: 14px; padding: 18px; cursor: pointer; transition: all 0.2s ease; &:hover { border-color: $color-primario; background: rgba(0,60,88,0.04); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,60,88,0.12); } }
+.paso-num { background: $color-primario; color: #fff; border-radius: 8px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.paso-icono { font-size: 1.6rem; color: $color-primario; flex: 0 0 auto; }
+.paso-info { flex: 1; }
+.paso-nombre { font-weight: 700; color: $color-primario; margin-bottom: 4px; }
+.paso-desc { font-size: 0.82rem; color: $color-texto-secundario; line-height: 1.4; }
+.paso-flecha { color: $color-primario; opacity: 0.5; font-size: 1rem; }
+@media (max-width: 700px) { .pasos-grid { grid-template-columns: 1fr; } }
+.fase-label { font-size: 0.72rem; font-weight: 700; color: $color-texto-secundario; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.btn-fase2 { background: $color-primario; color: #fff; border: none; border-radius: 999px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; &:hover { opacity: 0.85; } }
+.btn-fase3 { background: $color-primario; color: #fff; border: none; border-radius: 999px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; &:hover { opacity: 0.85; } }
 </style>
