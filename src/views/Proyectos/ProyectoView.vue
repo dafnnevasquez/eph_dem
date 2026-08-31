@@ -137,7 +137,7 @@ function toggleNuevoMenu() { mostrarMenuNuevo.value = !mostrarMenuNuevo.value }
 function seleccionarTipoProyecto(tipo) {
   mostrarMenuNuevo.value = false
   if (tipo === 'Atencion cerrada') { router.push('/crear-proyecto'); return }
-  alert(`El módulo de Atención Abierta no está implementado en esta versión.`)
+  if (tipo === 'Atencion abierta') { router.push('/crear-proyecto-abierta'); return }
 }
 
 function verProyecto(proyecto) {
