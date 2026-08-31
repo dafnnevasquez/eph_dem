@@ -61,6 +61,30 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+    path: '/crear-proyecto-abierta',
+    name: 'crear-proyecto-abierta',
+    component: () => import('@/views/CreacionProyecto/CreacionProyectoAbiertaView.vue'),
+    meta: { requiresAuth: true },
+    },
+    {
+    path: '/prestaciones-abierta/:proyectoId?',
+    name: 'prestaciones-abierta',
+    component: () => import('@/views/Prestaciones/PrestacionesAbiertaView.vue'),
+    meta: { requiresAuth: true },
+    },
+    {
+    path: '/parametros-abierta/:proyectoId?',
+    name: 'parametros-abierta',
+    component: () => import('@/views/Parametros/ParametrosAbiertaView.vue'),
+    meta: { requiresAuth: true },
+    },
+    {
+    path: '/resultados-abierta/:proyectoId?',
+    name: 'resultados-abierta',
+    component: () => import('@/views/Resultados/ResultadosAbiertaView.vue'),
+    meta: { requiresAuth: true },
+    },
+    {
       path: '/manual',
       name: 'manual',
       component: () => import('@/views/Manual/ManualView.vue'),
