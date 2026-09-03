@@ -9,8 +9,15 @@ const proyectos = ref([]);
 const cargando = ref(false);
 const errorCarga = ref('');
 const ordenSeleccionado = ref('fecha_desc');
+const filtroTipo = ref('todos');
 const proyectosOrdenados = computed(() => {
-    const lista = [...proyectos.value];
+    let lista = [...proyectos.value];
+    // Filtro por tipo de atención
+    if (filtroTipo.value === 'cerrada')
+        lista = lista.filter(p => p.tipo_atencion !== 'Atención abierta');
+    if (filtroTipo.value === 'abierta')
+        lista = lista.filter(p => p.tipo_atencion === 'Atención abierta');
+    // Ordenamiento
     return lista.sort((a, b) => {
         if (ordenSeleccionado.value === 'alfabetico_asc')
             return (a.nombre_proyecto || '').localeCompare(b.nombre_proyecto || '');
@@ -29,15 +36,26 @@ async function cargarProyectos() {
     cargando.value = true;
     errorCarga.value = '';
     try {
-        const url = `${import.meta.env.VITE_API_BASE}/get/get_proyectos.php?usuario_id=${userId}`;
-        const response = await fetch(url, { method: 'GET', credentials: 'same-origin' });
-        const result = await response.json();
-        if (result.ok && Array.isArray(result.datos)) {
-            proyectos.value = result.datos;
-        }
-        else {
-            errorCarga.value = result.error ?? 'No se pudieron cargar los proyectos.';
-        }
+        const [respCerrada, respAbierta] = await Promise.all([
+            fetch(`${import.meta.env.VITE_API_BASE}/get/get_proyectos.php?usuario_id=${userId}`, { method: 'GET', credentials: 'same-origin' }),
+            fetch(`${import.meta.env.VITE_API_BASE}/get/get_proyectos_abierta.php?usuario_id=${userId}`, { method: 'GET', credentials: 'same-origin' }),
+        ]);
+        const jsonCerrada = await respCerrada.json();
+        const jsonAbierta = await respAbierta.json();
+        const cerrada = (jsonCerrada.ok && Array.isArray(jsonCerrada.datos))
+            ? jsonCerrada.datos.map(p => ({ ...p, tipo_atencion: 'Atención cerrada' }))
+            : [];
+        const abierta = (jsonAbierta.ok && Array.isArray(jsonAbierta.datos))
+            ? jsonAbierta.datos.map(p => ({
+                id: p.ID_PROYECCION,
+                id_proyecto: p.ID_PROYECCION,
+                nombre_proyecto: p.NOMBRE_PROYECCION,
+                fecha_creacion: p.FECHA_CREACION,
+                tipo_proyecto: 'Atención abierta',
+                tipo_atencion: 'Atención abierta',
+            }))
+            : [];
+        proyectos.value = [...cerrada, ...abierta].sort((a, b) => b.id_proyecto - a.id_proyecto);
     }
     catch (error) {
         errorCarga.value = 'Error de conexión al cargar proyectos.';
@@ -53,13 +71,23 @@ function seleccionarTipoProyecto(tipo) {
         router.push('/crear-proyecto');
         return;
     }
-    alert(`El módulo de Atención Abierta no está implementado en esta versión.`);
+    if (tipo === 'Atencion abierta') {
+        router.push('/crear-proyecto-abierta');
+        return;
+    }
 }
 function verProyecto(proyecto) {
     const id = proyecto.id || proyecto.id_proyecto;
-    localStorage.setItem('ephdem_proyecto_activo', id);
-    localStorage.setItem('ephdem_nombre_proyecto_activo', proyecto.nombre_proyecto);
-    router.push(`/resultados/${id}`);
+    if (proyecto.tipo_atencion === 'Atención abierta') {
+        localStorage.setItem('ephdem_proyecto_activo_abierta', id);
+        localStorage.setItem('ephdem_nombre_proyecto_activo_abierta', proyecto.nombre_proyecto);
+        router.push(`/resultados-abierta/${id}`);
+    }
+    else {
+        localStorage.setItem('ephdem_proyecto_activo', id);
+        localStorage.setItem('ephdem_nombre_proyecto_activo', proyecto.nombre_proyecto);
+        router.push(`/resultados/${id}`);
+    }
 }
 function volverAtras() { router.back(); }
 function cerrarSesion() {
@@ -73,6 +101,9 @@ const __VLS_ctx = {
 let __VLS_components;
 let __VLS_intrinsics;
 let __VLS_directives;
+/** @type {__VLS_StyleScopedClasses['filtro-tipo']} */ ;
+/** @type {__VLS_StyleScopedClasses['btn-filtro']} */ ;
+/** @type {__VLS_StyleScopedClasses['btn-filtro-active']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
 const __VLS_1 = __VLS_asFunctionalComponent1(__VLS_0, new __VLS_0({}));
@@ -228,6 +259,43 @@ __VLS_asFunctionalElement1(__VLS_intrinsics.option, __VLS_intrinsics.option)({
 __VLS_asFunctionalElement1(__VLS_intrinsics.option, __VLS_intrinsics.option)({
     value: "alfabetico_desc",
 });
+__VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+    ...{ class: "filtro-tipo" },
+});
+/** @type {__VLS_StyleScopedClasses['filtro-tipo']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+    ...{ onClick: (...[$event]) => {
+            __VLS_ctx.filtroTipo = 'todos';
+            // @ts-ignore
+            [authStore, cerrarSesion, ordenSeleccionado, filtroTipo,];
+        } },
+    ...{ class: "btn-filtro" },
+    ...{ class: ({ 'btn-filtro-active': __VLS_ctx.filtroTipo === 'todos' }) },
+});
+/** @type {__VLS_StyleScopedClasses['btn-filtro']} */ ;
+/** @type {__VLS_StyleScopedClasses['btn-filtro-active']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+    ...{ onClick: (...[$event]) => {
+            __VLS_ctx.filtroTipo = 'cerrada';
+            // @ts-ignore
+            [filtroTipo, filtroTipo,];
+        } },
+    ...{ class: "btn-filtro" },
+    ...{ class: ({ 'btn-filtro-active': __VLS_ctx.filtroTipo === 'cerrada' }) },
+});
+/** @type {__VLS_StyleScopedClasses['btn-filtro']} */ ;
+/** @type {__VLS_StyleScopedClasses['btn-filtro-active']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+    ...{ onClick: (...[$event]) => {
+            __VLS_ctx.filtroTipo = 'abierta';
+            // @ts-ignore
+            [filtroTipo, filtroTipo,];
+        } },
+    ...{ class: "btn-filtro" },
+    ...{ class: ({ 'btn-filtro-active': __VLS_ctx.filtroTipo === 'abierta' }) },
+});
+/** @type {__VLS_StyleScopedClasses['btn-filtro']} */ ;
+/** @type {__VLS_StyleScopedClasses['btn-filtro-active']} */ ;
 __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
     ...{ onClick: (__VLS_ctx.toggleNuevoMenu) },
     ...{ class: "btn-primary" },
@@ -244,7 +312,7 @@ if (__VLS_ctx.mostrarMenuNuevo) {
                     return;
                 __VLS_ctx.seleccionarTipoProyecto('Atencion abierta');
                 // @ts-ignore
-                [authStore, cerrarSesion, ordenSeleccionado, toggleNuevoMenu, mostrarMenuNuevo, seleccionarTipoProyecto,];
+                [filtroTipo, toggleNuevoMenu, mostrarMenuNuevo, seleccionarTipoProyecto,];
             } },
         ...{ class: "nuevo-menu-item" },
     });
@@ -326,6 +394,7 @@ else {
         (proyecto.fecha_creacion);
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
             ...{ class: "table-chip" },
+            ...{ class: (proyecto.tipo_atencion === 'Atención abierta' ? 'chip-abierta' : 'chip-cerrada') },
         });
         /** @type {__VLS_StyleScopedClasses['table-chip']} */ ;
         (proyecto.tipo_proyecto);

@@ -45,6 +45,12 @@
                   <option value="alfabetico_desc">Alfabético (Z-A)</option>
                 </select>
               </div>
+              <div class="filtro-tipo">
+                <button class="btn-filtro" :class="{ 'btn-filtro-active': filtroTipo === 'todos' }" @click="filtroTipo = 'todos'">Todos</button>
+                <button class="btn-filtro" :class="{ 'btn-filtro-active': filtroTipo === 'cerrada' }" @click="filtroTipo = 'cerrada'">Atención cerrada</button>
+                <button class="btn-filtro" :class="{ 'btn-filtro-active': filtroTipo === 'abierta' }" @click="filtroTipo = 'abierta'">Atención abierta</button>
+              </div>
+
               <button class="btn-primary" @click="toggleNuevoMenu">Nuevo proyecto</button>
               <div v-if="mostrarMenuNuevo" class="nuevo-menu">
                 <button class="nuevo-menu-item" @click="seleccionarTipoProyecto('Atencion abierta')">Atención abierta</button>
@@ -73,7 +79,9 @@
             <div v-for="proyecto in proyectosOrdenados" :key="proyecto.id" class="table-row">
               <div class="table-name">{{ proyecto.nombre_proyecto }}</div>
               <div>{{ proyecto.fecha_creacion }}</div>
-              <div class="table-chip">{{ proyecto.tipo_proyecto }}</div>
+              <div class="table-chip" :class="proyecto.tipo_atencion === 'Atención abierta' ? 'chip-abierta' : 'chip-cerrada'">
+              {{ proyecto.tipo_proyecto }}
+              </div>
               <div class="table-actions">
                 <button class="btn-primary" @click="verProyecto(proyecto)">Ver</button>
               </div>
@@ -98,9 +106,16 @@ const proyectos = ref([])
 const cargando = ref(false)
 const errorCarga = ref('')
 const ordenSeleccionado = ref('fecha_desc')
+const filtroTipo = ref('todos')
 
 const proyectosOrdenados = computed(() => {
-  const lista = [...proyectos.value]
+  let lista = [...proyectos.value]
+  
+  // Filtro por tipo de atención
+  if (filtroTipo.value === 'cerrada') lista = lista.filter(p => p.tipo_atencion !== 'Atención abierta')
+  if (filtroTipo.value === 'abierta') lista = lista.filter(p => p.tipo_atencion === 'Atención abierta')
+
+  // Ordenamiento
   return lista.sort((a, b) => {
     if (ordenSeleccionado.value === 'alfabetico_asc') return (a.nombre_proyecto || '').localeCompare(b.nombre_proyecto || '')
     if (ordenSeleccionado.value === 'alfabetico_desc') return (b.nombre_proyecto || '').localeCompare(a.nombre_proyecto || '')
@@ -117,14 +132,30 @@ async function cargarProyectos() {
   cargando.value = true
   errorCarga.value = ''
   try {
-    const url = `${import.meta.env.VITE_API_BASE}/get/get_proyectos.php?usuario_id=${userId}`
-    const response = await fetch(url, { method: 'GET', credentials: 'same-origin' })
-    const result = await response.json()
-    if (result.ok && Array.isArray(result.datos)) {
-      proyectos.value = result.datos
-    } else {
-      errorCarga.value = result.error ?? 'No se pudieron cargar los proyectos.'
-    }
+    const [respCerrada, respAbierta] = await Promise.all([
+      fetch(`${import.meta.env.VITE_API_BASE}/get/get_proyectos.php?usuario_id=${userId}`, { method: 'GET', credentials: 'same-origin' }),
+      fetch(`${import.meta.env.VITE_API_BASE}/get/get_proyectos_abierta.php?usuario_id=${userId}`, { method: 'GET', credentials: 'same-origin' }),
+    ])
+    const jsonCerrada = await respCerrada.json()
+    const jsonAbierta = await respAbierta.json()
+
+    const cerrada = (jsonCerrada.ok && Array.isArray(jsonCerrada.datos))
+      ? jsonCerrada.datos.map(p => ({ ...p, tipo_atencion: 'Atención cerrada' }))
+      : []
+
+    const abierta = (jsonAbierta.ok && Array.isArray(jsonAbierta.datos))
+      ? jsonAbierta.datos.map(p => ({
+          id:              p.ID_PROYECCION,
+          id_proyecto:     p.ID_PROYECCION,
+          nombre_proyecto: p.NOMBRE_PROYECCION,
+          fecha_creacion:  p.FECHA_CREACION,
+          tipo_proyecto:   'Atención abierta',
+          tipo_atencion:   'Atención abierta',
+        }))
+      : []
+
+    proyectos.value = [...cerrada, ...abierta].sort((a, b) => b.id_proyecto - a.id_proyecto)
+
   } catch (error) {
     errorCarga.value = 'Error de conexión al cargar proyectos.'
   } finally {
@@ -142,9 +173,15 @@ function seleccionarTipoProyecto(tipo) {
 
 function verProyecto(proyecto) {
   const id = proyecto.id || proyecto.id_proyecto
-  localStorage.setItem('ephdem_proyecto_activo', id)
-  localStorage.setItem('ephdem_nombre_proyecto_activo', proyecto.nombre_proyecto)
-  router.push(`/resultados/${id}`)
+  if (proyecto.tipo_atencion === 'Atención abierta') {
+    localStorage.setItem('ephdem_proyecto_activo_abierta', id)
+    localStorage.setItem('ephdem_nombre_proyecto_activo_abierta', proyecto.nombre_proyecto)
+    router.push(`/resultados-abierta/${id}`)
+  } else {
+    localStorage.setItem('ephdem_proyecto_activo', id)
+    localStorage.setItem('ephdem_nombre_proyecto_activo', proyecto.nombre_proyecto)
+    router.push(`/resultados/${id}`)
+  }
 }
 
 function volverAtras() { router.back() }
@@ -205,6 +242,9 @@ function cerrarSesion() {
   padding: 6px 12px; border: 1px solid $color-borde; border-radius: 8px;
   font-size: 0.9rem; color: $color-texto-principal; background: #fff; cursor: pointer;
   &:focus { border-color: $color-primario; outline: none; }
+  .filtro-tipo { display: flex; gap: 8px; }
+.btn-filtro { background: rgba(0,60,88,0.06); color: $color-primario; border: 1.5px solid rgba(0,60,88,0.2); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.12); } }
+.btn-filtro-active { background: $color-primario; color: #fff; border-color: $color-primario; }
 }
 .nuevo-menu {
   position: absolute; top: calc(100% + 10px); right: 0;
@@ -247,4 +287,10 @@ function cerrarSesion() {
   background: rgba(0,60,88,0.08); color: $color-primario; font-weight: 600; font-size: 0.85rem;
 }
 .table-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.chip-cerrada { background: rgba(0,60,88,0.08); color: $color-primario; }
+.chip-abierta { background: rgba(26,158,92,0.12); color: #1a6e3c; }
+
+.filtro-tipo { display: flex; gap: 8px; }
+.btn-filtro { background: rgba(0,60,88,0.06); color: $color-primario; border: 1.5px solid rgba(0,60,88,0.2); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.12); } }
+.btn-filtro-active { background: $color-primario; color: #fff; border-color: $color-primario; }
 </style>

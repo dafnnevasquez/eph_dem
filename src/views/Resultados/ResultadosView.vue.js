@@ -169,6 +169,9 @@ function exportarPdf() {
     const nombre = encodeURIComponent(nombreProyecto.value || 'Proyecto');
     window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank');
 }
+function equiposNoImplementado() {
+    alert('Equipos de Oportunidad no está implementado en esta versión.');
+}
 const __VLS_ctx = {
     ...{},
     ...{},
@@ -341,13 +344,7 @@ if (__VLS_ctx.proyectoIdActivo) {
 }
 if (__VLS_ctx.proyectoIdActivo) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
-        ...{ onClick: (...[$event]) => {
-                if (!(__VLS_ctx.proyectoIdActivo))
-                    return;
-                __VLS_ctx.router.push(`/equipos-oportunidad/${__VLS_ctx.proyectoIdActivo}`);
-                // @ts-ignore
-                [router, router, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, volverAParametros, modificarPrestaciones,];
-            } },
+        ...{ onClick: (__VLS_ctx.equiposNoImplementado) },
         ...{ class: "btn-fase3" },
         type: "button",
     });
@@ -506,7 +503,7 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error && (__VLS_ctx.pabellonesPorRecinto.l
         /** @type {__VLS_StyleScopedClasses['chip-valor']} */ ;
         (rec.cantidad);
         // @ts-ignore
-        [authStore, cerrarSesion, exportarExcel, exportarPdf, nombreProyecto, cargando, cargando, error, error, error, totalUnidadesEquipos, pabellonesPorRecinto, pabellonesPorRecinto, boxesPorRecinto,];
+        [router, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, volverAParametros, modificarPrestaciones, equiposNoImplementado, authStore, cerrarSesion, exportarExcel, exportarPdf, nombreProyecto, cargando, cargando, error, error, error, totalUnidadesEquipos, pabellonesPorRecinto, pabellonesPorRecinto, boxesPorRecinto,];
     }
     for (const [rec] of __VLS_vFor((__VLS_ctx.boxesPorRecinto))) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
@@ -1367,13 +1364,7 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error && __VLS_ctx.proyectoIdActivo) {
     /** @type {__VLS_StyleScopedClasses['fa-arrow-right']} */ ;
     /** @type {__VLS_StyleScopedClasses['paso-flecha']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-        ...{ onClick: (...[$event]) => {
-                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error && __VLS_ctx.proyectoIdActivo))
-                    return;
-                __VLS_ctx.router.push(`/equipos-oportunidad/${__VLS_ctx.proyectoIdActivo}`);
-                // @ts-ignore
-                [router, proyectoIdActivo,];
-            } },
+        ...{ onClick: (__VLS_ctx.equiposNoImplementado) },
         ...{ class: "paso-card" },
     });
     /** @type {__VLS_StyleScopedClasses['paso-card']} */ ;
@@ -1410,7 +1401,7 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error && __VLS_ctx.proyectoIdActivo) {
     /** @type {__VLS_StyleScopedClasses['paso-flecha']} */ ;
 }
 // @ts-ignore
-[];
+[equiposNoImplementado,];
 var __VLS_3;
 // @ts-ignore
 [];

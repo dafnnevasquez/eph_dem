@@ -1,18 +1,21 @@
 <?php
 declare(strict_types=1);
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 
 if (session_status() == PHP_SESSION_NONE) session_start();
 
-require_once '/home4/csi84990/public_html/_general/fpdf/fpdf.php';
+require_once __DIR__ . '/../../lib/fpdf/fpdf.php';
 require_once __DIR__ . '/../../funciones_sigemuv_C_BaseDatos.php';
 
 $conn = SIGEM_UV_C_Nueva_Conexion();
 if (!$conn) die("Error al conectar a la base de datos.");
 
-$ID_Usuario    = $_SESSION['ID_Usuario'] ?? null;
+$ID_Usuario    = isset($_GET['usuario_id']) ? intval($_GET['usuario_id']) : null;
 $id_proyeccion = isset($_GET['id']) ? intval($_GET['id']) : null;
 
 if (!$ID_Usuario || !$id_proyeccion) die("Error: No se pudo identificar el usuario o el proyecto.");
+
 
 $sql = "SELECT NOMBRE_PROYECCION, DATOS_JSON FROM EPHDEM_PROYECCIONES_GUARDADAS WHERE ID_PROYECCION = ? AND USER_ID = ?";
 $stmt = mysqli_prepare($conn, $sql);
@@ -26,10 +29,11 @@ if (!$row) die("No se encontraron datos para esta proyección.");
 
 $nombre_proyecto = $row['NOMBRE_PROYECCION'];
 $datos_json      = json_decode($row['DATOS_JSON'], true);
-if (!$datos_json) die("Error al leer datos del JSON.");
 
+if (!$datos_json) $datos_json = [];
 $equiposSummary = $datos_json['equipos_summary'] ?? [];
 $recintoSummary = $datos_json['recinto_summary'] ?? [];
+$prestaciones   = $datos_json['prestaciones']    ?? [];
 
 $colorPrincipal  = [0, 60, 88];
 $colorBlanco     = [255, 255, 255];

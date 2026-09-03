@@ -141,26 +141,78 @@ function setDiasLaborales(dias) {
   filas.value.forEach(f => { f.diasLaborales = dias; calcularEEMM(f) })
 }
 
-function cargarDatos() {
+async function cargarDatos() {
   const raw = localStorage.getItem('ephdem_prestaciones_abierta')
   if (!raw) return
   try {
     const prestaciones = JSON.parse(raw)
-    filas.value = prestaciones.map(p => ({
-      ID_PRESTACION:  p.ID_PRESTACION,
-      cod_prestacion: p.cod_prestacion,
-      nombre_prestacion: p.nombre_prestacion,
-      area:           p.area,
-      demanda:        0,
-      tiempo:         0,
-      diasLaborales:  260,
-      nSimultaneas:   1,
-      disponibilidad: 100,
-      jornada:        7,
-      eemm:           null,
-    }))
+    const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
+    const usuarioId = authStore.usuarioId
+
+    // Cargar parámetros guardados del servidor
+    let parametrosGuardados = {}
+    if (proyectoId) {
+      try {
+        const url = `${import.meta.env.VITE_API_BASE}/get/get_prestaciones_demanda_abierta.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`
+        const resp = await fetch(url)
+        const json = await resp.json()
+        if (json.ok && Array.isArray(json.datos)) {
+          json.datos.forEach(p => {
+            parametrosGuardados[p.ID_PRESTACION] = p
+          })
+        }
+      } catch (e) {}
+    }
+
+    filas.value = prestaciones.map(p => {
+      const guardado = parametrosGuardados[p.ID_PRESTACION]
+      return {
+        ID_PRESTACION:     p.ID_PRESTACION,
+        cod_prestacion:    p.cod_prestacion,
+        nombre_prestacion: p.nombre_prestacion,
+        area:              p.area,
+        demanda:           guardado?.demanda       ?? 0,
+        tiempo:            guardado?.tiempo        ?? 0,
+        diasLaborales:     guardado?.diasLaborales ?? 260,
+        nSimultaneas:      guardado?.nSimultaneas  ?? 1,
+        disponibilidad:    guardado?.disponibilidad ?? 100,
+        jornada:           guardado?.jornada        ?? 7,
+        eemm:              null,
+      }
+    })
+    filas.value.forEach(f => calcularEEMM(f))
   } catch (e) {
     console.error('Error al cargar prestaciones:', e)
+  }
+}
+
+async function cargarDesdeServidor(proyectoId) {
+  const usuarioId = authStore.usuarioId
+  try {
+    const url = `${import.meta.env.VITE_API_BASE}/get/get_prestaciones_demanda_abierta.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`
+    const resp = await fetch(url)
+    const json = await resp.json()
+    if (!json.ok || !Array.isArray(json.datos) || json.datos.length === 0) {
+      cargarDatos()
+      return
+    }
+    filas.value = json.datos.map(p => ({
+      ID_PRESTACION:     p.ID_PRESTACION,
+      cod_prestacion:    p.cod_prestacion,
+      nombre_prestacion: p.nombre_prestacion,
+      area:              p.area,
+      demanda:           p.demanda,
+      tiempo:            p.tiempo,
+      diasLaborales:     p.diasLaborales,
+      nSimultaneas:      p.nSimultaneas,
+      disponibilidad:    p.disponibilidad,
+      jornada:           p.jornada,
+      eemm:              null,
+    }))
+    filas.value.forEach(f => calcularEEMM(f))
+  } catch (e) {
+    console.error('Error al cargar desde servidor:', e)
+    cargarDatos()
   }
 }
 
@@ -226,10 +278,17 @@ function irAPrestaciones() {
 function volverAtras() { router.back() }
 function cerrarSesion() { authStore.logout(); router.push('/login') }
 
-onMounted(() => {
+onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo_abierta') || 'Desconocido'
-  cargarDatos()
+  const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
+  const rawLocal = localStorage.getItem('ephdem_prestaciones_abierta')
+  if (rawLocal) {
+    await cargarDatos()
+  } else if (proyectoId) {
+    await cargarDesdeServidor(proyectoId)
+  }
 })
+  
 </script>
 
 <style lang="scss" scoped>

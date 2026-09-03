@@ -56,8 +56,11 @@
 
         <!-- Resumen de equipos -->
         <section class="resumen-panel" v-if="!cargando && !error">
-          <div class="panel-title">Resumen de equipos requeridos</div>
-          <div class="resumen-list">
+          <div class="panel-title panel-title-toggle" @click="resumenEquiposAbierto = !resumenEquiposAbierto">
+            <span>Resumen de equipos requeridos</span>
+            <i class="fa-solid" :class="resumenEquiposAbierto ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </div>
+          <div class="resumen-list" v-show="resumenEquiposAbierto">
             <div class="resumen-row resumen-row-head">
               <div>Equipo</div>
               <div class="row-total">Total</div>
@@ -70,10 +73,13 @@
           </div>
         </section>
 
-        <!-- Resumen de recintos -->
+                <!-- Resumen de recintos -->
         <section class="resumen-panel" v-if="!cargando && !error && Object.keys(recintoSummary).length > 0">
-          <div class="panel-title">Resumen por recinto</div>
-          <div class="resumen-list">
+          <div class="panel-title panel-title-toggle" @click="resumenRecintosAbierto = !resumenRecintosAbierto">
+            <span>Resumen por recinto</span>
+            <i class="fa-solid" :class="resumenRecintosAbierto ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </div>
+          <div class="resumen-list" v-show="resumenRecintosAbierto">
             <div class="resumen-row resumen-row-head">
               <div>Recinto</div>
               <div class="row-total">Requerimiento</div>
@@ -133,6 +139,8 @@ const equiposSummary = ref({})
 const recintoSummary = ref({})
 const prestaciones = ref([])
 const abiertos = ref({})
+const resumenEquiposAbierto = ref(true)
+const resumenRecintosAbierto = ref(true)
 
 const totalEquipos = computed(() => Object.values(equiposSummary.value).reduce((a, b) => a + b, 0))
 
@@ -182,12 +190,12 @@ function cerrarSesion() { authStore.logout(); router.push('/login') }
 
 function exportarExcel() {
   if (!proyectoIdActivo.value) { alert('No se pudo identificar el proyecto.'); return }
-  window.open(`${import.meta.env.VITE_API_BASE}/generar/generar_xls_abierta.php?id=${proyectoIdActivo.value}`, '_blank')
+  window.open(`${import.meta.env.VITE_API_BASE}/generar/generar_xls_abierta.php?id=${proyectoIdActivo.value}&usuario_id=${authStore.usuarioId}`, '_blank')
 }
 
 function exportarPdf() {
   if (!proyectoIdActivo.value) { alert('No se pudo identificar el proyecto.'); return }
-  window.open(`${import.meta.env.VITE_API_BASE}/generar/generar_pdf_abierta.php?id=${proyectoIdActivo.value}`, '_blank')
+  window.open(`${import.meta.env.VITE_API_BASE}/generar/generar_pdf_abierta.php?id=${proyectoIdActivo.value}&usuario_id=${authStore.usuarioId}`, '_blank')
 }
 
 onMounted(() => {
@@ -210,6 +218,7 @@ onMounted(() => {
 
 .resultados-page { background: $color-fondo; flex: 1; }
 .resultados-content { max-width: 1200px; margin: 32px auto 72px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 24px; }
+.resultados-header { display: flex; flex-direction: column; gap: 14px; }
 
 .nav-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .nav-buttons { display: flex; gap: 12px; align-items: center; }
@@ -221,7 +230,7 @@ onMounted(() => {
 
 .title-actions-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
 .header-actions { display: flex; gap: 10px; }
-.section-title { font-size: 1.6rem; font-weight: 700; color: $color-primario; margin: 0 0 4px; }
+.section-title { font-size: 1.6rem; font-weight: 700; color: $color-primario; margin: 8px 0 4px; }
 .section-subtitle { margin: 0; color: $color-texto-secundario; }
 
 .btn-export { background: #fff; border: 1px solid $color-borde; border-radius: 12px; padding: 10px 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
@@ -238,9 +247,9 @@ onMounted(() => {
 .resumen-panel, .desglose-panel { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .panel-title { font-weight: 700; color: $color-primario; margin-bottom: 16px; }
 .resumen-list { display: flex; flex-direction: column; border: 1px solid $color-borde; border-radius: 12px; overflow: hidden; }
-.resumen-row { background: #fff; padding: 10px 16px; display: grid; grid-template-columns: 1fr 70px; gap: 16px; align-items: center; border-bottom: 1px solid $color-borde; &:last-child { border-bottom: none; } }
+.resumen-row { background: #fff; padding: 10px 16px; display: grid; grid-template-columns: 1fr 120px; gap: 16px; align-items: center; border-bottom: 1px solid $color-borde; &:last-child { border-bottom: none; } }
 .resumen-row-head { background: #ddeaf4; font-weight: 700; color: $color-primario; }
-.row-total { font-size: 1.2rem; font-weight: 700; color: $color-primario; text-align: right; }
+.row-total { font-size: 0.88rem; font-weight: 700; color: $color-primario; text-align: right; white-space: nowrap; }
 .equipo-nombre { font-weight: 600; color: $color-primario; }
 
 .recinto-card { border-radius: 12px; border: 1px solid $color-borde; box-shadow: 0 2px 8px $color-sombra-suave; overflow: hidden; background: #fff; margin-bottom: 14px; }
@@ -253,4 +262,19 @@ onMounted(() => {
 .tabla-mini-row { display: grid; align-items: center; padding: 8px 12px; border-bottom: 1px solid $color-borde; font-size: 0.88rem; &:last-child { border-bottom: none; } }
 .tabla-mini-cantidad { text-align: right; }
 .lista-vacia { color: $color-texto-secundario; padding: 16px; text-align: center; }
+
+.panel-title-toggle { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  cursor: pointer; 
+  background: #eef5f9; 
+  margin: -20px -20px 16px -20px; 
+  padding: 10px 16px; 
+  border-radius: 14px 14px 0 0; 
+  &:hover { background: #ddeaf4; }
+  i { font-size: 0.85rem; opacity: 0.7; }
+}
+
+.row-total { font-size: 0.85rem; font-weight: 700; color: $color-primario; text-align: right; white-space: nowrap; }
 </style>

@@ -54,7 +54,7 @@ function estadoTexto(recintoId, categoriaId, equiposRequeridos) {
 }
 function guardarYContinuar() {
     localStorage.setItem('ephdem_rrhh', JSON.stringify(dotacion.value));
-    router.push(`/equipos-oportunidad/${proyectoId.value}`);
+    alert('Dotación de RRHH guardada correctamente.');
 }
 function volverAtras() {
     router.back();
@@ -322,10 +322,10 @@ __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
 });
 /** @type {__VLS_StyleScopedClasses['btn-principal']} */ ;
 __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
-    ...{ class: "fa-solid fa-arrow-right" },
+    ...{ class: "fa-solid fa-floppy-disk" },
 });
 /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
-/** @type {__VLS_StyleScopedClasses['fa-arrow-right']} */ ;
+/** @type {__VLS_StyleScopedClasses['fa-floppy-disk']} */ ;
 // @ts-ignore
 [guardarYContinuar,];
 var __VLS_3;

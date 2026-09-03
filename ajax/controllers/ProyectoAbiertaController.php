@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 
 require_once __DIR__ . '/../helpers/Response.php';
 require_once __DIR__ . '/../../funciones_sigemuv_C_BaseDatos.php';
@@ -70,22 +72,24 @@ class ProyectoAbiertaController
         mysqli_stmt_close($stmt);
 
         // Insertar
-        $fecha = date('Y-m-d H:i:s');
+        $fecha    = date('Y-m-d H:i:s');
+        $jsonVacio = '{}';
         $stmt = mysqli_prepare($this->conn,
-            "INSERT INTO EPHDEM_PROYECCIONES_GUARDADAS (USER_ID, NOMBRE_PROYECCION, FECHA_CREACION, DATOS_JSON)
-             VALUES (?, ?, ?, NULL)"
+        "INSERT INTO EPHDEM_PROYECCIONES_GUARDADAS (USER_ID, NOMBRE_PROYECCION, FECHA_CREACION, DATOS_JSON)
+         VALUES (?, ?, ?, ?)"
         );
-        mysqli_stmt_bind_param($stmt, 'iss', $usuarioId, $nombreProyecto, $fecha);
+        mysqli_stmt_bind_param($stmt, 'isss', $usuarioId, $nombreProyecto, $fecha, $jsonVacio);
 
         if (mysqli_stmt_execute($stmt)) {
-            $id = (int)mysqli_insert_id($this->conn);
-            mysqli_stmt_close($stmt);
-            mysqli_close($this->conn);
-            Response::ok(['id_proyeccion' => $id], 201);
+        $id = (int)mysqli_insert_id($this->conn);
+        mysqli_stmt_close($stmt);
+        mysqli_close($this->conn);
+        Response::ok(['id_proyeccion' => $id], 201);
         } else {
-            mysqli_stmt_close($stmt);
-            mysqli_close($this->conn);
-            Response::error('Error al crear el proyecto.', 500);
+        $error = mysqli_error($this->conn);
+        mysqli_stmt_close($stmt);
+        mysqli_close($this->conn);
+        Response::error('Error al crear el proyecto: ' . $error, 500);
         }
     }
 }

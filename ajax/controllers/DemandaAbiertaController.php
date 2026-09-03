@@ -61,17 +61,30 @@ class DemandaAbiertaController
             $equiposTipo1[] = $row['equipo'];
         }
 
+        // Obtener datos de las prestaciones (código, nombre, área)
+        $sqlPrest = "SELECT ID_PRESTACION, cod_prestacion, nombre_prestacion, area
+                     FROM EPHDEM_PRESTACION
+                     WHERE ID_PRESTACION IN ($ids)";
+        $resPrest = mysqli_query($this->conn, $sqlPrest);
+        $datosPrestacion = [];
+        while ($row = mysqli_fetch_assoc($resPrest)) {
+            $datosPrestacion[(int)$row['ID_PRESTACION']] = $row;
+        }
+
         // Construir prestaciones detalladas
         $prestacionesDetalle = [];
-        $areas = [];
         $totalTipo1 = count($equiposTipo1);
 
         foreach ($filas as $f) {
             $pid  = (int)$f['prestacion_id'];
             $req  = (float)($f['requerimiento'] ?? 0);
+            $info = $datosPrestacion[$pid] ?? [];
 
             $prestacionesDetalle[] = [
                 'ID_PRESTACION'        => $pid,
+                'COD_PRESTACION'       => $info['cod_prestacion']    ?? '',
+                'NOMBRE_PRESTACION'    => $info['nombre_prestacion'] ?? '',
+                'AREA'                 => $info['area']              ?? '',
                 'REQUERIMIENTO'        => number_format($req, 3, '.', ''),
                 'DEMANDA_PROCEDIMIENTO'=> (float)$f['demanda_anual'],
                 'TIEMPO_PROCEDIMIENTO' => (float)$f['tiempo_proc'],
@@ -91,7 +104,7 @@ class DemandaAbiertaController
             $reqVal = floatval($p['REQUERIMIENTO']);
 
             // Resumen recintos
-            $hasTipo2o5 = false;
+            $hasTipo2o5      = false;
             $recintosTipo2o5 = [];
             foreach ($p['EQUIPOS'] as $eq) {
                 $tipoNum = (int)str_replace('Tipo ', '', $eq['TIPO_EQUIPO'] ?? '');
@@ -132,7 +145,7 @@ class DemandaAbiertaController
 
         // Guardar JSON en BD
         $jsonData = json_encode([
-            'prestaciones' => $prestacionesDetalle,
+            'prestaciones'    => $prestacionesDetalle,
             'equipos_summary' => $equiposSummary,
             'recinto_summary' => $recintoSummary,
         ], JSON_UNESCAPED_UNICODE);
@@ -148,10 +161,10 @@ class DemandaAbiertaController
         mysqli_close($this->conn);
 
         Response::ok([
-            'proyecto_id'    => $proyectoId,
-            'equipos_summary'=> $equiposSummary,
-            'recinto_summary'=> $recintoSummary,
-            'prestaciones'   => $prestacionesDetalle,
+            'proyecto_id'     => $proyectoId,
+            'equipos_summary' => $equiposSummary,
+            'recinto_summary' => $recintoSummary,
+            'prestaciones'    => $prestacionesDetalle,
         ]);
     }
 
@@ -182,11 +195,11 @@ class DemandaAbiertaController
         if (!$datos) Response::error('Error al leer los datos del proyecto.', 500);
 
         Response::ok([
-            'proyecto_id'    => $proyectoId,
-            'nombre_proyecto'=> $row['NOMBRE_PROYECCION'],
-            'equipos_summary'=> $datos['equipos_summary'] ?? [],
-            'recinto_summary'=> $datos['recinto_summary'] ?? [],
-            'prestaciones'   => $datos['prestaciones']    ?? [],
+            'proyecto_id'     => $proyectoId,
+            'nombre_proyecto' => $row['NOMBRE_PROYECCION'],
+            'equipos_summary' => $datos['equipos_summary'] ?? [],
+            'recinto_summary' => $datos['recinto_summary'] ?? [],
+            'prestaciones'    => $datos['prestaciones']    ?? [],
         ]);
     }
 }

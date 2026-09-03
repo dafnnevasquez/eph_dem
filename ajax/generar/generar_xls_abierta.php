@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../lib/simplexlsxgen/SimpleXLSXGen.php';
 $conn = SIGEM_UV_C_Nueva_Conexion();
 if (!$conn) die("Error al conectar a la base de datos.");
 
-$ID_Usuario    = $_SESSION['ID_Usuario'] ?? null;
+$ID_Usuario    = isset($_GET['usuario_id']) ? intval($_GET['usuario_id']) : null;
 $id_proyeccion = isset($_GET['id']) ? intval($_GET['id']) : null;
 
 if (!$ID_Usuario || !$id_proyeccion) die("Error: No se pudo identificar el usuario o el proyecto.");
@@ -29,10 +29,12 @@ if (!$row) die("No se encontraron datos para esta proyección.");
 
 $nombre_proyecto = $row['NOMBRE_PROYECCION'];
 $datos_json      = json_decode($row['DATOS_JSON'], true);
-if (!$datos_json) die("Error al leer datos del JSON.");
 
+if (!$datos_json) $datos_json = [];
 $equiposSummary = $datos_json['equipos_summary'] ?? [];
 $recintoSummary = $datos_json['recinto_summary'] ?? [];
+$prestaciones   = $datos_json['prestaciones']    ?? [];
+
 $prestaciones   = $datos_json['prestaciones']    ?? [];
 
 // Hoja 1: Resumen equipos

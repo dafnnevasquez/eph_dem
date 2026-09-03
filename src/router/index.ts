@@ -98,12 +98,12 @@ const router = createRouter({
   ],
 })
 
-// Guard de navegacion: protege rutas que requieren autenticacion
 router.beforeEach((to) => {
   if (!to.meta.requiresAuth) return true
 
   try {
     const raw = localStorage.getItem('ephdem_sesion')
+    console.log('Guard - ephdem_sesion:', raw) // temporal
     if (raw) {
       const sesion = JSON.parse(raw)
       if (sesion?.id_usuario && sesion?.correo) return true

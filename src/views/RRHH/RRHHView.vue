@@ -95,7 +95,7 @@
             <i class="fa-solid fa-arrow-left"></i> Volver a Resultados
           </button>
           <button class="btn-principal" @click="guardarYContinuar">
-            Guardar y continuar <i class="fa-solid fa-arrow-right"></i>
+            Guardar <i class="fa-solid fa-floppy-disk"></i>
           </button>
         </section>
       </main>
@@ -164,7 +164,7 @@ function estadoTexto(recintoId, categoriaId, equiposRequeridos) {
 
 function guardarYContinuar() {
   localStorage.setItem('ephdem_rrhh', JSON.stringify(dotacion.value))
-  router.push(`/equipos-oportunidad/${proyectoId.value}`)
+  alert('Dotación de RRHH guardada correctamente.')
 }
 
 function volverAtras() {

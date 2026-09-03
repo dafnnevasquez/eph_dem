@@ -36,7 +36,7 @@
 
         <!-- Fase 3 -->
         <span class="fase-label" v-if="proyectoIdActivo">Fase 3</span>
-        <button class="btn-fase3" type="button" @click="router.push(`/equipos-oportunidad/${proyectoIdActivo}`)" v-if="proyectoIdActivo">
+        <button class="btn-fase3" type="button" @click="equiposNoImplementado" v-if="proyectoIdActivo">
           <i class="fa-solid fa-boxes-stacked"></i> Equipos
         </button>
       </div>
@@ -244,7 +244,7 @@
         <section class="siguientes-pasos" v-if="!cargando && !error && proyectoIdActivo">
           <div class="pasos-titulo">
             <i class="fa-solid fa-circle-check" style="color: #1a9e5c"></i>
-            ¡Equipamiento calculado! ¿Qué sigue?
+            Equipamiento calculado ¿Qué sigue?
           </div>
           <div class="pasos-grid">
             <div class="paso-card" @click="router.push(`/rrhh/${proyectoIdActivo}`)">
@@ -256,11 +256,11 @@
               </div>
               <i class="fa-solid fa-arrow-right paso-flecha"></i>
             </div>
-            <div class="paso-card" @click="router.push(`/equipos-oportunidad/${proyectoIdActivo}`)">
+            <div class="paso-card" @click="equiposNoImplementado">
               <div class="paso-num">Fase 3</div>
               <div class="paso-icono"><i class="fa-solid fa-boxes-stacked"></i></div>
               <div class="paso-info">
-                <div class="paso-nombre">Equipos de Oportunidad</div>
+                <div class="paso-nombre">Equipos por Oportunidad</div>
                 <div class="paso-desc">Agrega equipos adicionales no contemplados en el cálculo estándar.</div>
               </div>
               <i class="fa-solid fa-arrow-right paso-flecha"></i>
@@ -423,6 +423,10 @@ function exportarPdf() {
   if (!proyectoIdActivo.value) { alert('No se pudo identificar el proyecto activo.'); return }
   const nombre = encodeURIComponent(nombreProyecto.value || 'Proyecto')
   window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank')
+}
+
+function equiposNoImplementado() {
+  alert('Equipos de Oportunidad no está implementado en esta versión.')
 }
 </script>
 

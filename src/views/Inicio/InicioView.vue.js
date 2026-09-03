@@ -10,7 +10,7 @@ function irMisProyectos() {
     router.push('/proyectos');
 }
 function iniciarAtencionAbierta() {
-    alert('El módulo de Atención Abierta no está implementado en esta versión.');
+    router.push('/crear-proyecto-abierta');
 }
 function iniciarAtencionCerrada() {
     router.push('/crear-proyecto');

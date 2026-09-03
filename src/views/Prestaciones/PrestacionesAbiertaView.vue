@@ -182,9 +182,30 @@ function guardarYConfirmar() {
 function volverAtras() { router.back() }
 function cerrarSesion() { authStore.logout(); router.push('/login') }
 
+async function cargarDesdeServidor(proyectoId) {
+  const usuarioId = authStore.usuarioId
+  try {
+    const url = `${import.meta.env.VITE_API_BASE}/get/get_prestaciones_demanda_abierta.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`
+    const resp = await fetch(url)
+    const json = await resp.json()
+    if (json.ok && Array.isArray(json.datos) && json.datos.length > 0) {
+      seleccionadas.value = json.datos.map(p => ({
+        ID_PRESTACION:     p.ID_PRESTACION,
+        cod_prestacion:    p.cod_prestacion,
+        nombre_prestacion: p.nombre_prestacion,
+        area:              p.area,
+      }))
+    }
+  } catch (e) {
+    console.error('Error al cargar prestaciones del servidor:', e)
+  }
+}
+
 onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo_abierta') || 'Desconocido'
   await cargarPrestaciones()
+  const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
+  if (proyectoId) await cargarDesdeServidor(proyectoId)
 })
 </script>
 
