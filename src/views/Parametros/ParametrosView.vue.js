@@ -134,7 +134,7 @@ async function guardarYCalcular() {
             return;
         }
         localStorage.setItem('ephdem_resultado_calculo', JSON.stringify(data.datos));
-        router.push('/resultados');
+        router.push(`/resultados/${idProyectoActual}`);
     }
     catch (error) {
         alert('No se pudo conectar con el servidor de cálculo.');

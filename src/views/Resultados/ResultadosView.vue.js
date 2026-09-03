@@ -1,4 +1,4 @@
-import { computed, onMounted, ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -83,6 +83,7 @@ const equiposPrestaciones = computed(() => {
 function toggleRecinto(id) { recintoAbierto.value = { ...recintoAbierto.value, [id]: !recintoAbierto.value[id] }; }
 function toggleSubNorma(id) { subnormaAbierto.value = { ...subnormaAbierto.value, [id]: !subnormaAbierto.value[id] }; }
 function aplicarDatos(datos) {
+    error.value = null;
     proyectoIdActivo.value = datos.proyecto_id ?? null;
     equipos.value = datos.equipamiento?.equipos ?? [];
     porRecinto.value = datos.equipamiento?.por_recinto ?? {};
@@ -101,23 +102,43 @@ function aplicarDatos(datos) {
         localStorage.setItem('ephdem_proyecto_activo', datos.proyecto_id);
     cargando.value = false;
 }
-function cargarDesdeLocalStorage() {
+// Lee el resultado recién calculado desde localStorage. Devuelve true si lo aplicó.
+// Si se indica proyectoId, sólo lo usa cuando el resultado guardado corresponde a ese proyecto
+// (evita mostrar el cálculo de otro proyecto que haya quedado en localStorage).
+function aplicarDesdeLocalStorageSiCorresponde(proyectoId) {
     const raw = localStorage.getItem('ephdem_resultado_calculo');
-    if (!raw) {
-        error.value = 'No hay resultados disponibles.';
-        cargando.value = false;
-        return;
-    }
+    if (!raw)
+        return false;
     try {
         const parsed = JSON.parse(raw);
-        aplicarDatos(parsed.datos ? parsed.datos : parsed);
+        const datos = parsed.datos ? parsed.datos : parsed;
+        if (proyectoId && String(datos.proyecto_id) !== String(proyectoId))
+            return false;
+        aplicarDatos(datos);
+        // Ya se consumió: se limpia para que una futura visita a este proyecto use el servidor.
+        localStorage.removeItem('ephdem_resultado_calculo');
+        return true;
     }
     catch (e) {
-        error.value = 'Error al leer los resultados.';
-        cargando.value = false;
+        return false;
     }
 }
+function cargarDesdeLocalStorage() {
+    if (aplicarDesdeLocalStorageSiCorresponde(null))
+        return;
+    error.value = 'No hay resultados disponibles.';
+    cargando.value = false;
+}
 async function cargarDesdeServidor(proyectoId) {
+    // El cálculo recién hecho en ParametrosView (guardado en localStorage) es más reciente
+    // que lo que tenga persistido el servidor, así que se prioriza si coincide con el proyecto.
+    const rawDebug = localStorage.getItem('ephdem_resultado_calculo');
+    console.log('[ResultadosView] cargarDesdeServidor - proyectoId de la ruta:', proyectoId, '| localStorage presente:', !!rawDebug, '| proyecto_id en localStorage:', rawDebug ? JSON.parse(rawDebug)?.proyecto_id ?? JSON.parse(rawDebug)?.datos?.proyecto_id : null);
+    if (aplicarDesdeLocalStorageSiCorresponde(proyectoId)) {
+        console.log('[ResultadosView] rama: localStorage aplicado');
+        return;
+    }
+    console.log('[ResultadosView] rama: fetch al servidor');
     const usuarioId = authStore.usuarioId;
     if (!usuarioId) {
         error.value = 'No hay sesión activa.';
@@ -126,7 +147,7 @@ async function cargarDesdeServidor(proyectoId) {
     }
     try {
         const url = `${import.meta.env.VITE_API_BASE}/get/obtener_resultados_proyecto.php?proyecto_id=${proyectoId}&usuario_id=${usuarioId}`;
-        const resp = await fetch(url);
+        const resp = await fetch(url, { cache: 'no-store' });
         const json = await resp.json();
         if (!resp.ok || !json.ok) {
             error.value = json.error || 'Error al cargar resultados.';
@@ -141,14 +162,14 @@ async function cargarDesdeServidor(proyectoId) {
         cargando.value = false;
     }
 }
-onMounted(() => {
-    if (route.params.proyectoId) {
-        cargarDesdeServidor(route.params.proyectoId);
-    }
-    else {
+watch(() => route.params.proyectoId, (newId) => {
+    console.log('[Watch] proyectoId cambió a:', newId);
+    cargando.value = true;
+    if (newId)
+        cargarDesdeServidor(newId);
+    else
         cargarDesdeLocalStorage();
-    }
-});
+}, { immediate: true, flush: 'post' });
 function volverAParametros() { router.push(`/parametros/${proyectoIdActivo.value}`); }
 function modificarPrestaciones() { router.push(`/prestaciones/${proyectoIdActivo.value}`); }
 function volverAtras() { localStorage.removeItem('ephdem_resultado_calculo'); router.back(); setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }), 0); }

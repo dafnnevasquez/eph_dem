@@ -10,6 +10,7 @@ class Response
     {
         http_response_code($code);
         header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
         $payload = ['ok' => true];
         if ($datos !== null) $payload['datos'] = $datos;
         echo json_encode($payload);
@@ -20,6 +21,7 @@ class Response
     {
         http_response_code($code);
         header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
         echo json_encode(['ok' => false, 'error' => $mensaje]);
         exit;
     }

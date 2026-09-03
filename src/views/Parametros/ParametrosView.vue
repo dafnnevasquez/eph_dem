@@ -258,7 +258,7 @@ async function guardarYCalcular() {
     const data = await resp.json()
     if (!data.ok) { alert('Error al calcular: ' + (data.error || '')); return }
     localStorage.setItem('ephdem_resultado_calculo', JSON.stringify(data.datos))
-    router.push('/resultados')
+    router.push(`/resultados/${idProyectoActual}`)
   } catch (error) {
     alert('No se pudo conectar con el servidor de cálculo.')
   }

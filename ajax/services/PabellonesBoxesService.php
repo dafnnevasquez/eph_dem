@@ -41,6 +41,8 @@ class PabellonesBoxesService
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
 
+        error_log("EPHDEM guardarDemanda: DELETE proyecto_id=$proyectoId, filas_recibidas=" . count($filas));
+
         $n = 0;
         foreach ($filas as $f) {
             $pid  = (int)($f['prestacion_id'] ?? 0);
@@ -58,6 +60,7 @@ class PabellonesBoxesService
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
             $n++;
+            error_log("EPHDEM INSERT: proyecto=$proyectoId pid=$pid dem=$dem dias=$dias disp=$disp jorn=$jorn");
         }
         return $n;
     }
@@ -110,7 +113,7 @@ class PabellonesBoxesService
 
         $pabellonesPorRecinto = [];
         foreach ($sumaPorRecinto as $rec => $frac) {
-            $pabellonesPorRecinto[$rec] = ['fraccion' => round($frac, 4), 'pabellones' => (int)ceil($frac)];
+            $pabellonesPorRecinto[$rec] = ['fraccion' => (float)round($frac, 4), 'pabellones' => (int)ceil($frac)];
         }
 
         return [
@@ -185,7 +188,7 @@ class PabellonesBoxesService
 
         $boxesPorRecinto = [];
         foreach ($sumaPorRecinto as $rec => $frac) {
-            $boxesPorRecinto[$rec] = ['fraccion' => round($frac, 4), 'boxes' => (int)ceil($frac)];
+            $boxesPorRecinto[$rec] = ['fraccion' => (float)round($frac, 4), 'boxes' => (int)ceil($frac)];
         }
 
         return [
