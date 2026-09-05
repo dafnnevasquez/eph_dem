@@ -16,55 +16,44 @@ Módulo web para la estimación de equipamiento médico necesario para satisface
 | Base de datos | MySQL (SIGEM-UV) |
 
 ---
-
 ## Estructura del Repositorio
+
+```
 eph_dem/
-├── src/ ← Frontend Vue 3
-│ ├── layouts/ ← AppLayout.vue (topbar + footer compartido)
-│ ├── components/ ← Componentes reutilizables
-│ ├── views/ ← Vistas por módulo
-│ │ ├── Inicio/
-│ │ ├── Login/
-│ │ ├── Manual/
-│ │ ├── Proyectos/
-│ │ ├── CreacionProyecto/
-│ │ ├── Prestaciones/
-│ │ ├── Parametros/
-│ │ └── Resultados/
-│ ├── stores/ ← Pinia (auth)
-│ └── router/ ← Rutas protegidas
+├── frontend/                   ← Frontend Vue 3
+│   ├── src/
+│   │   ├── layouts/            ← AppLayout.vue (topbar + footer compartido)
+│   │   ├── views/              ← Vistas por módulo
+│   │   │   ├── Inicio/
+│   │   │   ├── Login/
+│   │   │   ├── Manual/
+│   │   │   ├── Proyectos/
+│   │   │   ├── CreacionProyecto/
+│   │   │   ├── Prestaciones/
+│   │   │   ├── Parametros/
+│   │   │   ├── Resultados/
+│   │   │   ├── RRHH/
+│   │   │   └── EquiposOportunidad/
+│   │   ├── stores/             ← Pinia (auth)
+│   │   └── router/             ← Rutas protegidas
+│   ├── dist/                   ← Frontend compilado (subir a front/ en servidor)
+│   ├── vite.config.ts
+│   └── package.json
 │
-├── ajax/ ← Backend PHP
-│ ├── controllers/ ← Lógica de cada endpoint
-│ │ ├── AuthController.php
-│ │ ├── ProyectoController.php
-│ │ ├── PrestacionController.php
-│ │ └── DemandaController.php
-│ ├── services/ ← Lógica de cálculo de equipamiento
-│ │ ├── PabellonesBoxesService.php
-│ │ ├── EquipamientoKitService.php
-│ │ ├── EquipamientoTipo5Service.php
-│ │ ├── EquipamientoTipo6Service.php
-│ │ ├── EquipamientoAgregadorService.php
-│ │ ├── EquipamientoVistasService.php
-│ │ └── UrpaService.php
-│ ├── helpers/ ← Utilidades compartidas
-│ │ └── Response.php
-│ ├── login.php ← Puntos de entrada (endpoints)
-│ ├── get_proyectos.php
-│ ├── crear_proyecto.php
-│ ├── get_prestaciones.php
-│ ├── get_prestaciones_demanda.php
-│ ├── calcular_demanda.php
-│ ├── obtener_resultados_proyecto.php
-│ ├── generar_xls_cerrada.php
-│ └── generar_pdf_cerrada.php
+├── backend/                    ← Backend PHP
+│   ├── ajax/
+│   │   ├── controllers/        ← Lógica de endpoints
+│   │   ├── services/           ← Lógica de cálculo
+│   │   ├── helpers/            ← Response.php
+│   │   ├── calculo/            ← Archivos de cálculo
+│   │   ├── get/                ← Endpoints GET
+│   │   └── generar/            ← Exportación Excel/PDF
+│   ├── tests/                  ← Tests unitarios PHPUnit
+│   └── composer.json
 │
-├── produccion/ ← Copia de referencia del código en producción
-├── eph_dem_backend/ ← Backend (PHP puro en ajax/)
+├── produccion/                 ← Copia de referencia del código original
 └── README.md
-
-
+```
 ---
 
 ## Flujo del Usuario
