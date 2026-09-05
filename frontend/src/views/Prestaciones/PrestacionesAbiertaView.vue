@@ -54,6 +54,13 @@
               <option v-for="area in opcionesArea" :key="area" :value="area">{{ area }}</option>
             </select>
           </div>
+          <div class="filtro">
+            <label>Subárea</label>
+            <select v-model="filtros.subarea">
+              <option value="">Todas</option>
+              <option v-for="sub in opcionesSubarea" :key="sub" :value="sub">{{ sub }}</option>
+            </select>
+          </div>
         </section>
 
         <section class="prestaciones-grid">
@@ -119,7 +126,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const filtros = ref({ texto: '', area: '' })
+const filtros = ref({ texto: '', area: '', subarea: '' })
 const prestaciones = ref([])
 const seleccionadas = ref([])
 const isLoading = ref(false)
@@ -130,6 +137,16 @@ function normalizarTexto(valor) {
 }
 
 const opcionesArea = computed(() => [...new Set(prestaciones.value.map(p => p.area))])
+const opcionesSubarea = [
+  'consultas y atencion medica',
+  'consultas por otros profesionales de la salud',
+  'educacion de grupo',
+  'visitas domiciliarias',
+  'miscelaneos',
+  'actividad compin',
+  'telemedicina',
+  'teleinterconsulta (telemedicina)',
+]
 
 const prestacionesFiltradas = computed(() => {
   const selIds = new Set(seleccionadas.value.map(p => p.ID_PRESTACION))
@@ -137,6 +154,7 @@ const prestacionesFiltradas = computed(() => {
   return prestaciones.value.filter(p => {
     if (selIds.has(p.ID_PRESTACION)) return false
     if (filtros.value.area && p.area !== filtros.value.area) return false
+    if (filtros.value.subarea && p.subarea !== filtros.value.subarea) return false
     if (texto) {
       const codigo = normalizarTexto(p.cod_prestacion)
       const nombre = normalizarTexto(p.nombre_prestacion)
@@ -240,7 +258,7 @@ onMounted(async () => {
 .instruccion-badge--agregar { background: $color-exito; color: #fff; }
 .instruccion-badge--quitar { background: $color-peligro; color: #fff; }
 
-.filtros-panel { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.filtros-panel { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .filtro { display: flex; flex-direction: column; gap: 6px; font-weight: 600; color: $color-primario; }
 .filtro select, .filtro input { padding: 10px 12px; border-radius: 10px; border: 1px solid $color-borde; font-size: 0.95rem; }
 

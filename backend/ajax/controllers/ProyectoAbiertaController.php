@@ -36,7 +36,11 @@ class ProyectoAbiertaController
 
         $proyectos = [];
         while ($row = mysqli_fetch_assoc($result)) {
-            $proyectos[] = $row;
+            $proyectos[] = [
+                'ID_PROYECCION'     => (int)$row['ID_PROYECCION'],
+                'NOMBRE_PROYECCION' => $row['NOMBRE_PROYECCION'],
+                'FECHA_CREACION'    => date('d/m/Y', strtotime($row['FECHA_CREACION'])),
+            ];
         }
         mysqli_stmt_close($stmt);
         mysqli_close($this->conn);

@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-const filtros = ref({ texto: '', area: '' });
+const filtros = ref({ texto: '', area: '', subarea: '' });
 const prestaciones = ref([]);
 const seleccionadas = ref([]);
 const isLoading = ref(false);
@@ -14,6 +14,16 @@ function normalizarTexto(valor) {
     return String(valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 const opcionesArea = computed(() => [...new Set(prestaciones.value.map(p => p.area))]);
+const opcionesSubarea = [
+    'consultas y atencion medica',
+    'consultas por otros profesionales de la salud',
+    'educacion de grupo',
+    'visitas domiciliarias',
+    'miscelaneos',
+    'actividad compin',
+    'telemedicina',
+    'teleinterconsulta (telemedicina)',
+];
 const prestacionesFiltradas = computed(() => {
     const selIds = new Set(seleccionadas.value.map(p => p.ID_PRESTACION));
     const texto = normalizarTexto(filtros.value.texto);
@@ -21,6 +31,8 @@ const prestacionesFiltradas = computed(() => {
         if (selIds.has(p.ID_PRESTACION))
             return false;
         if (filtros.value.area && p.area !== filtros.value.area)
+            return false;
+        if (filtros.value.subarea && p.subarea !== filtros.value.subarea)
             return false;
         if (texto) {
             const codigo = normalizarTexto(p.cod_prestacion);
@@ -296,6 +308,26 @@ for (const [area] of __VLS_vFor((__VLS_ctx.opcionesArea))) {
     (area);
     // @ts-ignore
     [authStore, cerrarSesion, nombreProyectoActivo, filtros, filtros, opcionesArea,];
+}
+__VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+    ...{ class: "filtro" },
+});
+/** @type {__VLS_StyleScopedClasses['filtro']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.label, __VLS_intrinsics.label)({});
+__VLS_asFunctionalElement1(__VLS_intrinsics.select, __VLS_intrinsics.select)({
+    value: (__VLS_ctx.filtros.subarea),
+});
+__VLS_asFunctionalElement1(__VLS_intrinsics.option, __VLS_intrinsics.option)({
+    value: "",
+});
+for (const [sub] of __VLS_vFor((__VLS_ctx.opcionesSubarea))) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.option, __VLS_intrinsics.option)({
+        key: (sub),
+        value: (sub),
+    });
+    (sub);
+    // @ts-ignore
+    [filtros, opcionesSubarea,];
 }
 __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
     ...{ class: "prestaciones-grid" },
