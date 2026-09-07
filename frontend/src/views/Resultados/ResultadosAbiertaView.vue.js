@@ -22,6 +22,8 @@ const equiposFiltrados = computed(() => {
         return Object.entries(equiposSummary.value);
     return Object.entries(equiposSummary.value).filter(([equipo]) => equipo.toLowerCase().includes(texto));
 });
+const resumenAbierto = ref(true);
+const vistaResumen = ref('lista');
 const totalEquipos = computed(() => Object.values(equiposSummary.value).reduce((a, b) => a + b, 0));
 function togglePrestacion(id) {
     abiertos.value = { ...abiertos.value, [id]: !abiertos.value[id] };
@@ -102,6 +104,7 @@ let __VLS_components;
 let __VLS_intrinsics;
 let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['filtro']} */ ;
+/** @type {__VLS_StyleScopedClasses['panel-title-toggle']} */ ;
 /** @type {__VLS_StyleScopedClasses['row-total']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
@@ -381,30 +384,206 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
 if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
         ...{ class: "resumen-panel" },
+        ...{ class: ({ 'resumen-panel-cerrado': !__VLS_ctx.resumenAbierto }) },
     });
     /** @type {__VLS_StyleScopedClasses['resumen-panel']} */ ;
+    /** @type {__VLS_StyleScopedClasses['resumen-panel-cerrado']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
         ...{ onClick: (...[$event]) => {
                 if (!(!__VLS_ctx.cargando && !__VLS_ctx.error))
                     return;
-                __VLS_ctx.resumenEquiposAbierto = !__VLS_ctx.resumenEquiposAbierto;
+                __VLS_ctx.resumenAbierto = !__VLS_ctx.resumenAbierto;
                 // @ts-ignore
-                [cargando, cargando, error, error, filtroTexto, resumenEquiposAbierto, resumenEquiposAbierto,];
+                [cargando, cargando, error, error, filtroTexto, resumenAbierto, resumenAbierto, resumenAbierto,];
             } },
         ...{ class: "panel-title panel-title-toggle" },
     });
     /** @type {__VLS_StyleScopedClasses['panel-title']} */ ;
     /** @type {__VLS_StyleScopedClasses['panel-title-toggle']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ onClick: () => { } },
+        ...{ class: "vista-toggle-group" },
+    });
+    /** @type {__VLS_StyleScopedClasses['vista-toggle-group']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+        ...{ onClick: (...[$event]) => {
+                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error))
+                    return;
+                __VLS_ctx.vistaResumen = 'lista';
+                // @ts-ignore
+                [vistaResumen,];
+            } },
+        ...{ class: "vista-btn" },
+        ...{ class: ({ 'vista-btn-active': __VLS_ctx.vistaResumen === 'lista' }) },
+    });
+    /** @type {__VLS_StyleScopedClasses['vista-btn']} */ ;
+    /** @type {__VLS_StyleScopedClasses['vista-btn-active']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.svg, __VLS_intrinsics.svg)({
+        width: "18",
+        height: "18",
+        viewBox: "0 0 18 18",
+        fill: "none",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "1",
+        y: "3",
+        width: "16",
+        height: "2.5",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "1",
+        y: "7.75",
+        width: "16",
+        height: "2.5",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "1",
+        y: "12.5",
+        width: "16",
+        height: "2.5",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+        ...{ onClick: (...[$event]) => {
+                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error))
+                    return;
+                __VLS_ctx.vistaResumen = 'mosaico2';
+                // @ts-ignore
+                [vistaResumen, vistaResumen,];
+            } },
+        ...{ class: "vista-btn" },
+        ...{ class: ({ 'vista-btn-active': __VLS_ctx.vistaResumen === 'mosaico2' }) },
+    });
+    /** @type {__VLS_StyleScopedClasses['vista-btn']} */ ;
+    /** @type {__VLS_StyleScopedClasses['vista-btn-active']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.svg, __VLS_intrinsics.svg)({
+        width: "18",
+        height: "18",
+        viewBox: "0 0 18 18",
+        fill: "none",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "1",
+        y: "1",
+        width: "7",
+        height: "7",
+        rx: "1.5",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "10",
+        y: "1",
+        width: "7",
+        height: "7",
+        rx: "1.5",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "1",
+        y: "10",
+        width: "7",
+        height: "7",
+        rx: "1.5",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "10",
+        y: "10",
+        width: "7",
+        height: "7",
+        rx: "1.5",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+        ...{ onClick: (...[$event]) => {
+                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error))
+                    return;
+                __VLS_ctx.vistaResumen = 'mosaico3';
+                // @ts-ignore
+                [vistaResumen, vistaResumen,];
+            } },
+        ...{ class: "vista-btn" },
+        ...{ class: ({ 'vista-btn-active': __VLS_ctx.vistaResumen === 'mosaico3' }) },
+    });
+    /** @type {__VLS_StyleScopedClasses['vista-btn']} */ ;
+    /** @type {__VLS_StyleScopedClasses['vista-btn-active']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.svg, __VLS_intrinsics.svg)({
+        width: "18",
+        height: "18",
+        viewBox: "0 0 18 18",
+        fill: "none",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "1",
+        y: "1",
+        width: "4.5",
+        height: "7",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "6.75",
+        y: "1",
+        width: "4.5",
+        height: "7",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "12.5",
+        y: "1",
+        width: "4.5",
+        height: "7",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "1",
+        y: "10",
+        width: "4.5",
+        height: "7",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "6.75",
+        y: "10",
+        width: "4.5",
+        height: "7",
+        rx: "1.2",
+        fill: "currentColor",
+    });
+    __VLS_asFunctionalElement1(__VLS_intrinsics.rect)({
+        x: "12.5",
+        y: "10",
+        width: "4.5",
+        height: "7",
+        rx: "1.2",
+        fill: "currentColor",
+    });
     __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
-        ...{ class: "fa-solid" },
-        ...{ class: (__VLS_ctx.resumenEquiposAbierto ? 'fa-chevron-up' : 'fa-chevron-down') },
+        ...{ onClick: (...[$event]) => {
+                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error))
+                    return;
+                __VLS_ctx.resumenAbierto = !__VLS_ctx.resumenAbierto;
+                // @ts-ignore
+                [resumenAbierto, resumenAbierto, vistaResumen,];
+            } },
+        ...{ class: "fa-solid vista-chevron" },
+        ...{ class: (__VLS_ctx.resumenAbierto ? 'fa-chevron-up' : 'fa-chevron-down') },
     });
     /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['vista-chevron']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
         ...{ class: "resumen-list" },
     });
-    __VLS_asFunctionalDirective(__VLS_directives.vShow, {})(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.resumenEquiposAbierto) }, null, null);
+    __VLS_asFunctionalDirective(__VLS_directives.vShow, {})(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.resumenAbierto && __VLS_ctx.vistaResumen === 'lista') }, null, null);
     /** @type {__VLS_StyleScopedClasses['resumen-list']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
         ...{ class: "resumen-row resumen-row-head" },
@@ -439,7 +618,42 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
         /** @type {__VLS_StyleScopedClasses['row-total']} */ ;
         (cantidad);
         // @ts-ignore
-        [resumenEquiposAbierto, resumenEquiposAbierto, equiposFiltrados, equiposFiltrados,];
+        [resumenAbierto, resumenAbierto, vistaResumen, equiposFiltrados, equiposFiltrados,];
+    }
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "resumen-mosaico" },
+        ...{ class: (__VLS_ctx.vistaResumen === 'mosaico3' ? 'resumen-mosaico-3' : 'resumen-mosaico-2') },
+    });
+    __VLS_asFunctionalDirective(__VLS_directives.vShow, {})(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.resumenAbierto && (__VLS_ctx.vistaResumen === 'mosaico2' || __VLS_ctx.vistaResumen === 'mosaico3')) }, null, null);
+    /** @type {__VLS_StyleScopedClasses['resumen-mosaico']} */ ;
+    if (__VLS_ctx.equiposFiltrados.length === 0) {
+        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+            ...{ class: "lista-vacia" },
+        });
+        /** @type {__VLS_StyleScopedClasses['lista-vacia']} */ ;
+    }
+    for (const [[equipo, cantidad]] of __VLS_vFor((__VLS_ctx.equiposFiltrados))) {
+        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+            key: (equipo),
+            ...{ class: "mosaic-card" },
+        });
+        /** @type {__VLS_StyleScopedClasses['mosaic-card']} */ ;
+        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+            ...{ class: "mosaic-header" },
+        });
+        /** @type {__VLS_StyleScopedClasses['mosaic-header']} */ ;
+        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+            ...{ class: "mosaic-nombre" },
+        });
+        /** @type {__VLS_StyleScopedClasses['mosaic-nombre']} */ ;
+        (equipo);
+        __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+            ...{ class: "mosaic-total" },
+        });
+        /** @type {__VLS_StyleScopedClasses['mosaic-total']} */ ;
+        (cantidad);
+        // @ts-ignore
+        [resumenAbierto, vistaResumen, vistaResumen, vistaResumen, equiposFiltrados, equiposFiltrados,];
     }
 }
 if (!__VLS_ctx.cargando && !__VLS_ctx.error) {

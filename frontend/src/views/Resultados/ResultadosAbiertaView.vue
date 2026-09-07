@@ -64,6 +64,7 @@
             </div>
           </div>
         </section>
+
         <!-- Buscador Equipos-->
         <section class="filtros-panel" v-if="!cargando && !error">
           <div class="filtro">
@@ -72,21 +73,38 @@
           </div>
         </section>
 
-        <!-- Resumen de equipos -->
-        <section class="resumen-panel" v-if="!cargando && !error">
-          <div class="panel-title panel-title-toggle" @click="resumenEquiposAbierto = !resumenEquiposAbierto">
-            <span>Resumen de equipos requeridos</span>
-            <i class="fa-solid" :class="resumenEquiposAbierto ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-          </div>
-          <div class="resumen-list" v-show="resumenEquiposAbierto">
-            <div class="resumen-row resumen-row-head">
-              <div>Equipo</div>
-              <div class="row-total">Total</div>
+       <!-- Resumen de equipos -->
+        <section class="resumen-panel" :class="{ 'resumen-panel-cerrado': !resumenAbierto }" v-if="!cargando && !error">
+          <div class="panel-title panel-title-toggle" @click="resumenAbierto = !resumenAbierto">
+            <span>Resumen de equipos necesarios (total)</span>
+            <div class="vista-toggle-group" @click.stop>
+              <button class="vista-btn" :class="{ 'vista-btn-active': vistaResumen === 'lista' }" @click="vistaResumen = 'lista'">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="3" width="16" height="2.5" rx="1.2" fill="currentColor"/><rect x="1" y="7.75" width="16" height="2.5" rx="1.2" fill="currentColor"/><rect x="1" y="12.5" width="16" height="2.5" rx="1.2" fill="currentColor"/></svg>
+              </button>
+              <button class="vista-btn" :class="{ 'vista-btn-active': vistaResumen === 'mosaico2' }" @click="vistaResumen = 'mosaico2'">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="currentColor"/></svg>
+              </button>
+              <button class="vista-btn" :class="{ 'vista-btn-active': vistaResumen === 'mosaico3' }" @click="vistaResumen = 'mosaico3'">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="4.5" height="7" rx="1.2" fill="currentColor"/><rect x="6.75" y="1" width="4.5" height="7" rx="1.2" fill="currentColor"/><rect x="12.5" y="1" width="4.5" height="7" rx="1.2" fill="currentColor"/><rect x="1" y="10" width="4.5" height="7" rx="1.2" fill="currentColor"/><rect x="6.75" y="10" width="4.5" height="7" rx="1.2" fill="currentColor"/><rect x="12.5" y="10" width="4.5" height="7" rx="1.2" fill="currentColor"/></svg>
+              </button>
+              <i class="fa-solid vista-chevron" :class="resumenAbierto ? 'fa-chevron-up' : 'fa-chevron-down'" @click="resumenAbierto = !resumenAbierto"></i>
             </div>
+          </div>
+          <div class="resumen-list" v-show="resumenAbierto && vistaResumen === 'lista'">
+            <div class="resumen-row resumen-row-head"><div>Equipo</div><div class="row-total">Total</div></div>
             <div v-if="equiposFiltrados.length === 0" class="lista-vacia">Sin equipos calculados.</div>
             <div v-for="([equipo, cantidad]) in equiposFiltrados" :key="equipo" class="resumen-row">
               <div class="equipo-nombre">{{ equipo }}</div>
               <div class="row-total">{{ cantidad }}</div>
+            </div>
+          </div>
+          <div v-show="resumenAbierto && (vistaResumen === 'mosaico2' || vistaResumen === 'mosaico3')" class="resumen-mosaico" :class="vistaResumen === 'mosaico3' ? 'resumen-mosaico-3' : 'resumen-mosaico-2'">
+            <div v-if="equiposFiltrados.length === 0" class="lista-vacia">Sin equipos calculados.</div>
+            <div v-for="([equipo, cantidad]) in equiposFiltrados" :key="equipo" class="mosaic-card">
+              <div class="mosaic-header">
+                <div class="mosaic-nombre">{{ equipo }}</div>
+                <span class="mosaic-total">{{ cantidad }}</span>
+              </div>
             </div>
           </div>
         </section>
@@ -147,6 +165,9 @@ const equiposFiltrados = computed(() => {
   if (!texto) return Object.entries(equiposSummary.value)
   return Object.entries(equiposSummary.value).filter(([equipo]) => equipo.toLowerCase().includes(texto))
 })
+
+const resumenAbierto = ref(true)
+const vistaResumen = ref('lista')
 
 const totalEquipos = computed(() => Object.values(equiposSummary.value).reduce((a, b) => a + b, 0))
 
@@ -278,6 +299,16 @@ onMounted(() => {
 .filtros-panel { background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .filtro label { font-size: 0.85rem; color: $color-primario; font-weight: 600; margin-bottom: 6px; display: block; }
 .filtro input { width: 100%; padding: 8px 10px; border: 1px solid $color-borde; border-radius: 10px; font-weight: 500; color: $color-texto-principal; }
+
+.vista-toggle-group { display: flex; align-items: center; gap: 4px; }
+.vista-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: transparent; border: 1.5px solid transparent; border-radius: 8px; color: $color-primario; opacity: 0.45; cursor: pointer; padding: 0; &:hover { opacity: 0.9; background: rgba(0,60,88,0.08); } &.vista-btn-active { opacity: 1; background: $color-primario; border-color: $color-primario; color: #fff; } }
+.vista-chevron { font-size: 0.85rem; opacity: 0.55; margin-left: 6px; cursor: pointer; }
+.resumen-mosaico { display: grid; gap: 8px; &.resumen-mosaico-2 { grid-template-columns: repeat(2, 1fr); } &.resumen-mosaico-3 { grid-template-columns: repeat(3, 1fr); } }
+.mosaic-card { background: #f4f8fb; border: 1px solid $color-borde; border-radius: 8px; padding: 8px 12px; &:hover { background: #e8f2fa; } }
+.mosaic-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mosaic-nombre { font-size: 0.8rem; font-weight: 600; color: $color-texto-principal; flex: 1; }
+.mosaic-total { font-size: 1.05rem; font-weight: 800; color: $color-primario; }
+.resumen-panel-cerrado { padding-bottom: 0 !important; .panel-title-toggle { margin-bottom: 0 !important; border-radius: 14px !important; } }
 
 .panel-title-toggle { 
   display: flex; 
