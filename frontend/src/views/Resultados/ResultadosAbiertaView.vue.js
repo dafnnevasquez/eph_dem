@@ -15,6 +15,13 @@ const prestaciones = ref([]);
 const abiertos = ref({});
 const resumenEquiposAbierto = ref(true);
 const resumenRecintosAbierto = ref(true);
+const filtroTexto = ref('');
+const equiposFiltrados = computed(() => {
+    const texto = filtroTexto.value.toLowerCase().trim();
+    if (!texto)
+        return Object.entries(equiposSummary.value);
+    return Object.entries(equiposSummary.value).filter(([equipo]) => equipo.toLowerCase().includes(texto));
+});
 const totalEquipos = computed(() => Object.values(equiposSummary.value).reduce((a, b) => a + b, 0));
 function togglePrestacion(id) {
     abiertos.value = { ...abiertos.value, [id]: !abiertos.value[id] };
@@ -94,6 +101,7 @@ const __VLS_ctx = {
 let __VLS_components;
 let __VLS_intrinsics;
 let __VLS_directives;
+/** @type {__VLS_StyleScopedClasses['filtro']} */ ;
 /** @type {__VLS_StyleScopedClasses['row-total']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
@@ -321,6 +329,55 @@ else {
     });
     /** @type {__VLS_StyleScopedClasses['metric-label']} */ ;
 }
+if (!__VLS_ctx.cargando && !__VLS_ctx.error && Object.keys(__VLS_ctx.recintoSummary).length > 0) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
+        ...{ class: "recintos-conteo-panel" },
+    });
+    /** @type {__VLS_StyleScopedClasses['recintos-conteo-panel']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "panel-title" },
+    });
+    /** @type {__VLS_StyleScopedClasses['panel-title']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "conteo-chips" },
+    });
+    /** @type {__VLS_StyleScopedClasses['conteo-chips']} */ ;
+    for (const [cantidad, recinto] of __VLS_vFor((__VLS_ctx.recintoSummary))) {
+        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+            key: (recinto),
+            ...{ class: "conteo-chip" },
+        });
+        /** @type {__VLS_StyleScopedClasses['conteo-chip']} */ ;
+        __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+            ...{ class: "chip-nombre" },
+        });
+        /** @type {__VLS_StyleScopedClasses['chip-nombre']} */ ;
+        (recinto);
+        __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+            ...{ class: "chip-valor" },
+        });
+        /** @type {__VLS_StyleScopedClasses['chip-valor']} */ ;
+        (cantidad);
+        // @ts-ignore
+        [proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, editarParametros, modificarPrestaciones, authStore, cerrarSesion, exportarExcel, exportarPdf, nombreProyecto, cargando, cargando, error, error, error, totalEquipos, recintoSummary, recintoSummary,];
+    }
+}
+if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
+        ...{ class: "filtros-panel" },
+    });
+    /** @type {__VLS_StyleScopedClasses['filtros-panel']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "filtro" },
+    });
+    /** @type {__VLS_StyleScopedClasses['filtro']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.label, __VLS_intrinsics.label)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.input)({
+        value: (__VLS_ctx.filtroTexto),
+        type: "text",
+        placeholder: "Nombre de equipo",
+    });
+}
 if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
         ...{ class: "resumen-panel" },
@@ -332,7 +389,7 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
                     return;
                 __VLS_ctx.resumenEquiposAbierto = !__VLS_ctx.resumenEquiposAbierto;
                 // @ts-ignore
-                [proyectoIdActivo, proyectoIdActivo, proyectoIdActivo, editarParametros, modificarPrestaciones, authStore, cerrarSesion, exportarExcel, exportarPdf, nombreProyecto, cargando, cargando, error, error, error, totalEquipos, resumenEquiposAbierto, resumenEquiposAbierto,];
+                [cargando, cargando, error, error, filtroTexto, resumenEquiposAbierto, resumenEquiposAbierto,];
             } },
         ...{ class: "panel-title panel-title-toggle" },
     });
@@ -359,13 +416,13 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
         ...{ class: "row-total" },
     });
     /** @type {__VLS_StyleScopedClasses['row-total']} */ ;
-    if (Object.keys(__VLS_ctx.equiposSummary).length === 0) {
+    if (__VLS_ctx.equiposFiltrados.length === 0) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
             ...{ class: "lista-vacia" },
         });
         /** @type {__VLS_StyleScopedClasses['lista-vacia']} */ ;
     }
-    for (const [cantidad, equipo] of __VLS_vFor((__VLS_ctx.equiposSummary))) {
+    for (const [[equipo, cantidad]] of __VLS_vFor((__VLS_ctx.equiposFiltrados))) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
             key: (equipo),
             ...{ class: "resumen-row" },
@@ -382,65 +439,7 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
         /** @type {__VLS_StyleScopedClasses['row-total']} */ ;
         (cantidad);
         // @ts-ignore
-        [resumenEquiposAbierto, resumenEquiposAbierto, equiposSummary, equiposSummary,];
-    }
-}
-if (!__VLS_ctx.cargando && !__VLS_ctx.error && Object.keys(__VLS_ctx.recintoSummary).length > 0) {
-    __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
-        ...{ class: "resumen-panel" },
-    });
-    /** @type {__VLS_StyleScopedClasses['resumen-panel']} */ ;
-    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-        ...{ onClick: (...[$event]) => {
-                if (!(!__VLS_ctx.cargando && !__VLS_ctx.error && Object.keys(__VLS_ctx.recintoSummary).length > 0))
-                    return;
-                __VLS_ctx.resumenRecintosAbierto = !__VLS_ctx.resumenRecintosAbierto;
-                // @ts-ignore
-                [cargando, error, recintoSummary, resumenRecintosAbierto, resumenRecintosAbierto,];
-            } },
-        ...{ class: "panel-title panel-title-toggle" },
-    });
-    /** @type {__VLS_StyleScopedClasses['panel-title']} */ ;
-    /** @type {__VLS_StyleScopedClasses['panel-title-toggle']} */ ;
-    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({});
-    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
-        ...{ class: "fa-solid" },
-        ...{ class: (__VLS_ctx.resumenRecintosAbierto ? 'fa-chevron-up' : 'fa-chevron-down') },
-    });
-    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
-    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-        ...{ class: "resumen-list" },
-    });
-    __VLS_asFunctionalDirective(__VLS_directives.vShow, {})(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.resumenRecintosAbierto) }, null, null);
-    /** @type {__VLS_StyleScopedClasses['resumen-list']} */ ;
-    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-        ...{ class: "resumen-row resumen-row-head" },
-    });
-    /** @type {__VLS_StyleScopedClasses['resumen-row']} */ ;
-    /** @type {__VLS_StyleScopedClasses['resumen-row-head']} */ ;
-    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({});
-    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-        ...{ class: "row-total" },
-    });
-    /** @type {__VLS_StyleScopedClasses['row-total']} */ ;
-    for (const [cantidad, recinto] of __VLS_vFor((__VLS_ctx.recintoSummary))) {
-        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-            key: (recinto),
-            ...{ class: "resumen-row" },
-        });
-        /** @type {__VLS_StyleScopedClasses['resumen-row']} */ ;
-        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-            ...{ class: "equipo-nombre" },
-        });
-        /** @type {__VLS_StyleScopedClasses['equipo-nombre']} */ ;
-        (recinto);
-        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-            ...{ class: "row-total" },
-        });
-        /** @type {__VLS_StyleScopedClasses['row-total']} */ ;
-        (cantidad);
-        // @ts-ignore
-        [recintoSummary, resumenRecintosAbierto, resumenRecintosAbierto,];
+        [resumenEquiposAbierto, resumenEquiposAbierto, equiposFiltrados, equiposFiltrados,];
     }
 }
 if (!__VLS_ctx.cargando && !__VLS_ctx.error) {

@@ -54,7 +54,7 @@
                         <input v-model.number="calc.puac" type="number" min="0" step="1" placeholder="0" />
                       </div>
                       <div class="calc-field">
-                        <label>Promedio Estancia (días) <span class="info-icon" :data-tooltip="infoTexts.calcPromedioEstancia" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></label>
+                        <label>Promedio Estancia<span class="info-icon" :data-tooltip="infoTexts.calcPromedioEstancia" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></label>
                         <input v-model.number="calc.promedioEstancia" type="number" min="0" step="0.1" placeholder="0" />
                       </div>
                     </div>

@@ -53,6 +53,24 @@
             <span class="metric-label">Equipos (total)</span>
           </div>
         </section>
+       
+        <!-- Recintos requeridos -->
+        <section class="recintos-conteo-panel" v-if="!cargando && !error && Object.keys(recintoSummary).length > 0">
+          <div class="panel-title">Recintos requeridos</div>
+          <div class="conteo-chips">
+            <div v-for="(cantidad, recinto) in recintoSummary" :key="recinto" class="conteo-chip">
+              <span class="chip-nombre">{{ recinto }}</span>
+              <span class="chip-valor">{{ cantidad }}</span>
+            </div>
+          </div>
+        </section>
+        <!-- Buscador Equipos-->
+        <section class="filtros-panel" v-if="!cargando && !error">
+          <div class="filtro">
+            <label>Buscar equipo</label>
+            <input v-model="filtroTexto" type="text" placeholder="Nombre de equipo" />
+          </div>
+        </section>
 
         <!-- Resumen de equipos -->
         <section class="resumen-panel" v-if="!cargando && !error">
@@ -65,27 +83,9 @@
               <div>Equipo</div>
               <div class="row-total">Total</div>
             </div>
-            <div v-if="Object.keys(equiposSummary).length === 0" class="lista-vacia">Sin equipos calculados.</div>
-            <div v-for="(cantidad, equipo) in equiposSummary" :key="equipo" class="resumen-row">
+            <div v-if="equiposFiltrados.length === 0" class="lista-vacia">Sin equipos calculados.</div>
+            <div v-for="([equipo, cantidad]) in equiposFiltrados" :key="equipo" class="resumen-row">
               <div class="equipo-nombre">{{ equipo }}</div>
-              <div class="row-total">{{ cantidad }}</div>
-            </div>
-          </div>
-        </section>
-
-                <!-- Resumen de recintos -->
-        <section class="resumen-panel" v-if="!cargando && !error && Object.keys(recintoSummary).length > 0">
-          <div class="panel-title panel-title-toggle" @click="resumenRecintosAbierto = !resumenRecintosAbierto">
-            <span>Resumen por recinto</span>
-            <i class="fa-solid" :class="resumenRecintosAbierto ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-          </div>
-          <div class="resumen-list" v-show="resumenRecintosAbierto">
-            <div class="resumen-row resumen-row-head">
-              <div>Recinto</div>
-              <div class="row-total">Requerimiento</div>
-            </div>
-            <div v-for="(cantidad, recinto) in recintoSummary" :key="recinto" class="resumen-row">
-              <div class="equipo-nombre">{{ recinto }}</div>
               <div class="row-total">{{ cantidad }}</div>
             </div>
           </div>
@@ -141,6 +141,12 @@ const prestaciones = ref([])
 const abiertos = ref({})
 const resumenEquiposAbierto = ref(true)
 const resumenRecintosAbierto = ref(true)
+const filtroTexto = ref('')
+const equiposFiltrados = computed(() => {
+  const texto = filtroTexto.value.toLowerCase().trim()
+  if (!texto) return Object.entries(equiposSummary.value)
+  return Object.entries(equiposSummary.value).filter(([equipo]) => equipo.toLowerCase().includes(texto))
+})
 
 const totalEquipos = computed(() => Object.values(equiposSummary.value).reduce((a, b) => a + b, 0))
 
@@ -252,6 +258,12 @@ onMounted(() => {
 .row-total { font-size: 0.88rem; font-weight: 700; color: $color-primario; text-align: right; white-space: nowrap; }
 .equipo-nombre { font-weight: 600; color: $color-primario; }
 
+.recintos-conteo-panel { background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.conteo-chips { display: flex; flex-wrap: wrap; gap: 12px; }
+.conteo-chip { display: flex; align-items: center; gap: 10px; background: #eef5f9; border: 1px solid $color-borde; border-radius: 999px; padding: 8px 16px; }
+.chip-nombre { font-weight: 600; color: $color-primario; }
+.chip-valor { font-weight: 700; font-size: 1.2rem; color: $color-primario; }
+
 .recinto-card { border-radius: 12px; border: 1px solid $color-borde; box-shadow: 0 2px 8px $color-sombra-suave; overflow: hidden; background: #fff; margin-bottom: 14px; }
 .recinto-title { font-weight: 700; color: $color-primario; background: #eef5f9; padding: 10px 14px; }
 .recinto-title-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; &:hover { background: #ddeaf4; } i { font-size: 0.85rem; opacity: 0.7; } }
@@ -262,6 +274,10 @@ onMounted(() => {
 .tabla-mini-row { display: grid; align-items: center; padding: 8px 12px; border-bottom: 1px solid $color-borde; font-size: 0.88rem; &:last-child { border-bottom: none; } }
 .tabla-mini-cantidad { text-align: right; }
 .lista-vacia { color: $color-texto-secundario; padding: 16px; text-align: center; }
+
+.filtros-panel { background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.filtro label { font-size: 0.85rem; color: $color-primario; font-weight: 600; margin-bottom: 6px; display: block; }
+.filtro input { width: 100%; padding: 8px 10px; border: 1px solid $color-borde; border-radius: 10px; font-weight: 500; color: $color-texto-principal; }
 
 .panel-title-toggle { 
   display: flex; 
