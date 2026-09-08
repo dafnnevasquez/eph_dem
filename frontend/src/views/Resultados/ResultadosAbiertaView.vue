@@ -111,7 +111,7 @@
 
         <!-- Detalle por prestación -->
         <section class="desglose-panel" v-if="!cargando && !error">
-          <div class="panel-title">Detalle por prestación</div>
+          <div class="panel-title">Desglose por prestación</div>
           <div v-for="prestacion in prestaciones" :key="prestacion.ID_PRESTACION" class="recinto-card">
             <div class="recinto-title recinto-title-toggle" @click="togglePrestacion(prestacion.ID_PRESTACION)">
               <span>{{ prestacion.COD_PRESTACION || prestacion.ID_PRESTACION }} — {{ prestacion.NOMBRE_PRESTACION || 'Prestación' }}
