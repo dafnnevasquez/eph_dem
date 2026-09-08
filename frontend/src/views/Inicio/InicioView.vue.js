@@ -200,22 +200,42 @@ __VLS_asFunctionalElement1(__VLS_intrinsics.p, __VLS_intrinsics.p)({
 });
 /** @type {__VLS_StyleScopedClasses['manual-link-hint']} */ ;
 __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
-    ...{ class: "fa-solid fa-book" },
+    ...{ class: "fa-solid fa-book-open" },
 });
 /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
-/** @type {__VLS_StyleScopedClasses['fa-book']} */ ;
-__VLS_asFunctionalElement1(__VLS_intrinsics.a, __VLS_intrinsics.a)({
+/** @type {__VLS_StyleScopedClasses['fa-book-open']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+    ...{ class: "material-buttons" },
+});
+/** @type {__VLS_StyleScopedClasses['material-buttons']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
     ...{ onClick: (...[$event]) => {
             __VLS_ctx.router.push('/manual');
             // @ts-ignore
             [router,];
         } },
-    ...{ class: "link-manual" },
-    href: "#",
+    ...{ class: "btn-material" },
 });
-/** @type {__VLS_StyleScopedClasses['link-manual']} */ ;
-__VLS_asFunctionalElement1(__VLS_intrinsics.strong, __VLS_intrinsics.strong)({});
-__VLS_asFunctionalElement1(__VLS_intrinsics.u, __VLS_intrinsics.u)({});
+/** @type {__VLS_StyleScopedClasses['btn-material']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+    ...{ class: "fa-solid fa-book" },
+});
+/** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+/** @type {__VLS_StyleScopedClasses['fa-book']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
+    ...{ onClick: (...[$event]) => {
+            __VLS_ctx.router.push('/glosario');
+            // @ts-ignore
+            [router,];
+        } },
+    ...{ class: "btn-material" },
+});
+/** @type {__VLS_StyleScopedClasses['btn-material']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+    ...{ class: "fa-solid fa-list" },
+});
+/** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+/** @type {__VLS_StyleScopedClasses['fa-list']} */ ;
 // @ts-ignore
 [];
 var __VLS_3;

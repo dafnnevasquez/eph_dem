@@ -58,12 +58,17 @@
 
       </div>
       <p class="manual-link-hint">
-        <i class="fa-solid fa-book"></i> Revisa el
-        <a class="link-manual" href="#" @click.prevent="router.push('/manual')"><strong><u>manual de usuario</u></strong></a>
-        para conocer el flujo completo de la aplicación.
-      </p>
-    </div>
-
+      <i class="fa-solid fa-book-open"></i> Revisa el siguiente material para conocer sobre EPH y la aplicación
+    </p>
+    <div class="material-buttons">
+      <button class="btn-material" @click="router.push('/manual')">
+        <i class="fa-solid fa-book"></i> Manual de usuario
+      </button>
+      <button class="btn-material" @click="router.push('/glosario')">
+        <i class="fa-solid fa-list"></i> Glosario EPH
+      </button>
+    </div>  
+  </div>
   </AppLayout>
 </template>
 
@@ -167,5 +172,8 @@ function iniciarAtencionCerrada() {
 .nuevo-menu-enter-to, .nuevo-menu-leave-from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 
 .manual-link-hint { text-align: center; margin-top: 120px; font-size: 0.95rem; color: $color-texto-secundario; }
-.link-manual { color: $color-primario; font-weight: 700; cursor: pointer; &:hover { opacity: 0.8; } }
+.material-buttons { display: flex; justify-content: center; gap: 14px; margin-top: 16px; }
+.btn-material { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; &:hover { opacity: 0.85; } }
+
+
 </style>

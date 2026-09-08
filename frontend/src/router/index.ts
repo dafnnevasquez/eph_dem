@@ -91,6 +91,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/glosario',
+      name: 'glosario',
+      component: () => import('@/views/Glosario/GlosarioView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       // Redirige cualquier ruta desconocida a /login
       path: '/:pathMatch(.*)*',
       redirect: '/login',
