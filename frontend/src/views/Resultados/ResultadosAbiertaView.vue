@@ -244,7 +244,7 @@ onMounted(() => {
 .hero-sub { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 700px; line-height: 1.5; margin: 0; }
 
 .resultados-page { background: $color-fondo; flex: 1; }
-.resultados-content { max-width: 1200px; margin: 32px auto 72px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 24px; }
+.resultados-content { max-width: 1480px; margin: 32px auto 72px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 24px; }
 .resultados-header { display: flex; flex-direction: column; gap: 14px; }
 
 .nav-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -274,10 +274,12 @@ onMounted(() => {
 .resumen-panel, .desglose-panel { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .panel-title { font-weight: 700; color: $color-primario; margin-bottom: 16px; }
 .resumen-list { display: flex; flex-direction: column; border: 1px solid $color-borde; border-radius: 12px; overflow: hidden; }
-.resumen-row { background: #fff; padding: 10px 16px; display: grid; grid-template-columns: 1fr 120px; gap: 16px; align-items: center; border-bottom: 1px solid $color-borde; &:last-child { border-bottom: none; } }
-.resumen-row-head { background: #ddeaf4; font-weight: 700; color: $color-primario; }
-.row-total { font-size: 0.88rem; font-weight: 700; color: $color-primario; text-align: right; white-space: nowrap; }
-.equipo-nombre { font-weight: 600; color: $color-primario; }
+.resumen-row { background: #fff; padding: 12px 16px; display: grid; grid-template-columns: 1fr 120px; gap: 16px; align-items: center; border-bottom: 1px solid $color-borde; &:last-child { border-bottom: none; } }
+.resumen-list .resumen-row:not(.resumen-row-head):nth-child(even) { background: #f0f6fb; }
+.resumen-list .resumen-row:not(.resumen-row-head):nth-child(odd) { background: #f8fbfd; }
+.resumen-row-head { background: #ddeaf4; font-weight: 700; color: $color-primario; font-size: 1.4rem; }
+.row-total { font-size: 1.4rem; font-weight: 700; color: $color-primario; text-align: right; white-space: nowrap; }
+.equipo-nombre { font-weight: 700; color: $color-primario; }
 
 .recintos-conteo-panel { background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .conteo-chips { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -323,5 +325,4 @@ onMounted(() => {
   i { font-size: 0.85rem; opacity: 0.7; }
 }
 
-.row-total { font-size: 0.85rem; font-weight: 700; color: $color-primario; text-align: right; white-space: nowrap; }
 </style>

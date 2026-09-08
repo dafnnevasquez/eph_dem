@@ -103,9 +103,14 @@ const __VLS_ctx = {
 let __VLS_components;
 let __VLS_intrinsics;
 let __VLS_directives;
+/** @type {__VLS_StyleScopedClasses['resumen-list']} */ ;
+/** @type {__VLS_StyleScopedClasses['resumen-row']} */ ;
+/** @type {__VLS_StyleScopedClasses['resumen-list']} */ ;
+/** @type {__VLS_StyleScopedClasses['resumen-row']} */ ;
+/** @type {__VLS_StyleScopedClasses['resumen-row-head']} */ ;
+/** @type {__VLS_StyleScopedClasses['resumen-row-head']} */ ;
 /** @type {__VLS_StyleScopedClasses['filtro']} */ ;
 /** @type {__VLS_StyleScopedClasses['panel-title-toggle']} */ ;
-/** @type {__VLS_StyleScopedClasses['row-total']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
 const __VLS_1 = __VLS_asFunctionalComponent1(__VLS_0, new __VLS_0({}));
