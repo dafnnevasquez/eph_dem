@@ -109,6 +109,11 @@ let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['resumen-row']} */ ;
 /** @type {__VLS_StyleScopedClasses['resumen-row-head']} */ ;
 /** @type {__VLS_StyleScopedClasses['resumen-row-head']} */ ;
+/** @type {__VLS_StyleScopedClasses['tabla-mini-row']} */ ;
+/** @type {__VLS_StyleScopedClasses['tabla-mini-row']} */ ;
+/** @type {__VLS_StyleScopedClasses['tabla-mini-row']} */ ;
+/** @type {__VLS_StyleScopedClasses['tabla-mini-head']} */ ;
+/** @type {__VLS_StyleScopedClasses['tabla-mini-cantidad']} */ ;
 /** @type {__VLS_StyleScopedClasses['filtro']} */ ;
 /** @type {__VLS_StyleScopedClasses['panel-title-toggle']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
@@ -691,11 +696,6 @@ if (!__VLS_ctx.cargando && !__VLS_ctx.error) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({});
         (prestacion.COD_PRESTACION || prestacion.ID_PRESTACION);
         (prestacion.NOMBRE_PRESTACION || 'Prestación');
-        __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
-            ...{ class: "recinto-count" },
-        });
-        /** @type {__VLS_StyleScopedClasses['recinto-count']} */ ;
-        (prestacion.REQUERIMIENTO);
         __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
             ...{ class: "fa-solid" },
             ...{ class: (__VLS_ctx.abiertos[prestacion.ID_PRESTACION] ? 'fa-chevron-up' : 'fa-chevron-down') },

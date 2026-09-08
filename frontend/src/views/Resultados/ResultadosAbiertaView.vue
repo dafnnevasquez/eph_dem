@@ -115,7 +115,6 @@
           <div v-for="prestacion in prestaciones" :key="prestacion.ID_PRESTACION" class="recinto-card">
             <div class="recinto-title recinto-title-toggle" @click="togglePrestacion(prestacion.ID_PRESTACION)">
               <span>{{ prestacion.COD_PRESTACION || prestacion.ID_PRESTACION }} — {{ prestacion.NOMBRE_PRESTACION || 'Prestación' }}
-                <span class="recinto-count">(EEMM: {{ prestacion.REQUERIMIENTO }})</span>
               </span>
               <i class="fa-solid" :class="abiertos[prestacion.ID_PRESTACION] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </div>
@@ -294,8 +293,11 @@ onMounted(() => {
 .recinto-count { font-weight: 500; color: $color-texto-secundario; }
 .tabla-mini { display: flex; flex-direction: column; }
 .tabla-mini-head { display: grid; background: #eef5f9; padding: 8px 12px; font-size: 0.78rem; font-weight: 700; color: $color-primario; text-transform: uppercase; }
-.tabla-mini-row { display: grid; align-items: center; padding: 8px 12px; border-bottom: 1px solid $color-borde; font-size: 0.88rem; &:last-child { border-bottom: none; } }
-.tabla-mini-cantidad { text-align: right; }
+.tabla-mini-row { display: grid; align-items: center; padding: 12px 12px; border-bottom: 1px solid $color-borde; font-size: 0.88rem; font-weight: 700; color: $color-primario; &:last-child { border-bottom: none; } }
+.tabla-mini-row:nth-child(even) { background: #f0f6fb; }
+.tabla-mini-row:nth-child(odd) { background: #f8fbfd; }
+.tabla-mini-row .tabla-mini-cantidad { text-align: right; font-size: 1.2rem; font-weight: 700; color: $color-primario; }
+.tabla-mini-head .tabla-mini-cantidad { text-align: right; }
 .lista-vacia { color: $color-texto-secundario; padding: 16px; text-align: center; }
 
 .filtros-panel { background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
