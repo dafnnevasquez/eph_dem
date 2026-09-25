@@ -193,6 +193,7 @@ usort($equipos, static function ($a, $b) {
     return $b['cantidad'] <=> $a['cantidad'];
 });
 foreach ($equipos as $e) {
+    if ($e['cantidad'] <= 0) continue;
     $hoja3[] = [$e['nombre_equipo'], $e['cantidad'], $e['cantidad_piso'], $e['cantidad_demanda']];
 }
 

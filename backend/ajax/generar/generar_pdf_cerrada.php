@@ -176,6 +176,7 @@ if (empty($equiposOrdenados)) {
     $pdf->FilaTabla('(Sin equipamiento calculado)', '');
 } else {
     foreach ($equiposOrdenados as $e) {
+        if ($e['cantidad'] <= 0) continue;
         $pdf->FilaTabla($e['nombre_equipo'], $e['cantidad']);
     }
 }
@@ -197,6 +198,7 @@ foreach ($vistas['por_recinto'] as $rid => $rec) {
     if (!empty($rec['equipos'])) {
         $pdf->CabeceraTabla('Equipo', 'Cantidad');
         foreach ($rec['equipos'] as $e) {
+            if ($e['cantidad'] <= 0) continue;
             $pdf->FilaTabla($e['nombre_equipo'], $e['cantidad']);
         }
     }

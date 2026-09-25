@@ -49,20 +49,14 @@
           </div>
           <div class="filtro">
             <label>Área</label>
-            <select v-model="filtros.area">
-              <option value="">Todas</option>
-              <option v-for="area in opcionesArea" :key="area" :value="area">{{ area }}</option>
-            </select>
+            <div class="subarea-chip">Atención abierta</div>
           </div>
           <div class="filtro">
             <label>Subárea</label>
-            <select v-model="filtros.subarea">
-              <option value="">Todas</option>
-              <option v-for="sub in opcionesSubarea" :key="sub" :value="sub">{{ sub }}</option>
-            </select>
+            <div class="subarea-chip">Consultas y atención médica</div>
           </div>
         </section>
-
+                
         <section class="prestaciones-grid">
           <div class="prestaciones-panel">
             <div class="panel-title">Disponibles</div>
@@ -126,7 +120,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const filtros = ref({ texto: '', area: '', subarea: '' })
+const filtros = ref({ texto: '', subarea: 'consultas y atencion medica' })
 const prestaciones = ref([])
 const seleccionadas = ref([])
 const isLoading = ref(false)
@@ -139,13 +133,6 @@ function normalizarTexto(valor) {
 const opcionesArea = computed(() => [...new Set(prestaciones.value.map(p => p.area))])
 const opcionesSubarea = [
   'consultas y atencion medica',
-  'consultas por otros profesionales de la salud',
-  'educacion de grupo',
-  'visitas domiciliarias',
-  'miscelaneos',
-  'actividad compin',
-  'telemedicina',
-  'teleinterconsulta (telemedicina)',
 ]
 
 const prestacionesFiltradas = computed(() => {
@@ -153,7 +140,7 @@ const prestacionesFiltradas = computed(() => {
   const texto = normalizarTexto(filtros.value.texto)
   return prestaciones.value.filter(p => {
     if (selIds.has(p.ID_PRESTACION)) return false
-    if (filtros.value.area && p.area !== filtros.value.area) return false
+    if (p.area !== 'atencion abierta') return false
     if (filtros.value.subarea && p.subarea !== filtros.value.subarea) return false
     if (texto) {
       const codigo = normalizarTexto(p.cod_prestacion)
@@ -261,6 +248,7 @@ onMounted(async () => {
 .filtros-panel { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; background: #fff; border-radius: 16px; padding: 18px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .filtro { display: flex; flex-direction: column; gap: 6px; font-weight: 600; color: $color-primario; }
 .filtro select, .filtro input { padding: 10px 12px; border-radius: 10px; border: 1px solid $color-borde; font-size: 0.95rem; }
+.subarea-chip { display: inline-flex; align-items: center; padding: 8px 14px; background: rgba(0,60,88,0.08); border: 1.5px solid rgba(0,60,88,0.2); border-radius: 999px; font-weight: 600; color: $color-primario; font-size: 0.9rem; }
 
 .prestaciones-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
 .prestaciones-panel { background: #fff; border-radius: 18px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; min-height: 320px; display: flex; flex-direction: column; }

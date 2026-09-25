@@ -32,15 +32,23 @@
         </header>
 
         <section class="terminos-panel">
-        <div v-for="categoria in categorias" :key="categoria">
-            <div class="categoria-titulo">{{ categoria }}</div>
-            <div v-if="terminosPorCategoria(categoria).length === 0" class="lista-vacia">No se encontraron términos.</div>
-            <div v-for="termino in terminosPorCategoria(categoria)" :key="termino.termino" class="termino-card">
-            <div class="termino-titulo">{{ termino.termino }}</div>
-            <div class="termino-definicion">{{ termino.definicion }}</div>
+          <div class="categorias-container">
+            <div v-for="categoria in categorias" :key="categoria" class="categoria-section">
+              <div class="categoria-titulo" @click="toggleCategoria(categoria)">
+                <span>{{ categoria }}</span>
+                <i class="fa-solid" :class="categoriasAbiertas[categoria] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              </div>
+              <div v-show="categoriasAbiertas[categoria]">
+                <div v-if="terminosPorCategoria(categoria).length === 0" class="lista-vacia">No se encontraron términos.</div>
+                <div v-for="(termino, index) in terminosPorCategoria(categoria)" :key="termino.termino"
+                    class="termino-card" :class="index % 2 === 0 ? 'termino-par' : 'termino-impar'">
+                  <div class="termino-titulo">{{ termino.termino }}</div>
+                  <div class="termino-definicion">{{ termino.definicion }}</div>
+                </div>
+              </div>
             </div>
-        </div>
-        <div v-if="terminosFiltrados.length === 0" class="lista-vacia">No se encontraron términos.</div>
+            <div v-if="terminosFiltrados.length === 0" class="lista-vacia">No se encontraron términos.</div>
+          </div>
         </section>
       </main>
     </div>
@@ -58,6 +66,16 @@ const authStore = useAuthStore()
 const busqueda = ref('')
 const categorias = ['General', 'Tipos de equipamiento', 'Atención cerrada', 'Atención abierta']
 
+const categoriasAbiertas = ref({
+  'General': false,
+  'Tipos de equipamiento': false,
+  'Atención cerrada': false,
+  'Atención abierta': false,
+})
+
+function toggleCategoria(categoria) {
+  categoriasAbiertas.value[categoria] = !categoriasAbiertas.value[categoria]
+}
 
 const terminos = [
   // GENERALES
@@ -148,11 +166,17 @@ function cerrarSesion() {
 
 .filtro-buscar input { width: 100%; padding: 10px 14px; border: 1px solid $color-borde; border-radius: 10px; font-size: 0.95rem; color: $color-texto-principal; }
 
-.terminos-panel { display: flex; flex-direction: column; gap: 12px; }
-.termino-card { background: #fff; border-radius: 12px; padding: 16px 20px; border: 1px solid $color-borde; box-shadow: 0 2px 8px $color-sombra-suave; }
-.termino-titulo { font-size: 1.05rem; font-weight: 700; color: $color-primario; margin-bottom: 6px; }
-.termino-definicion { font-size: 0.9rem; color: $color-texto-secundario; line-height: 1.6; }
-.lista-vacia { color: $color-texto-secundario; padding: 20px; text-align: center; }
+.categorias-container { border: 1px solid $color-borde; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px $color-sombra-suave; }
+.categoria-titulo { display: flex; align-items: center; justify-content: space-between; background: #fff; color: $color-primario; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; cursor: pointer; user-select: none; border-bottom: 1px solid $color-borde; &:hover { background: #eef5f9; } i { font-size: 0.85rem; opacity: 0.6; } }
+.categoria-section { margin-bottom: 0; border-radius: 0; overflow: hidden; border: none; border-bottom: 1px solid $color-borde; box-shadow: none; &:first-child { border-radius: 14px 14px 0 0; } &:last-child { border-radius: 0 0 14px 14px; border-bottom: none; } }
+.categoria-titulo { display: flex; align-items: center; justify-content: space-between; background: $color-primario; color: #fff; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; cursor: pointer; user-select: none; &:hover { background: mix(#fff, $color-primario, 8%); } i { font-size: 0.85rem; opacity: 0.8; } }
 
-.categoria-titulo { font-size: 1.2rem; font-weight: 700; color: $color-primario; margin: 24px 0 12px; padding-bottom: 6px; border-bottom: 2px solid $color-primario; }
+.termino-card { padding: 14px 20px; border-bottom: 1px solid $color-borde; &:last-child { border-bottom: none; } }
+.termino-par { background: #f8fbfd; }
+.termino-impar { background: #eef5f9; }
+.termino-titulo { font-size: 0.95rem; font-weight: 700; color: #0a5c7a; margin-bottom: 4px; }
+.termino-definicion { font-size: 0.88rem; color: $color-texto-secundario; line-height: 1.6; }
+.lista-vacia { color: $color-texto-secundario; padding: 16px 20px; text-align: center; background: #fff; }
+
+
 </style>

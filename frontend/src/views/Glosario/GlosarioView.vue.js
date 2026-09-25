@@ -6,6 +6,15 @@ const router = useRouter();
 const authStore = useAuthStore();
 const busqueda = ref('');
 const categorias = ['General', 'Tipos de equipamiento', 'Atención cerrada', 'Atención abierta'];
+const categoriasAbiertas = ref({
+    'General': false,
+    'Tipos de equipamiento': false,
+    'Atención cerrada': false,
+    'Atención abierta': false,
+});
+function toggleCategoria(categoria) {
+    categoriasAbiertas.value[categoria] = !categoriasAbiertas.value[categoria];
+}
 const terminos = [
     // GENERALES
     { categoria: 'General', termino: 'EPH', definicion: 'Estudio de Preinversión Hospitalaria. Desarrollo sistematizado y en profundidad de la detección y solución de las brechas y objetivos de gestión de un establecimiento de salud en su contexto de red, que define el tamaño nominal del proyecto y permite comparar alternativas de solución hasta seleccionar la más rentable técnica, económica y socialmente, para postulación a financiamiento.' },
@@ -70,6 +79,7 @@ const __VLS_ctx = {
 let __VLS_components;
 let __VLS_intrinsics;
 let __VLS_directives;
+/** @type {__VLS_StyleScopedClasses['categoria-titulo']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
 const __VLS_1 = __VLS_asFunctionalComponent1(__VLS_0, new __VLS_0({}));
@@ -193,25 +203,45 @@ __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
     ...{ class: "terminos-panel" },
 });
 /** @type {__VLS_StyleScopedClasses['terminos-panel']} */ ;
+__VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+    ...{ class: "categorias-container" },
+});
+/** @type {__VLS_StyleScopedClasses['categorias-container']} */ ;
 for (const [categoria] of __VLS_vFor((__VLS_ctx.categorias))) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
         key: (categoria),
+        ...{ class: "categoria-section" },
     });
+    /** @type {__VLS_StyleScopedClasses['categoria-section']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ onClick: (...[$event]) => {
+                __VLS_ctx.toggleCategoria(categoria);
+                // @ts-ignore
+                [authStore, cerrarSesion, busqueda, categorias, toggleCategoria,];
+            } },
         ...{ class: "categoria-titulo" },
     });
     /** @type {__VLS_StyleScopedClasses['categoria-titulo']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({});
     (categoria);
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid" },
+        ...{ class: (__VLS_ctx.categoriasAbiertas[categoria] ? 'fa-chevron-up' : 'fa-chevron-down') },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({});
+    __VLS_asFunctionalDirective(__VLS_directives.vShow, {})(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.categoriasAbiertas[categoria]) }, null, null);
     if (__VLS_ctx.terminosPorCategoria(categoria).length === 0) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
             ...{ class: "lista-vacia" },
         });
         /** @type {__VLS_StyleScopedClasses['lista-vacia']} */ ;
     }
-    for (const [termino] of __VLS_vFor((__VLS_ctx.terminosPorCategoria(categoria)))) {
+    for (const [termino, index] of __VLS_vFor((__VLS_ctx.terminosPorCategoria(categoria)))) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
             key: (termino.termino),
             ...{ class: "termino-card" },
+            ...{ class: (index % 2 === 0 ? 'termino-par' : 'termino-impar') },
         });
         /** @type {__VLS_StyleScopedClasses['termino-card']} */ ;
         __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
@@ -225,7 +255,7 @@ for (const [categoria] of __VLS_vFor((__VLS_ctx.categorias))) {
         /** @type {__VLS_StyleScopedClasses['termino-definicion']} */ ;
         (termino.definicion);
         // @ts-ignore
-        [authStore, cerrarSesion, busqueda, categorias, terminosPorCategoria, terminosPorCategoria,];
+        [categoriasAbiertas, categoriasAbiertas, terminosPorCategoria, terminosPorCategoria,];
     }
     // @ts-ignore
     [];
