@@ -1,0 +1,14 @@
+{
+    "name": "sigem-uv/ephdem",
+    "description": "Módulo EPHDEM",
+    "type": "project",
+    "authors": [
+        {
+            "name": "dafnnevasquez",
+            "email": "dafnne.vvasquez@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^13.3"
+    }
+}
