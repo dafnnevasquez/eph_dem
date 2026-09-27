@@ -704,7 +704,7 @@ else {
                 } },
             type: "number",
             min: "0",
-            step: "0.1",
+            step: "1",
             ...{ class: ({ 'input-error': __VLS_ctx.erroresCeldas.has(`${fila.id}-tiempoProcedimiento`) }) },
         });
         (fila.tiempoProcedimiento);
@@ -721,7 +721,7 @@ else {
             type: "number",
             min: "0",
             max: "100",
-            step: "0.1",
+            step: "1",
             ...{ class: ({ 'input-error': __VLS_ctx.erroresCeldas.has(`${fila.id}-disponibilidad`) }) },
         });
         (fila.disponibilidad);
@@ -738,7 +738,7 @@ else {
             type: "number",
             min: "0",
             max: "24",
-            step: "0.1",
+            step: "0.5",
             ...{ class: ({ 'input-error': __VLS_ctx.erroresCeldas.has(`${fila.id}-jornadaLaboral`) }) },
         });
         (fila.jornadaLaboral);

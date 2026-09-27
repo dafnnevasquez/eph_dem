@@ -109,9 +109,9 @@
                   </td>
                   <td><input v-model.number="fila.demanda" type="number" min="0" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-demanda`) }" @input="limpiarError(fila.id, 'demanda')" /></td>
                   <td><input v-model.number="fila.diasAnuales" type="number" min="1" max="366" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-diasAnuales`) }" @input="limpiarError(fila.id, 'diasAnuales')" /></td>
-                  <td><input v-model.number="fila.tiempoProcedimiento" type="number" min="0" step="0.1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-tiempoProcedimiento`) }" @input="limpiarError(fila.id, 'tiempoProcedimiento')" /></td>
-                  <td><input v-model.number="fila.disponibilidad" type="number" min="0" max="100" step="0.1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-disponibilidad`) }" @input="limpiarError(fila.id, 'disponibilidad')" /></td>
-                  <td><input v-model.number="fila.jornadaLaboral" type="number" min="0" max="24" step="0.1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-jornadaLaboral`) }" @input="limpiarError(fila.id, 'jornadaLaboral')" /></td>
+                  <td><input v-model.number="fila.tiempoProcedimiento" type="number" min="0" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-tiempoProcedimiento`) }" @input="limpiarError(fila.id, 'tiempoProcedimiento')" /></td>
+                  <td><input v-model.number="fila.disponibilidad" type="number" min="0" max="100" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-disponibilidad`) }" @input="limpiarError(fila.id, 'disponibilidad')" /></td>
+                  <td><input v-model.number="fila.jornadaLaboral" type="number" min="0" max="24" step="0.5" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-jornadaLaboral`) }" @input="limpiarError(fila.id, 'jornadaLaboral')" /></td>
                 </tr>
               </tbody>
             </table>

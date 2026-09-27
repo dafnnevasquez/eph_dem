@@ -78,10 +78,10 @@
                   <td class="td-nombre">{{ fila.nombre_prestacion }}</td>
                   <td class="td-area">{{ fila.area }}</td>
                   <td><input v-model.number="fila.demanda" type="number" min="0" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-demanda`) }" @input="calcularEEMM(fila)" /></td>
-                  <td><input v-model.number="fila.tiempo" type="number" min="0" step="0.1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-tiempo`) }" @input="calcularEEMM(fila)" /></td>
+                  <td><input v-model.number="fila.tiempo" type="number" min="0" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-tiempo`) }" @input="calcularEEMM(fila)" /></td>
                   <td><input v-model.number="fila.diasLaborales" type="number" min="1" max="366" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-diasLaborales`) }" @input="calcularEEMM(fila)" /></td>
                   <td><input v-model.number="fila.nSimultaneas" type="number" min="1" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-nSimultaneas`) }" @input="calcularEEMM(fila)" /></td>
-                  <td><input v-model.number="fila.disponibilidad" type="number" min="0" max="100" step="0.1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-disponibilidad`) }" @input="calcularEEMM(fila)" /></td>
+                  <td><input v-model.number="fila.disponibilidad" type="number" min="0" max="100" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-disponibilidad`) }" @input="calcularEEMM(fila)" /></td>
                   <td>
                     <select v-model.number="fila.jornada" @change="calcularEEMM(fila)">
                       <option v-for="j in 12" :key="j" :value="j">{{ j }}</option>

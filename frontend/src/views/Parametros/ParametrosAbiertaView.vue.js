@@ -459,7 +459,7 @@ else {
                 } },
             type: "number",
             min: "0",
-            step: "0.1",
+            step: "1",
             ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-tiempo`) }) },
         });
         (fila.tiempo);
@@ -509,7 +509,7 @@ else {
             type: "number",
             min: "0",
             max: "100",
-            step: "0.1",
+            step: "1",
             ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-disponibilidad`) }) },
         });
         (fila.disponibilidad);
