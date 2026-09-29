@@ -454,7 +454,7 @@ function exportarPdf() {
 }
 
 function equiposNoImplementado() {
-  alert('Equipos de Oportunidad no está implementado en esta versión.')
+  alert('Equipos por Oportunidad no está implementado en esta versión.')
 }
 </script>
 

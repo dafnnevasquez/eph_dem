@@ -191,7 +191,7 @@ function exportarPdf() {
     window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank');
 }
 function equiposNoImplementado() {
-    alert('Equipos de Oportunidad no está implementado en esta versión.');
+    alert('Equipos por Oportunidad no está implementado en esta versión.');
 }
 const __VLS_ctx = {
     ...{},

@@ -33,11 +33,11 @@
           <div class="instruccion-indicator">
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">
-              Selecciona las prestaciones MAI de FONASA usando
+              Selecciona las prestaciones que se asociarán al proyecto: usa
               <span class="instruccion-badge instruccion-badge--agregar"><i class="fa-solid fa-plus"></i></span>
               para agregar y
               <span class="instruccion-badge instruccion-badge--quitar"><i class="fa-solid fa-xmark"></i></span>
-              para quitar. Luego presiona <strong>Guardar y confirmar</strong>.
+              para eliminar de la selección. Luego presiona <strong>Guardar y confirmar</strong>.
             </span>
           </div>
         </header>

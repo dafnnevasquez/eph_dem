@@ -122,7 +122,7 @@
                 <i class="fa-solid fa-triangle-exclamation"></i> {{ errorValidacion }}
               </div>
             </transition>
-            <button class="btn-principal" @click="guardarYCalcular">Guardar y calcular</button>
+            <button class="btn-principal" @click="guardarYCalcular"><i class="fa-solid fa-calculator"></i> Guardar y calcular</button>
           </div>
         </section>
       </main>
@@ -352,7 +352,7 @@ onBeforeUnmount(() => { document.removeEventListener('pointerdown', cerrarCalcul
 .instruccion-icon-circle { display: flex; align-items: center; justify-content: center; color: $color-primario; font-size: 1.4rem; flex: 0 0 auto; }
 .instruccion-texto { font-size: 1.05rem; color: $color-primario; line-height: 1.8; strong { font-weight: 700; } }
 .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 6px; border-radius: 50%; background: rgba(0,60,88,0.14); color: $color-primario; font-size: 0.72rem; font-weight: 700; cursor: help; }
-.info-icon--demo { pointer-events: none; cursor: default; vertical-align: middle; }
+.info-icon--demo { pointer-events: none; cursor: default; vertical-align: middle; } 
 
 .calculadora-wrapper { position: relative; display: flex; flex-direction: column; align-items: flex-end; flex: 0 0 auto; }
 .calculadora-toggle { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1.5px solid $color-primario; border-radius: 999px; background: rgba(0,60,88,0.06); color: $color-primario; font-weight: 700; font-size: 0.93rem; cursor: pointer; white-space: nowrap; &:hover { background: rgba(0,60,88,0.12); } }
@@ -373,11 +373,10 @@ onBeforeUnmount(() => { document.removeEventListener('pointerdown', cerrarCalcul
 .panel-vacio, .tabla-panel { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .panel-vacio { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .tabla-scroll { overflow-x: auto; }
-.tabla-parametros { width: 100%; min-width: 1200px; border-collapse: separate; border-spacing: 0; }
-.tabla-parametros th, .tabla-parametros td { padding: 12px 10px; border-bottom: 1px solid $color-borde; text-align: left; vertical-align: middle; }
-.tabla-parametros th { background: #e9f1f6; color: $color-primario; font-size: 0.9rem; font-weight: 700; position: sticky; top: 0; }
+.tabla-parametros th { background: #e9f1f6; color: $color-primario; font-size: 0.9rem; font-weight: 700; padding: 10px 8px; text-align: left; white-space: nowrap; position: sticky; top: 0; }
 .tabla-parametros td input { width: 100%; padding: 8px 10px; border: 1px solid $color-borde; border-radius: 8px; background: #fff; font-weight: 500; color: $color-texto-principal; transition: border-color 0.2s ease; }
 .tabla-parametros td input.input-error { border-color: #e53935; background: #fff5f5; box-shadow: 0 0 0 2px rgba(229,57,53,0.18); animation: shake 0.35s ease; }
+.tabla-parametros td { padding: 10px 8px; border-bottom: 1px solid $color-borde; vertical-align: middle; }
 
 @keyframes shake {
   0% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); }

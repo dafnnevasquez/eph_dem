@@ -233,8 +233,6 @@ let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
-/** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
-/** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tooltip-flecha']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
@@ -782,6 +780,11 @@ else {
         ...{ class: "btn-principal" },
     });
     /** @type {__VLS_StyleScopedClasses['btn-principal']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-calculator" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-calculator']} */ ;
 }
 // @ts-ignore
 [guardarYCalcular,];
