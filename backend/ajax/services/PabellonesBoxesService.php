@@ -36,33 +36,56 @@ class PabellonesBoxesService
 
     public function guardarDemanda(int $proyectoId, array $filas): int
     {
-        $stmt = mysqli_prepare($this->conn, "DELETE FROM " . self::TBL_DEMANDA . " WHERE proyecto_id = ?");
-        mysqli_stmt_bind_param($stmt, 'i', $proyectoId);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
+        $this->conn->begin_transaction();
 
-        error_log("EPHDEM guardarDemanda: DELETE proyecto_id=$proyectoId, filas_recibidas=" . count($filas));
+        try {
+            $del = $this->conn->prepare("DELETE FROM " . self::TBL_DEMANDA . " WHERE proyecto_id = ?");
+            if ($del === false) {
+                throw new \RuntimeException('prepare DELETE fallo');
+            }
+            $del->bind_param('i', $proyectoId);
+            if (!$del->execute()) {
+                throw new \RuntimeException('execute DELETE fallo');
+            }
+            $del->close();
 
-        $n = 0;
-        foreach ($filas as $f) {
-            $pid  = (int)($f['prestacion_id'] ?? 0);
-            if ($pid <= 0) continue;
-            $dem  = (int)($f['demanda_anual']    ?? 0);
-            $dias = (int)($f['dias_laborales']   ?? 0);
-            $disp = (float)($f['disponibilidad'] ?? 1.0);
-            $jorn = (float)($f['jornada_efectiva'] ?? 0.0);
-
-            $stmt = mysqli_prepare($this->conn,
+            $stmt = $this->conn->prepare(
                 "INSERT INTO " . self::TBL_DEMANDA . " (proyecto_id, prestacion_id, demanda_anual, dias_laborales, disponibilidad, jornada_efectiva)
                  VALUES (?, ?, ?, ?, ?, ?)"
             );
-            mysqli_stmt_bind_param($stmt, 'iiiidd', $proyectoId, $pid, $dem, $dias, $disp, $jorn);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-            $n++;
-            error_log("EPHDEM INSERT: proyecto=$proyectoId pid=$pid dem=$dem dias=$dias disp=$disp jorn=$jorn");
+            if ($stmt === false) {
+                throw new \RuntimeException('prepare INSERT fallo');
+            }
+
+            $pid = $prest = $dem = $dias = 0;
+            $disp = $jorn = 0.0;
+            $stmt->bind_param('iiiidd', $pid, $prest, $dem, $dias, $disp, $jorn);
+
+            $n = 0;
+            foreach ($filas as $f) {
+                $pid   = $proyectoId;
+                $prest = (int)($f['prestacion_id']      ?? 0);
+                $dem   = (int)($f['demanda_anual']      ?? 0);
+                $dias  = (int)($f['dias_laborales']     ?? 0);
+                $disp  = (float)($f['disponibilidad']   ?? 1.0);
+                $jorn  = (float)($f['jornada_efectiva'] ?? 0.0);
+                if ($prest <= 0) {
+                    continue;
+                }
+                if (!$stmt->execute()) {
+                    throw new \RuntimeException('execute INSERT fallo');
+                }
+                $n++;
+            }
+            $stmt->close();
+
+            $this->conn->commit();
+            return $n;
+
+        } catch (\Throwable $e) {
+            $this->conn->rollback();
+            return 0;
         }
-        return $n;
     }
 
     public function calcularPabellones(int $proyectoId): array
