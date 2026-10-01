@@ -56,7 +56,7 @@ async function cargarDatos() {
                 nombre_prestacion: p.nombre_prestacion,
                 area: p.area,
                 demanda: guardado?.demanda ?? 0,
-                tiempo: guardado?.tiempo ?? 0,
+                tiempo: guardado?.tiempo ?? p.tiempo_procedimiento ?? 0,
                 diasLaborales: guardado?.diasLaborales ?? 260,
                 nSimultaneas: guardado?.nSimultaneas ?? 1,
                 disponibilidad: guardado?.disponibilidad ?? 100,

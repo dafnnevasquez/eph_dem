@@ -25,7 +25,7 @@
               </button>
             </div>
           </div>
-          <h2 class="section-title">Prestaciones — Atención Abierta</h2>
+          <h2 class="section-title">Prestaciones</h2>
           <div class="proyecto-activo-badge">
             <span class="badge-label">Proyecto en edición</span>
             <span class="badge-name">{{ nombreProyectoActivo }}</span>
@@ -199,6 +199,7 @@ async function cargarDesdeServidor(proyectoId) {
         cod_prestacion:    p.cod_prestacion,
         nombre_prestacion: p.nombre_prestacion,
         area:              p.area,
+        tiempo_procedimiento: p.tiempo ?? null,
       }))
     }
   } catch (e) {
