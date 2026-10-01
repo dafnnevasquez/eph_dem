@@ -89,7 +89,7 @@ function aplicarDatos(datos) {
     porRecinto.value = datos.equipamiento?.por_recinto ?? {};
     demandaCompartidaRaw.value = datos.equipamiento?.demanda_compartida ?? [];
     pabellonesPorRecintoRaw.value = datos.pabellones?.pabellones_por_recinto ?? {};
-    boxesPorRecintoRaw.value = datos.boxes?.por_recinto ?? {};
+    boxesPorRecintoRaw.value = datos.boxes?.boxes_por_recinto ?? datos.boxes?.por_recinto ?? {};
     urpaRaw.value = datos.urpa ?? null;
     if (datos.nombre_proyecto) {
         nombreProyecto.value = datos.nombre_proyecto;
