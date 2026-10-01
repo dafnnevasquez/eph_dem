@@ -10,7 +10,7 @@ $conn = SIGEM_UV_C_Nueva_Conexion();
 if (!$conn) Response::error('No se pudo conectar a la base de datos.', 500);
 mysqli_set_charset($conn, 'utf8mb4');
 
-$sql = "SELECT DISTINCT p.ID_PRESTACION, p.cod_prestacion, p.nombre_prestacion, p.area, p.subarea
+$sql = "SELECT DISTINCT p.ID_PRESTACION, p.cod_prestacion, p.nombre_prestacion, p.area, p.subarea, p.tiempo_min_anexo5
         FROM EPHDEM_PRESTACION p
         LEFT JOIN EPHDEM_PREST_RECINTO_EQ rel ON rel.ID_PRESTACION = p.ID_PRESTACION
         WHERE p.area = 'atencion abierta'
@@ -27,6 +27,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         'nombre_prestacion' => $row['nombre_prestacion'],
         'area'              => $row['area'],
         'subarea'           => $row['subarea'] ?? '',
+        'tiempo_procedimiento'=> $row['tiempo_min_anexo5'] !== null ? (int)$row['tiempo_min_anexo5'] : null,
     ];
 }
 mysqli_close($conn);

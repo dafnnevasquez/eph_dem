@@ -233,8 +233,6 @@ let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
-/** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
-/** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tooltip-flecha']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
@@ -704,7 +702,7 @@ else {
                 } },
             type: "number",
             min: "0",
-            step: "0.1",
+            step: "1",
             ...{ class: ({ 'input-error': __VLS_ctx.erroresCeldas.has(`${fila.id}-tiempoProcedimiento`) }) },
         });
         (fila.tiempoProcedimiento);
@@ -721,7 +719,7 @@ else {
             type: "number",
             min: "0",
             max: "100",
-            step: "0.1",
+            step: "1",
             ...{ class: ({ 'input-error': __VLS_ctx.erroresCeldas.has(`${fila.id}-disponibilidad`) }) },
         });
         (fila.disponibilidad);
@@ -738,7 +736,7 @@ else {
             type: "number",
             min: "0",
             max: "24",
-            step: "0.1",
+            step: "0.5",
             ...{ class: ({ 'input-error': __VLS_ctx.erroresCeldas.has(`${fila.id}-jornadaLaboral`) }) },
         });
         (fila.jornadaLaboral);
@@ -782,6 +780,11 @@ else {
         ...{ class: "btn-principal" },
     });
     /** @type {__VLS_StyleScopedClasses['btn-principal']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
+        ...{ class: "fa-solid fa-calculator" },
+    });
+    /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
+    /** @type {__VLS_StyleScopedClasses['fa-calculator']} */ ;
 }
 // @ts-ignore
 [guardarYCalcular,];

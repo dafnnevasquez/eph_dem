@@ -27,7 +27,7 @@
               </button>
             </div>
           </div>
-          <h2 class="section-title">Parámetros — Atención Abierta</h2>
+          <h2 class="section-title">Parámetros</h2>
           <div class="proyecto-activo-badge">
             <span class="badge-label">Proyecto en edición</span>
             <span class="badge-name">{{ nombreProyectoActivo }}</span>
@@ -39,15 +39,6 @@
             </span>
           </div>
 
-          <!-- Botones de días -->
-          <div class="botones-dias">
-            <button class="btn-dias" type="button" @click="setDiasLaborales(260)">
-              <i class="fa-solid fa-calendar-days"></i> Días hábiles (260)
-            </button>
-            <button class="btn-dias" type="button" @click="setDiasLaborales(365)">
-              <i class="fa-solid fa-calendar"></i> Todo el año (365)
-            </button>
-          </div>
         </header>
 
         <section v-if="filas.length === 0" class="panel-vacio">
@@ -60,34 +51,27 @@
             <table class="tabla-parametros">
               <thead>
                 <tr>
-                  <th>Código</th>
                   <th>Prestación</th>
-                  <th>Área</th>
-                  <th>Demanda anual</th>
-                  <th>Tiempo (min)</th>
-                  <th>Días laborales</th>
-                  <th>N° simultáneas</th>
-                  <th>Disponibilidad (%)</th>
-                  <th>Jornada (hrs)</th>
-                  <th>EEMM</th>
+                  <th>Demanda <span class="info-icon" :data-tooltip="infoTexts.demanda" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
+                  <th>Días al año disponibles <span class="info-icon" :data-tooltip="infoTexts.diasLaborales" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
+                  <th>Tiempo de procedimiento (min) <span class="info-icon" :data-tooltip="infoTexts.tiempo" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
+                  <th>N° simultáneas <span class="info-icon" :data-tooltip="infoTexts.nSimultaneas" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
+                  <th>Disponibilidad (%) <span class="info-icon" :data-tooltip="infoTexts.disponibilidad" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
+                  <th>Jornada laboral (hrs) <span class="info-icon" :data-tooltip="infoTexts.jornada" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="fila in filas" :key="fila.ID_PRESTACION">
-                  <td class="td-codigo">{{ fila.cod_prestacion }}</td>
-                  <td class="td-nombre">{{ fila.nombre_prestacion }}</td>
-                  <td class="td-area">{{ fila.area }}</td>
-                  <td><input v-model.number="fila.demanda" type="number" min="0" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-demanda`) }" @input="calcularEEMM(fila)" /></td>
-                  <td><input v-model.number="fila.tiempo" type="number" min="0" step="0.1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-tiempo`) }" @input="calcularEEMM(fila)" /></td>
-                  <td><input v-model.number="fila.diasLaborales" type="number" min="1" max="366" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-diasLaborales`) }" @input="calcularEEMM(fila)" /></td>
-                  <td><input v-model.number="fila.nSimultaneas" type="number" min="1" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-nSimultaneas`) }" @input="calcularEEMM(fila)" /></td>
-                  <td><input v-model.number="fila.disponibilidad" type="number" min="0" max="100" step="0.1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-disponibilidad`) }" @input="calcularEEMM(fila)" /></td>
                   <td>
-                    <select v-model.number="fila.jornada" @change="calcularEEMM(fila)">
-                      <option v-for="j in 12" :key="j" :value="j">{{ j }}</option>
-                    </select>
+                    <div class="td-codigo">{{ fila.cod_prestacion }}</div>
+                    <div class="td-nombre">{{ fila.nombre_prestacion }}</div>
                   </td>
-                  <td class="td-eemm">{{ fila.eemm !== null ? fila.eemm.toFixed(3) : '—' }}</td>
+                  <td><input v-model.number="fila.demanda" type="number" min="0" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-demanda`) }" @input="calcularEEMM(fila)" /></td>
+                  <td><input v-model.number="fila.diasLaborales" type="number" min="1" max="366" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-diasLaborales`) }" @input="calcularEEMM(fila)" /></td>
+                  <td><input v-model.number="fila.tiempo" type="number" min="0" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-tiempo`) }" @input="calcularEEMM(fila)" /></td>
+                  <td><input v-model.number="fila.nSimultaneas" type="number" min="1" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-nSimultaneas`) }" @input="calcularEEMM(fila)" /></td>
+                  <td><input v-model.number="fila.disponibilidad" type="number" min="0" max="100" step="1" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-disponibilidad`) }" @input="calcularEEMM(fila)" /></td>
+                  <td><input v-model.number="fila.jornada" type="number" min="0" max="24" step="0.5" :class="{ 'input-error': errores.has(`${fila.ID_PRESTACION}-jornada`) }" @input="calcularEEMM(fila)" /></td>
                 </tr>
               </tbody>
             </table>
@@ -100,12 +84,18 @@
               </div>
             </transition>
             <button class="btn-principal" @click="guardarYCalcular">
-              <i class="fa-solid fa-calculator"></i> Calcular y ver Resultados
+              <i class="fa-solid fa-calculator"></i> Guardar y calcular
             </button>
           </div>
         </section>
       </main>
     </div>
+
+    <div v-if="tooltipPosicion.visible" class="tooltip-flotante" :class="{ 'tooltip-flotante--left': tooltipPosicion.abrirIzquierda }" :style="{ top: tooltipPosicion.top, left: tooltipPosicion.left }">
+      <div class="tooltip-flecha"></div>
+      <div class="tooltip-contenido">{{ tooltipPosicion.texto }}</div>
+    </div>
+
   </AppLayout>
 </template>
 
@@ -172,7 +162,7 @@ async function cargarDatos() {
         nombre_prestacion: p.nombre_prestacion,
         area:              p.area,
         demanda:           guardado?.demanda       ?? 0,
-        tiempo:            guardado?.tiempo        ?? 0,
+        tiempo:            guardado?.tiempo        ?? p.tiempo_procedimiento ?? 0,
         diasLaborales:     guardado?.diasLaborales ?? 260,
         nSimultaneas:      guardado?.nSimultaneas  ?? 1,
         disponibilidad:    guardado?.disponibilidad ?? 100,
@@ -214,6 +204,15 @@ async function cargarDesdeServidor(proyectoId) {
     console.error('Error al cargar desde servidor:', e)
     cargarDatos()
   }
+}
+
+const infoTexts = {
+  demanda: 'Cantidad de atenciones proyectadas para esta prestación en el período.',
+  diasLaborales: 'Número de días disponibles al año para operar. Máximo 366 días.',
+  tiempo: 'Minutos que dura el procedimiento.',
+  disponibilidad: 'Porcentaje de disponibilidad real del equipo para esta prestación.',
+  jornada: 'Horas efectivas de operación al día.',
+  nSimultaneas: 'Cantidad de prestaciones simultáneas.',
 }
 
 function validar() {
@@ -263,6 +262,8 @@ async function guardarYCalcular() {
     const data = await resp.json()
     if (!data.ok) { alert('Error al calcular: ' + (data.error || '')); return }
     localStorage.setItem('ephdem_resultado_abierta', JSON.stringify(data.datos))
+    localStorage.removeItem('ephdem_prestaciones_abierta')
+    localStorage.removeItem('ephdem_prestaciones_abierta_pid')
     router.push(`/resultados-abierta/${proyectoId}`)
   } catch (e) {
     alert('No se pudo conectar con el servidor.')
@@ -282,13 +283,25 @@ onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo_abierta') || 'Desconocido'
   const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
   const rawLocal = localStorage.getItem('ephdem_prestaciones_abierta')
-  if (rawLocal) {
+  const pidLocal = localStorage.getItem('ephdem_prestaciones_abierta_pid')
+  if (rawLocal && proyectoId && String(pidLocal) === String(proyectoId)) {
     await cargarDatos()
   } else if (proyectoId) {
     await cargarDesdeServidor(proyectoId)
   }
 })
-  
+
+const tooltipPosicion = ref({ top: '0px', left: '0px', visible: false, texto: '', abrirIzquierda: false })
+
+function mostrarTooltip(event) {
+  const span = event.target
+  const rect = span.getBoundingClientRect()
+  const TOOLTIP_WIDTH = 240
+  const abrirIzquierda = (rect.left + TOOLTIP_WIDTH + 16) > window.innerWidth
+  tooltipPosicion.value = { top: `${rect.bottom + 8}px`, left: abrirIzquierda ? `${rect.right - TOOLTIP_WIDTH}px` : `${rect.left}px`, visible: true, texto: span.getAttribute('data-tooltip'), abrirIzquierda }
+}
+function ocultarTooltip() { tooltipPosicion.value.visible = false }
+
 </script>
 
 <style lang="scss" scoped>
@@ -332,10 +345,15 @@ onMounted(async () => {
 .tabla-parametros td { padding: 10px 8px; border-bottom: 1px solid $color-borde; vertical-align: middle; }
 .tabla-parametros td input, .tabla-parametros td select { width: 100%; padding: 7px 8px; border: 1px solid $color-borde; border-radius: 8px; font-size: 0.88rem; }
 .tabla-parametros td input.input-error { border-color: #e53935; background: #fff5f5; }
-.td-codigo { font-size: 0.78rem; font-weight: 700; color: $color-primario; white-space: nowrap; }
-.td-nombre { font-size: 0.88rem; font-weight: 500; min-width: 200px; }
+.td-codigo { font-size: 0.85rem; font-weight: 700; color: $color-primario; }
+.td-nombre { font-size: 0.95rem; font-weight: 500; color: $color-texto-principal;}
 .td-area { font-size: 0.78rem; color: $color-texto-secundario; white-space: nowrap; }
 .td-eemm { font-weight: 700; color: $color-primario; text-align: center; }
+.info-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 6px; border-radius: 50%; background: rgba(0,60,88,0.14); color: $color-primario; font-size: 0.72rem; font-weight: 700; cursor: help; }
+.tooltip-flotante { position: fixed; z-index: 10000; pointer-events: none; }
+.tooltip-contenido { width: 240px; padding: 10px 14px; background: $color-primario; color: #fff; font-size: 0.85rem; font-weight: 500; border-radius: 8px; text-align: center; line-height: 1.5; box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+.tooltip-flecha { position: absolute; top: -7px; left: 7px; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 7px solid $color-primario; }
+.tooltip-flotante--left .tooltip-flecha { left: auto; right: 7px; }
 
 .acciones-finales { margin-top: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .banner-error { display: flex; align-items: center; gap: 10px; background: #fff5f5; border: 1.5px solid #e53935; color: #c62828; border-radius: 10px; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; width: 100%; }

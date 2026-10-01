@@ -30,7 +30,7 @@
           </div>
           <div class="title-actions-row">
             <div>
-              <h2 class="section-title">Resultados — Atención Abierta</h2>
+              <h2 class="section-title">Resultados</h2>
               <p class="section-subtitle">Resumen de equipamiento por prestación y recinto.</p>
             </div>
             <div class="header-actions">

@@ -87,6 +87,7 @@ async function cargarDesdeServidor(proyectoId) {
                 cod_prestacion: p.cod_prestacion,
                 nombre_prestacion: p.nombre_prestacion,
                 area: p.area,
+                tiempo_procedimiento: p.tiempo ?? null,
             }));
         }
     }

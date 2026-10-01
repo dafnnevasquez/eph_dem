@@ -25,7 +25,7 @@
               </button>
             </div>
           </div>
-          <h2 class="section-title">Prestaciones — Atención Abierta</h2>
+          <h2 class="section-title">Prestaciones</h2>
           <div class="proyecto-activo-badge">
             <span class="badge-label">Proyecto en edición</span>
             <span class="badge-name">{{ nombreProyectoActivo }}</span>
@@ -33,11 +33,11 @@
           <div class="instruccion-indicator">
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">
-              Selecciona las prestaciones MAI de FONASA usando
+              Selecciona las prestaciones que se asociarán al proyecto: usa
               <span class="instruccion-badge instruccion-badge--agregar"><i class="fa-solid fa-plus"></i></span>
               para agregar y
               <span class="instruccion-badge instruccion-badge--quitar"><i class="fa-solid fa-xmark"></i></span>
-              para quitar. Luego presiona <strong>Guardar y confirmar</strong>.
+              para eliminar de la selección. Luego presiona <strong>Guardar y confirmar</strong>.
             </span>
           </div>
         </header>
@@ -178,8 +178,9 @@ function limpiarSeleccion() { seleccionadas.value = [] }
 
 function guardarYConfirmar() {
   if (seleccionadas.value.length === 0) { alert('Debes seleccionar al menos una prestación.'); return }
-  localStorage.setItem('ephdem_prestaciones_abierta', JSON.stringify(seleccionadas.value))
   const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
+  localStorage.setItem('ephdem_prestaciones_abierta', JSON.stringify(seleccionadas.value))
+  localStorage.setItem('ephdem_prestaciones_abierta_pid', String(proyectoId))
   if (proyectoId) router.push(`/parametros-abierta/${proyectoId}`)
   else router.push('/parametros-abierta')
 }
@@ -199,6 +200,7 @@ async function cargarDesdeServidor(proyectoId) {
         cod_prestacion:    p.cod_prestacion,
         nombre_prestacion: p.nombre_prestacion,
         area:              p.area,
+        tiempo_procedimiento: p.tiempo ?? null,
       }))
     }
   } catch (e) {

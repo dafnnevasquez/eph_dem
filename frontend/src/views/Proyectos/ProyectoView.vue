@@ -174,10 +174,13 @@ function seleccionarTipoProyecto(tipo) {
 function verProyecto(proyecto) {
   const id = proyecto.id || proyecto.id_proyecto
   if (proyecto.tipo_atencion === 'Atención abierta') {
+    localStorage.removeItem('ephdem_prestaciones_abierta')
+    localStorage.removeItem('ephdem_prestaciones_abierta_pid')
     localStorage.setItem('ephdem_proyecto_activo_abierta', id)
     localStorage.setItem('ephdem_nombre_proyecto_activo_abierta', proyecto.nombre_proyecto)
     router.push(`/resultados-abierta/${id}`)
   } else {
+    localStorage.removeItem('ephdem_origen_edicion')
     localStorage.setItem('ephdem_proyecto_activo', id)
     localStorage.setItem('ephdem_nombre_proyecto_activo', proyecto.nombre_proyecto)
     router.push(`/resultados/${id}`)

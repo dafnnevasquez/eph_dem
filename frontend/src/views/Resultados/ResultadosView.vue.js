@@ -89,7 +89,7 @@ function aplicarDatos(datos) {
     porRecinto.value = datos.equipamiento?.por_recinto ?? {};
     demandaCompartidaRaw.value = datos.equipamiento?.demanda_compartida ?? [];
     pabellonesPorRecintoRaw.value = datos.pabellones?.pabellones_por_recinto ?? {};
-    boxesPorRecintoRaw.value = datos.boxes?.por_recinto ?? {};
+    boxesPorRecintoRaw.value = datos.boxes?.boxes_por_recinto ?? datos.boxes?.por_recinto ?? {};
     urpaRaw.value = datos.urpa ?? null;
     if (datos.nombre_proyecto) {
         nombreProyecto.value = datos.nombre_proyecto;
@@ -191,7 +191,7 @@ function exportarPdf() {
     window.open(`https://sigem-uv.cl/__v2/modulo_eph/ajax/generar/generar_pdf_cerrada.php?proyecto_id=${proyectoIdActivo.value}&nombre=${nombre}`, '_blank');
 }
 function equiposNoImplementado() {
-    alert('Equipos de Oportunidad no está implementado en esta versión.');
+    alert('Equipos por Oportunidad no está implementado en esta versión.');
 }
 const __VLS_ctx = {
     ...{},

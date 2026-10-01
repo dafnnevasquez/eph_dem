@@ -45,3 +45,6 @@ funciones_sigemuv_C_BaseDatos.php
 .env.production
 .env.development
 .env
+.phpunit.result.cache
+
+*.vue.js

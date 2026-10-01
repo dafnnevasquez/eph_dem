@@ -56,7 +56,7 @@ async function cargarDatos() {
                 nombre_prestacion: p.nombre_prestacion,
                 area: p.area,
                 demanda: guardado?.demanda ?? 0,
-                tiempo: guardado?.tiempo ?? 0,
+                tiempo: guardado?.tiempo ?? p.tiempo_procedimiento ?? 0,
                 diasLaborales: guardado?.diasLaborales ?? 260,
                 nSimultaneas: guardado?.nSimultaneas ?? 1,
                 disponibilidad: guardado?.disponibilidad ?? 100,
@@ -100,6 +100,14 @@ async function cargarDesdeServidor(proyectoId) {
         cargarDatos();
     }
 }
+const infoTexts = {
+    demanda: 'Cantidad de atenciones proyectadas para esta prestación en el período.',
+    diasLaborales: 'Número de días disponibles al año para operar. Máximo 366 días.',
+    tiempo: 'Minutos que dura el procedimiento.',
+    disponibilidad: 'Porcentaje de disponibilidad real del equipo para esta prestación.',
+    jornada: 'Horas efectivas de operación al día.',
+    nSimultaneas: 'Cantidad de prestaciones simultáneas.',
+};
 function validar() {
     const errs = new Set();
     for (const f of filas.value) {
@@ -177,6 +185,15 @@ onMounted(async () => {
         await cargarDesdeServidor(proyectoId);
     }
 });
+const tooltipPosicion = ref({ top: '0px', left: '0px', visible: false, texto: '', abrirIzquierda: false });
+function mostrarTooltip(event) {
+    const span = event.target;
+    const rect = span.getBoundingClientRect();
+    const TOOLTIP_WIDTH = 240;
+    const abrirIzquierda = (rect.left + TOOLTIP_WIDTH + 16) > window.innerWidth;
+    tooltipPosicion.value = { top: `${rect.bottom + 8}px`, left: abrirIzquierda ? `${rect.right - TOOLTIP_WIDTH}px` : `${rect.left}px`, visible: true, texto: span.getAttribute('data-tooltip'), abrirIzquierda };
+}
+function ocultarTooltip() { tooltipPosicion.value.visible = false; }
 const __VLS_ctx = {
     ...{},
     ...{},
@@ -190,6 +207,7 @@ let __VLS_directives;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
 /** @type {__VLS_StyleScopedClasses['tabla-parametros']} */ ;
+/** @type {__VLS_StyleScopedClasses['tooltip-flecha']} */ ;
 const __VLS_0 = AppLayout || AppLayout;
 // @ts-ignore
 const __VLS_1 = __VLS_asFunctionalComponent1(__VLS_0, new __VLS_0({}));
@@ -341,40 +359,6 @@ __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
     ...{ class: "instruccion-texto" },
 });
 /** @type {__VLS_StyleScopedClasses['instruccion-texto']} */ ;
-__VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
-    ...{ class: "botones-dias" },
-});
-/** @type {__VLS_StyleScopedClasses['botones-dias']} */ ;
-__VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
-    ...{ onClick: (...[$event]) => {
-            __VLS_ctx.setDiasLaborales(260);
-            // @ts-ignore
-            [irAPrestaciones, authStore, cerrarSesion, nombreProyectoActivo, setDiasLaborales,];
-        } },
-    ...{ class: "btn-dias" },
-    type: "button",
-});
-/** @type {__VLS_StyleScopedClasses['btn-dias']} */ ;
-__VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
-    ...{ class: "fa-solid fa-calendar-days" },
-});
-/** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
-/** @type {__VLS_StyleScopedClasses['fa-calendar-days']} */ ;
-__VLS_asFunctionalElement1(__VLS_intrinsics.button, __VLS_intrinsics.button)({
-    ...{ onClick: (...[$event]) => {
-            __VLS_ctx.setDiasLaborales(365);
-            // @ts-ignore
-            [setDiasLaborales,];
-        } },
-    ...{ class: "btn-dias" },
-    type: "button",
-});
-/** @type {__VLS_StyleScopedClasses['btn-dias']} */ ;
-__VLS_asFunctionalElement1(__VLS_intrinsics.i, __VLS_intrinsics.i)({
-    ...{ class: "fa-solid fa-calendar" },
-});
-/** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
-/** @type {__VLS_StyleScopedClasses['fa-calendar']} */ ;
 if (__VLS_ctx.filas.length === 0) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.section, __VLS_intrinsics.section)({
         ...{ class: "panel-vacio" },
@@ -404,34 +388,69 @@ else {
     __VLS_asFunctionalElement1(__VLS_intrinsics.tr, __VLS_intrinsics.tr)({});
     __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
     __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ onMouseenter: (__VLS_ctx.mostrarTooltip) },
+        ...{ onMouseleave: (__VLS_ctx.ocultarTooltip) },
+        ...{ class: "info-icon" },
+        'data-tooltip': (__VLS_ctx.infoTexts.demanda),
+    });
+    /** @type {__VLS_StyleScopedClasses['info-icon']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ onMouseenter: (__VLS_ctx.mostrarTooltip) },
+        ...{ onMouseleave: (__VLS_ctx.ocultarTooltip) },
+        ...{ class: "info-icon" },
+        'data-tooltip': (__VLS_ctx.infoTexts.diasLaborales),
+    });
+    /** @type {__VLS_StyleScopedClasses['info-icon']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ onMouseenter: (__VLS_ctx.mostrarTooltip) },
+        ...{ onMouseleave: (__VLS_ctx.ocultarTooltip) },
+        ...{ class: "info-icon" },
+        'data-tooltip': (__VLS_ctx.infoTexts.tiempo),
+    });
+    /** @type {__VLS_StyleScopedClasses['info-icon']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ onMouseenter: (__VLS_ctx.mostrarTooltip) },
+        ...{ onMouseleave: (__VLS_ctx.ocultarTooltip) },
+        ...{ class: "info-icon" },
+        'data-tooltip': (__VLS_ctx.infoTexts.nSimultaneas),
+    });
+    /** @type {__VLS_StyleScopedClasses['info-icon']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ onMouseenter: (__VLS_ctx.mostrarTooltip) },
+        ...{ onMouseleave: (__VLS_ctx.ocultarTooltip) },
+        ...{ class: "info-icon" },
+        'data-tooltip': (__VLS_ctx.infoTexts.disponibilidad),
+    });
+    /** @type {__VLS_StyleScopedClasses['info-icon']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
-    __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
-    __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
-    __VLS_asFunctionalElement1(__VLS_intrinsics.th, __VLS_intrinsics.th)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.span, __VLS_intrinsics.span)({
+        ...{ onMouseenter: (__VLS_ctx.mostrarTooltip) },
+        ...{ onMouseleave: (__VLS_ctx.ocultarTooltip) },
+        ...{ class: "info-icon" },
+        'data-tooltip': (__VLS_ctx.infoTexts.jornada),
+    });
+    /** @type {__VLS_StyleScopedClasses['info-icon']} */ ;
     __VLS_asFunctionalElement1(__VLS_intrinsics.tbody, __VLS_intrinsics.tbody)({});
     for (const [fila] of __VLS_vFor((__VLS_ctx.filas))) {
         __VLS_asFunctionalElement1(__VLS_intrinsics.tr, __VLS_intrinsics.tr)({
             key: (fila.ID_PRESTACION),
         });
-        __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({
+        __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({});
+        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
             ...{ class: "td-codigo" },
         });
         /** @type {__VLS_StyleScopedClasses['td-codigo']} */ ;
         (fila.cod_prestacion);
-        __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({
+        __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
             ...{ class: "td-nombre" },
         });
         /** @type {__VLS_StyleScopedClasses['td-nombre']} */ ;
         (fila.nombre_prestacion);
-        __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({
-            ...{ class: "td-area" },
-        });
-        /** @type {__VLS_StyleScopedClasses['td-area']} */ ;
-        (fila.area);
         __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({});
         __VLS_asFunctionalElement1(__VLS_intrinsics.input)({
             ...{ onInput: (...[$event]) => {
@@ -439,7 +458,7 @@ else {
                         return;
                     __VLS_ctx.calcularEEMM(fila);
                     // @ts-ignore
-                    [irAPrestaciones, filas, filas, calcularEEMM,];
+                    [irAPrestaciones, irAPrestaciones, authStore, cerrarSesion, nombreProyectoActivo, filas, filas, mostrarTooltip, mostrarTooltip, mostrarTooltip, mostrarTooltip, mostrarTooltip, mostrarTooltip, ocultarTooltip, ocultarTooltip, ocultarTooltip, ocultarTooltip, ocultarTooltip, ocultarTooltip, infoTexts, infoTexts, infoTexts, infoTexts, infoTexts, infoTexts, calcularEEMM,];
                 } },
             type: "number",
             min: "0",
@@ -458,11 +477,12 @@ else {
                     [calcularEEMM, errores,];
                 } },
             type: "number",
-            min: "0",
-            step: "0.1",
-            ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-tiempo`) }) },
+            min: "1",
+            max: "366",
+            step: "1",
+            ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-diasLaborales`) }) },
         });
-        (fila.tiempo);
+        (fila.diasLaborales);
         /** @type {__VLS_StyleScopedClasses['input-error']} */ ;
         __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({});
         __VLS_asFunctionalElement1(__VLS_intrinsics.input)({
@@ -474,12 +494,11 @@ else {
                     [calcularEEMM, errores,];
                 } },
             type: "number",
-            min: "1",
-            max: "366",
+            min: "0",
             step: "1",
-            ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-diasLaborales`) }) },
+            ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-tiempo`) }) },
         });
-        (fila.diasLaborales);
+        (fila.tiempo);
         /** @type {__VLS_StyleScopedClasses['input-error']} */ ;
         __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({});
         __VLS_asFunctionalElement1(__VLS_intrinsics.input)({
@@ -509,38 +528,30 @@ else {
             type: "number",
             min: "0",
             max: "100",
-            step: "0.1",
+            step: "1",
             ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-disponibilidad`) }) },
         });
         (fila.disponibilidad);
         /** @type {__VLS_StyleScopedClasses['input-error']} */ ;
         __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({});
-        __VLS_asFunctionalElement1(__VLS_intrinsics.select, __VLS_intrinsics.select)({
-            ...{ onChange: (...[$event]) => {
+        __VLS_asFunctionalElement1(__VLS_intrinsics.input)({
+            ...{ onInput: (...[$event]) => {
                     if (!!(__VLS_ctx.filas.length === 0))
                         return;
                     __VLS_ctx.calcularEEMM(fila);
                     // @ts-ignore
                     [calcularEEMM, errores,];
                 } },
-            value: (fila.jornada),
+            type: "number",
+            min: "0",
+            max: "24",
+            step: "0.5",
+            ...{ class: ({ 'input-error': __VLS_ctx.errores.has(`${fila.ID_PRESTACION}-jornada`) }) },
         });
-        for (const [j] of __VLS_vFor((12))) {
-            __VLS_asFunctionalElement1(__VLS_intrinsics.option, __VLS_intrinsics.option)({
-                key: (j),
-                value: (j),
-            });
-            (j);
-            // @ts-ignore
-            [];
-        }
-        __VLS_asFunctionalElement1(__VLS_intrinsics.td, __VLS_intrinsics.td)({
-            ...{ class: "td-eemm" },
-        });
-        /** @type {__VLS_StyleScopedClasses['td-eemm']} */ ;
-        (fila.eemm !== null ? fila.eemm.toFixed(3) : '—');
+        (fila.jornada);
+        /** @type {__VLS_StyleScopedClasses['input-error']} */ ;
         // @ts-ignore
-        [];
+        [errores,];
     }
     __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
         ...{ class: "acciones-finales" },
@@ -583,8 +594,26 @@ else {
     /** @type {__VLS_StyleScopedClasses['fa-solid']} */ ;
     /** @type {__VLS_StyleScopedClasses['fa-calculator']} */ ;
 }
+if (__VLS_ctx.tooltipPosicion.visible) {
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "tooltip-flotante" },
+        ...{ class: ({ 'tooltip-flotante--left': __VLS_ctx.tooltipPosicion.abrirIzquierda }) },
+        ...{ style: ({ top: __VLS_ctx.tooltipPosicion.top, left: __VLS_ctx.tooltipPosicion.left }) },
+    });
+    /** @type {__VLS_StyleScopedClasses['tooltip-flotante']} */ ;
+    /** @type {__VLS_StyleScopedClasses['tooltip-flotante--left']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "tooltip-flecha" },
+    });
+    /** @type {__VLS_StyleScopedClasses['tooltip-flecha']} */ ;
+    __VLS_asFunctionalElement1(__VLS_intrinsics.div, __VLS_intrinsics.div)({
+        ...{ class: "tooltip-contenido" },
+    });
+    /** @type {__VLS_StyleScopedClasses['tooltip-contenido']} */ ;
+    (__VLS_ctx.tooltipPosicion.texto);
+}
 // @ts-ignore
-[guardarYCalcular,];
+[guardarYCalcular, tooltipPosicion, tooltipPosicion, tooltipPosicion, tooltipPosicion, tooltipPosicion,];
 var __VLS_3;
 // @ts-ignore
 [];
