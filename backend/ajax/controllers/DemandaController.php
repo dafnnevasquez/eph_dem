@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
 error_reporting(E_ALL);
 
 
@@ -37,6 +37,25 @@ class DemandaController
         $this->urpaService       = new UrpaService($this->conn);
     }
 
+    private function cerrarConexion(): void
+    {
+        try {
+            mysqli_close($this->conn);
+        } catch (\Throwable $ignorada) {
+            // la conexion ya estaba cerrada
+        }
+    }
+
+    private function responderDatosInvalidos(array $errores): void
+    {
+        $this->cerrarConexion();
+        http_response_code(400);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        echo json_encode(['ok' => false, 'error' => 'Datos invalidos.', 'detalle' => $errores], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     public function calcular(): void
     {
         Response::soloPost();
@@ -45,24 +64,68 @@ class DemandaController
         $proyectoId = (int)($input['proyecto_id'] ?? 0);
         $filas      = $input['filas'] ?? [];
 
-        if ($proyectoId <= 0)  Response::error('proyecto_id es requerido.', 400);
-        if (empty($filas))     Response::error('Se requiere al menos una prestación.', 400);
+        if ($proyectoId <= 0)                   Response::error('proyecto_id es requerido.', 400);
+        if (!is_array($filas) || empty($filas)) Response::error('Se requiere al menos una prestación.', 400);
 
-        // 1. Guardar demanda
-        $guardadas = $this->pabellonesService->guardarDemanda($proyectoId, $filas);
+        // Validación y saneo fila por fila (igual que produccion/ajax/calcular_demanda.php)
+        $filasSane = [];
+        $errores   = [];
+        foreach ($filas as $i => $f) {
+            if (!is_array($f)) {
+                $errores[] = "fila[$i]: formato invalido";
+                continue;
+            }
 
-        // 2. Calcular pabellones y boxes
-        $pabellones = $this->pabellonesService->calcularPabellones($proyectoId);
-        $boxes      = $this->pabellonesService->calcularBoxes($proyectoId);
+            $pid  = isset($f['prestacion_id'])    ? (int)$f['prestacion_id']      : 0;
+            $dem  = isset($f['demanda_anual'])    ? (int)$f['demanda_anual']      : -1;
+            $dias = isset($f['dias_laborales'])   ? (int)$f['dias_laborales']     : 0;
+            $disp = isset($f['disponibilidad'])   ? (float)$f['disponibilidad']   : -1.0;
+            $jor  = isset($f['jornada_efectiva']) ? (float)$f['jornada_efectiva'] : 0.0;
 
-        // 3. Equipamiento consolidado
-        $equipamiento = $this->agregadorService->calcular($proyectoId);
+            if ($pid <= 0)               { $errores[] = "fila[$i]: prestacion_id invalido"; continue; }
+            if ($dem < 0)                { $errores[] = "fila[$i]: demanda_anual debe ser >= 0"; continue; }
+            if ($dias <= 0)              { $errores[] = "fila[$i]: dias_laborales debe ser > 0"; continue; }
+            if ($disp <= 0 || $disp > 1) { $errores[] = "fila[$i]: disponibilidad debe estar en (0,1]"; continue; }
+            if ($jor <= 0 || $jor > 24)  { $errores[] = "fila[$i]: jornada_efectiva debe estar en (0,24]"; continue; }
 
-        // 4. Vistas por recinto
-        $vistas = $this->vistasService->calcular($equipamiento);
+            $filasSane[] = [
+                'prestacion_id'    => $pid,
+                'demanda_anual'    => $dem,
+                'dias_laborales'   => $dias,
+                'disponibilidad'   => $disp,
+                'jornada_efectiva' => $jor,
+            ];
+        }
 
-        // 5. URPA
-        $urpa = $this->urpaService->calcular((int)$pabellones['pabellones_total']);
+        if (count($errores) > 0) {
+            $this->responderDatosInvalidos($errores);
+        }
+
+        try {
+            // 1. Guardar demanda
+            $guardadas = $this->pabellonesService->guardarDemanda($proyectoId, $filasSane);
+            if ($guardadas <= 0) {
+                $this->cerrarConexion();
+                Response::error('No se pudo guardar la demanda del proyecto. No se realizó el cálculo.', 500);
+            }
+
+            // 2. Calcular pabellones y boxes
+            $pabellones = $this->pabellonesService->calcularPabellones($proyectoId);
+            $boxes      = $this->pabellonesService->calcularBoxes($proyectoId);
+
+            // 3. Equipamiento consolidado
+            $equipamiento = $this->agregadorService->calcular($proyectoId);
+
+            // 4. Vistas por recinto
+            $vistas = $this->vistasService->calcular($equipamiento);
+
+            // 5. URPA
+            $urpa = $this->urpaService->calcular((int)$pabellones['pabellones_total']);
+        } catch (\Throwable $e) {
+            error_log('DemandaController::calcular: ' . $e->getMessage());
+            $this->cerrarConexion();
+            Response::error('Error en el cálculo.', 500);
+        }
 
         mysqli_close($this->conn);
 
