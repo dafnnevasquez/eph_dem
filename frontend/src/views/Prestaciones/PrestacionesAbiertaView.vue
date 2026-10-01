@@ -178,8 +178,9 @@ function limpiarSeleccion() { seleccionadas.value = [] }
 
 function guardarYConfirmar() {
   if (seleccionadas.value.length === 0) { alert('Debes seleccionar al menos una prestación.'); return }
-  localStorage.setItem('ephdem_prestaciones_abierta', JSON.stringify(seleccionadas.value))
   const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
+  localStorage.setItem('ephdem_prestaciones_abierta', JSON.stringify(seleccionadas.value))
+  localStorage.setItem('ephdem_prestaciones_abierta_pid', String(proyectoId))
   if (proyectoId) router.push(`/parametros-abierta/${proyectoId}`)
   else router.push('/parametros-abierta')
 }

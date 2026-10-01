@@ -262,6 +262,8 @@ async function guardarYCalcular() {
     const data = await resp.json()
     if (!data.ok) { alert('Error al calcular: ' + (data.error || '')); return }
     localStorage.setItem('ephdem_resultado_abierta', JSON.stringify(data.datos))
+    localStorage.removeItem('ephdem_prestaciones_abierta')
+    localStorage.removeItem('ephdem_prestaciones_abierta_pid')
     router.push(`/resultados-abierta/${proyectoId}`)
   } catch (e) {
     alert('No se pudo conectar con el servidor.')
@@ -281,7 +283,8 @@ onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo_abierta') || 'Desconocido'
   const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
   const rawLocal = localStorage.getItem('ephdem_prestaciones_abierta')
-  if (rawLocal) {
+  const pidLocal = localStorage.getItem('ephdem_prestaciones_abierta_pid')
+  if (rawLocal && proyectoId && String(pidLocal) === String(proyectoId)) {
     await cargarDatos()
   } else if (proyectoId) {
     await cargarDesdeServidor(proyectoId)
