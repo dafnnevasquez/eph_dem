@@ -148,7 +148,7 @@ class PabellonesBoxesService
         while ($row = mysqli_fetch_assoc($result)) {
             $req = $this->formulaEEMM(
                 (float)$row['demanda_anual'],
-                (float)self::TP_DIA_CAMA,
+                (float)$row['dias_laborales'],
                 (float)self::TP_DIA_CAMA,
                 (float)$row['disponibilidad'],
                 (float)$row['jornada_efectiva']
