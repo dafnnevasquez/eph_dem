@@ -99,6 +99,8 @@ class DemandaAbiertaController
         // Calcular resúmenes
         $equiposSummary = [];
         $recintoSummary = [];
+        $fracRecinto = [];
+        $fijoRecinto = [];
 
         foreach ($prestacionesDetalle as $p) {
             $reqVal = floatval($p['REQUERIMIENTO']);
@@ -115,14 +117,12 @@ class DemandaAbiertaController
             }
             if ($hasTipo2o5) {
                 foreach (array_unique($recintosTipo2o5) as $r) {
-                    if (!isset($recintoSummary[$r])) $recintoSummary[$r] = 0;
-                    $recintoSummary[$r] += (int)ceil($reqVal);
+                    $fracRecinto[$r] = ($fracRecinto[$r] ?? 0) + $reqVal;
                 }
             } elseif (!empty($p['EQUIPOS'])) {
                 $primerRec = $p['EQUIPOS'][0]['RECINTO'] ?? '';
                 if ($primerRec !== '') {
-                    if (!isset($recintoSummary[$primerRec])) $recintoSummary[$primerRec] = 0;
-                    $recintoSummary[$primerRec] += 1;
+                    $fijoRecinto[$primerRec] = ($fijoRecinto[$primerRec] ?? 0) + 1;
                 }
             }
 
@@ -143,6 +143,13 @@ class DemandaAbiertaController
             }
         }
 
+        foreach ($fracRecinto as $r => $f) {
+            $recintoSummary[$r] = (int)ceil($f);
+        }
+        foreach ($fijoRecinto as $r => $n) {
+            $recintoSummary[$r] = ($recintoSummary[$r] ?? 0) + $n;
+        }
+        
         // Guardar JSON en BD
         $jsonData = json_encode([
             'prestaciones'    => $prestacionesDetalle,
