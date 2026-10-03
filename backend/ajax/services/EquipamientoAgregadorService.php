@@ -1,141 +1,36 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../calculo/calculo_equipamiento.php';
+
 class EquipamientoAgregadorService
 {
-    const TBL_PRESTACIONES = 'EPHAC_Prestaciones';
-
-    const MAPA_REGLA_RECINTO = [
-        'uci'            => 2,
-        'enfermeria_uci' => 2,
-        'uti'            => 1,
-        'enfermeria_uti' => 1,
-    ];
-
     private mysqli $conn;
-    private EquipamientoKitService   $kitService;
-    private EquipamientoTipo5Service $tipo5Service;
-    private EquipamientoTipo6Service $tipo6Service;
 
+    /**
+     * $kitService, $tipo5Service y $tipo6Service ya no se usan:
+     * SIGEM_EPHDEM_CERRADA_CalcularEquipamiento llama por su cuenta a las
+     * funciones de calculo/ de cada fuente (kit, tipo 2, tipo 5 y tipo 6).
+     * Se conservan en la firma para no cambiar DemandaController.
+     */
     public function __construct(mysqli $conn, EquipamientoKitService $kitService, EquipamientoTipo5Service $tipo5Service, EquipamientoTipo6Service $tipo6Service)
     {
-        $this->conn         = $conn;
-        $this->kitService   = $kitService;
-        $this->tipo5Service = $tipo5Service;
-        $this->tipo6Service = $tipo6Service;
+        $this->conn = $conn;
     }
 
     public function calcular(int $proyectoId): array
     {
-        $kit   = $this->kitService->calcularKit($proyectoId);
-        $tipo2 = $this->kitService->calcularTipo2($proyectoId);
-        $tipo6 = $this->tipo6Service->calcular($proyectoId);
-        $tipo5 = $this->tipo5Service->calcular($proyectoId);
+        $resultado = SIGEM_EPHDEM_CERRADA_CalcularEquipamiento($this->conn, $proyectoId);
 
-        // Resolver recinto por prestación para T5
-        $prestIds = [];
-        foreach ($tipo5['equipos'] as $item) {
-            foreach ($item['por_prestacion'] as $pp) $prestIds[(int)$pp['prestacion_id']] = true;
-        }
-
-        $recintoPorPrestacion = [];
-        if (!empty($prestIds)) {
-            $ids    = implode(',', array_map('intval', array_keys($prestIds)));
-            $result = mysqli_query($this->conn, "SELECT id_prestacion, recinto_base_id FROM " . self::TBL_PRESTACIONES . " WHERE id_prestacion IN ($ids)");
-            while ($row = mysqli_fetch_assoc($result)) $recintoPorPrestacion[(int)$row['id_prestacion']] = (int)$row['recinto_base_id'];
-        }
-
-        $eq = [];
-
-        $asegurar = function (int $id, ?string $nombre) use (&$eq) {
-            if (!isset($eq[$id])) $eq[$id] = ['nombre' => $nombre, 'piso_por_bucket' => [], 'demanda' => 0, 'origenes' => [], 'detalle' => []];
-            elseif ($eq[$id]['nombre'] === null && $nombre !== null) $eq[$id]['nombre'] = $nombre;
-        };
-
-        $registrarPiso = function (int $id, ?string $nombre, string $bucket, int $cant) use (&$eq, $asegurar) {
-            $asegurar($id, $nombre);
-            if (!isset($eq[$id]['piso_por_bucket'][$bucket]) || $cant > $eq[$id]['piso_por_bucket'][$bucket]) $eq[$id]['piso_por_bucket'][$bucket] = $cant;
-        };
-
-        // KIT
-        foreach ($kit['equipos'] as $item) {
-            $id = (int)$item['equipo_id'];
-            $asegurar($id, $item['nombre_equipo'] ?? null);
-            foreach ($item['por_recinto'] as $pr) $registrarPiso($id, $item['nombre_equipo'] ?? null, 'recinto_' . (int)$pr['recinto_id'], (int)$pr['subtotal']);
-            $eq[$id]['origenes']['kit'] = (int)$item['cantidad'];
-            $eq[$id]['detalle'][] = ['origen' => 'kit', 'cantidad' => (int)$item['cantidad']];
-        }
-
-        // TIPO2
-        foreach ($tipo2['equipos'] as $item) {
-            $id = (int)$item['equipo_id'];
-            $asegurar($id, $item['nombre_equipo'] ?? null);
-            foreach ($item['por_recinto'] as $pr) $registrarPiso($id, $item['nombre_equipo'] ?? null, 'recinto_' . (int)$pr['recinto_id'], (int)$pr['nro_recintos']);
-            $eq[$id]['origenes']['tipo2_relacion'] = (int)$item['cantidad'];
-            $eq[$id]['detalle'][] = ['origen' => 'tipo2_relacion', 'cantidad' => (int)$item['cantidad']];
-        }
-
-        // TIPO6
-        foreach ($tipo6['equipos'] as $item) {
-            $id = (int)$item['equipo_id'];
-            $asegurar($id, $item['nombre_equipo'] ?? null);
-            $porBucketTmp = [];
-            foreach ($item['por_regla'] as $pr) {
-                $recId = self::MAPA_REGLA_RECINTO[$pr['regla']] ?? null;
-                if ($recId === null) continue;
-                $bucket = 'recinto_' . $recId;
-                $porBucketTmp[$bucket] = ($porBucketTmp[$bucket] ?? 0) + (int)$pr['subtotal'];
+        // La funcion original agrega 'desglose' (copia de la fuente) a cada
+        // entrada de 'detalle'. La respuesta actual de la API no lo incluye,
+        // asi que se quita para no cambiar el JSON.
+        foreach ($resultado['equipos'] as $i => $equipo) {
+            foreach (array_keys($equipo['detalle']) as $j) {
+                unset($resultado['equipos'][$i]['detalle'][$j]['desglose']);
             }
-            foreach ($porBucketTmp as $bucket => $cant) $registrarPiso($id, $item['nombre_equipo'] ?? null, $bucket, $cant);
-            $eq[$id]['origenes']['norma_upc'] = (int)$item['cantidad'];
-            $eq[$id]['detalle'][] = ['origen' => 'norma_upc', 'cantidad' => (int)$item['cantidad']];
         }
 
-        // TIPO5
-        foreach ($tipo5['equipos'] as $item) {
-            $id   = (int)$item['equipo_id'];
-            $cant = (int)$item['cantidad'];
-            $asegurar($id, $item['nombre_equipo'] ?? null);
-
-            $recintosSet = [];
-            foreach ($item['por_prestacion'] as $pp) {
-                $rec = $recintoPorPrestacion[(int)$pp['prestacion_id']] ?? null;
-                if ($rec !== null) $recintosSet[$rec] = true;
-            }
-            $recintosInvolucrados = array_keys($recintosSet);
-
-            if (count($recintosInvolucrados) === 1) {
-                $registrarPiso($id, $item['nombre_equipo'] ?? null, 'recinto_' . $recintosInvolucrados[0], $cant);
-            } else {
-                $eq[$id]['demanda'] = $cant;
-            }
-
-            $eq[$id]['origenes']['demanda'] = $cant;
-            $eq[$id]['detalle'][] = ['origen' => 'demanda', 'cantidad' => $cant];
-        }
-
-        // Cantidad final = max(piso, demanda)
-        $equipos = [];
-        foreach ($eq as $id => $info) {
-            $piso          = array_sum($info['piso_por_bucket']);
-            $cantidadFinal = max($piso, $info['demanda']);
-            $equipos[] = [
-                'equipo_id'        => $id,
-                'nombre_equipo'    => $info['nombre'],
-                'cantidad'         => $cantidadFinal,
-                'cantidad_piso'    => $piso,
-                'cantidad_demanda' => $info['demanda'],
-                'origenes'         => $info['origenes'],
-                'detalle'          => $info['detalle'],
-            ];
-        }
-
-        usort($equipos, fn($a, $b) => $a['equipo_id'] <=> $b['equipo_id']);
-
-        return [
-            'proyecto_id' => $proyectoId,
-            'equipos'     => $equipos,
-            'fuentes'     => ['kit' => $kit, 'tipo2' => $tipo2, 'tipo5' => $tipo5, 'tipo6' => $tipo6],
-        ];
+        return $resultado;
     }
 }
