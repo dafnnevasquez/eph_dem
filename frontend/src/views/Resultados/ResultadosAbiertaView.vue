@@ -16,9 +16,29 @@
             <div class="nav-buttons">
               <button class="btn-back" type="button" @click="volverAtras"><i class="fa-solid fa-arrow-left"></i> Volver</button>
               <button class="btn-back" type="button" @click="router.push('/inicio')"><i class="fa-solid fa-house-user"></i> Inicio</button>
+
               <div class="nav-divider" v-if="proyectoIdActivo"></div>
+
+              <!-- Fase 1 -->
+              <span class="fase-label" v-if="proyectoIdActivo">Fase 1</span>
               <button class="btn-back" type="button" @click="editarParametros" v-if="proyectoIdActivo"><i class="fa-solid fa-sliders"></i> Editar parámetros</button>
               <button class="btn-back" type="button" @click="modificarPrestaciones" v-if="proyectoIdActivo"><i class="fa-solid fa-list-check"></i> Modificar prestaciones</button>
+
+              <div class="nav-divider" v-if="proyectoIdActivo"></div>
+
+              <!-- Fase 2 -->
+              <span class="fase-label" v-if="proyectoIdActivo">Fase 2</span>
+              <button class="btn-fase2" type="button" @click="rrhhNoImplementado" v-if="proyectoIdActivo">
+                <i class="fa-solid fa-user-nurse"></i> RRHH
+              </button>
+
+              <div class="nav-divider" v-if="proyectoIdActivo"></div>
+
+              <!-- Fase 3 -->
+              <span class="fase-label" v-if="proyectoIdActivo">Fase 3</span>
+              <button class="btn-fase3" type="button" @click="equiposNoImplementado" v-if="proyectoIdActivo">
+                <i class="fa-solid fa-boxes-stacked"></i> Equipos
+              </button>
             </div>
             <div class="session-badge">
               <i class="fa-solid fa-circle-user"></i>
@@ -133,6 +153,32 @@
             </div>
           </div>
         </section>
+        <section class="siguientes-pasos" v-if="!cargando && !error && proyectoIdActivo">
+          <div class="pasos-titulo">
+            <i class="fa-solid fa-circle-check" style="color: #1a9e5c"></i>
+            Equipamiento calculado ¿Qué sigue?
+          </div>
+          <div class="pasos-grid">
+            <div class="paso-card" @click="rrhhNoImplementado">
+              <div class="paso-num">Fase 2</div>
+              <div class="paso-icono"><i class="fa-solid fa-user-nurse"></i></div>
+              <div class="paso-info">
+                <div class="paso-nombre">Dotación de RRHH</div>
+                <div class="paso-desc">Ingresa el personal disponible para ajustar el equipamiento según tu dotación real.</div>
+              </div>
+              <i class="fa-solid fa-arrow-right paso-flecha"></i>
+            </div>
+            <div class="paso-card" @click="equiposNoImplementado">
+              <div class="paso-num">Fase 3</div>
+              <div class="paso-icono"><i class="fa-solid fa-boxes-stacked"></i></div>
+              <div class="paso-info">
+                <div class="paso-nombre">Equipos por Oportunidad</div>
+                <div class="paso-desc">Agrega equipos adicionales no contemplados en el cálculo estándar.</div>
+              </div>
+              <i class="fa-solid fa-arrow-right paso-flecha"></i>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </AppLayout>
@@ -222,6 +268,13 @@ function exportarExcel() {
 function exportarPdf() {
   if (!proyectoIdActivo.value) { alert('No se pudo identificar el proyecto.'); return }
   window.open(`${import.meta.env.VITE_API_BASE}/generar/generar_pdf_abierta.php?id=${proyectoIdActivo.value}&usuario_id=${authStore.usuarioId}`, '_blank')
+}
+
+function rrhhNoImplementado() {
+  alert('RRHH no está implementado para atención abierta en esta versión.')
+}
+function equiposNoImplementado() {
+  alert('Equipos por Oportunidad no está implementado en esta versión.')
 }
 
 onMounted(() => {
@@ -326,5 +379,21 @@ onMounted(() => {
   &:hover { background: #ddeaf4; }
   i { font-size: 0.85rem; opacity: 0.7; }
 }
+
+.siguientes-pasos { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
+.pasos-titulo { font-size: 1.2rem; font-weight: 700; color: $color-primario; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.pasos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.paso-card { display: flex; align-items: center; gap: 16px; background: $color-claro; border: 1.5px solid $color-borde; border-radius: 14px; padding: 18px; cursor: pointer; transition: all 0.2s ease; &:hover { border-color: $color-primario; background: rgba(0,60,88,0.04); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,60,88,0.12); } }
+.paso-num { background: $color-primario; color: #fff; border-radius: 8px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.paso-icono { font-size: 1.6rem; color: $color-primario; flex: 0 0 auto; }
+.paso-info { flex: 1; }
+.paso-nombre { font-weight: 700; color: $color-primario; margin-bottom: 4px; }
+.paso-desc { font-size: 0.82rem; color: $color-texto-secundario; line-height: 1.4; }
+.paso-flecha { color: $color-primario; opacity: 0.5; font-size: 1rem; }
+@media (max-width: 700px) { .pasos-grid { grid-template-columns: 1fr; } }
+.fase-label { font-size: 0.72rem; font-weight: 700; color: $color-texto-secundario; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.btn-fase2 { background: $color-primario; color: #fff; border: none; border-radius: 999px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; &:hover { opacity: 0.85; } }
+.btn-fase3 { background: $color-primario; color: #fff; border: none; border-radius: 999px; padding: 6px 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; &:hover { opacity: 0.85; } }
+
 
 </style>
