@@ -43,7 +43,7 @@ $prestaciones = array_map(fn($p) => [
     'tiempo'            => $p['TIEMPO_PROCEDIMIENTO']  ?? 0,
     'diasLaborales'     => $p['DIAS_LABORALES']        ?? 260,
     'nSimultaneas'      => $p['N_SIMULTANEAS']          ?? 1,
-    'disponibilidad'    => $p['DISPONIBILIDAD'] * 100  ?? 100,
+    'disponibilidad' => isset($p['DISPONIBILIDAD']) ? $p['DISPONIBILIDAD'] * 100 : 100,
     'jornada'           => $p['JORNADA']               ?? 7,
 ], $datos['prestaciones']);
 

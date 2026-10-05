@@ -48,3 +48,7 @@ funciones_sigemuv_C_BaseDatos.php
 .phpunit.result.cache
 
 *.vue.js
+
+backend/vendor/
+
+error_log

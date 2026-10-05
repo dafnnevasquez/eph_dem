@@ -109,7 +109,6 @@ router.beforeEach((to) => {
 
   try {
     const raw = localStorage.getItem('ephdem_sesion')
-    console.log('Guard - ephdem_sesion:', raw) // temporal
     if (raw) {
       const sesion = JSON.parse(raw)
       if (sesion?.id_usuario && sesion?.correo) return true

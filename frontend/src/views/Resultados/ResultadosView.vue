@@ -28,7 +28,7 @@
 
         <!-- Fase 2 -->
         <span class="fase-label" v-if="proyectoIdActivo">Fase 2</span>
-        <button class="btn-fase2" type="button" @click="() => { console.log('proyectoId:', proyectoIdActivo); router.push(`/rrhh/${proyectoIdActivo}`) }" v-if="proyectoIdActivo">
+        <button class="btn-fase2" type="button" @click="router.push(`/rrhh/${proyectoIdActivo}`)" v-if="proyectoIdActivo">
           <i class="fa-solid fa-user-nurse"></i> RRHH
         </button>
 
@@ -415,10 +415,7 @@ function cargarDesdeLocalStorage() {
 async function cargarDesdeServidor(proyectoId) {
   // El cálculo recién hecho en ParametrosView (guardado en localStorage) es más reciente
   // que lo que tenga persistido el servidor, así que se prioriza si coincide con el proyecto.
-  const rawDebug = localStorage.getItem('ephdem_resultado_calculo')
-  console.log('[ResultadosView] cargarDesdeServidor - proyectoId de la ruta:', proyectoId, '| localStorage presente:', !!rawDebug, '| proyecto_id en localStorage:', rawDebug ? JSON.parse(rawDebug)?.proyecto_id ?? JSON.parse(rawDebug)?.datos?.proyecto_id : null)
-  if (aplicarDesdeLocalStorageSiCorresponde(proyectoId)) { console.log('[ResultadosView] rama: localStorage aplicado'); return }
-  console.log('[ResultadosView] rama: fetch al servidor')
+  if (aplicarDesdeLocalStorageSiCorresponde(proyectoId)) return
   const usuarioId = authStore.usuarioId
   if (!usuarioId) { error.value = 'No hay sesión activa.'; cargando.value = false; return }
   try {
@@ -431,7 +428,6 @@ async function cargarDesdeServidor(proyectoId) {
 }
 
 watch(() => route.params.proyectoId, (newId) => {
-  console.log('[Watch] proyectoId cambió a:', newId)
   cargando.value = true
   if (newId) cargarDesdeServidor(newId)
   else cargarDesdeLocalStorage()
