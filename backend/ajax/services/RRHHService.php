@@ -25,7 +25,7 @@ class RRHHService
 
             $ins = $this->conn->prepare(
                 'INSERT INTO ' . self::TBL .
-                ' (proyecto_id, recinto_id, tipo_rrhh, personas, jornada_semanal, min_interaccion)
+                ' (proyecto_id, recinto_id, tipo_rrhh, cantidad_personas, jornada_semanal, min_interaccion)
                   VALUES (?, ?, ?, ?, ?, ?)'
             );
             if (!$ins) throw new RuntimeException('prepare insert');
@@ -34,7 +34,7 @@ class RRHHService
             foreach ($grupos as $g) {
                 $rec = (int)$g['recinto_id'];
                 $tipo = (string)$g['tipo_rrhh'];
-                $per = (int)$g['personas'];
+                $per = (int)$g['cantidad_personas'];
                 $jor = (int)$g['jornada_semanal'];
                 $min = (int)$g['min_interaccion'];
                 $ins->bind_param('iisiii', $proyectoId, $rec, $tipo, $per, $jor, $min);
@@ -54,8 +54,8 @@ class RRHHService
     public function obtener(int $proyectoId): array
     {
         $stmt = $this->conn->prepare(
-            'SELECT recinto_id, tipo_rrhh, personas, jornada_semanal, min_interaccion
-             FROM ' . self::TBL . ' WHERE proyecto_id = ? ORDER BY id_registro'
+            'SELECT recinto_id, tipo_rrhh, cantidad_personas, jornada_semanal, min_interaccion
+             FROM ' . self::TBL . ' WHERE proyecto_id = ? ORDER BY id_rrhh'
         );
         if (!$stmt) throw new RuntimeException('prepare select');
         $stmt->bind_param('i', $proyectoId);
@@ -63,7 +63,7 @@ class RRHHService
         $res = $stmt->get_result();
         $grupos = [];
         while ($r = $res->fetch_assoc()) {
-            $r['minutos_semanales'] = (int)$r['personas'] * (int)$r['jornada_semanal'] * 60;
+            $r['minutos_semanales'] = (int)$r['cantidad_personas'] * (int)$r['jornada_semanal'] * 60;
             $grupos[] = $r;
         }
         $stmt->close();

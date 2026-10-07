@@ -34,7 +34,7 @@ class RRHHController
 
         foreach ($grupos as $g) {
             $rec = (int)($g['recinto_id'] ?? 0);
-            $per = $g['personas'] ?? null;
+            $per = $g['cantidad_personas'] ?? null;
             $jor = (int)($g['jornada_semanal'] ?? 0);
             $min = $g['min_interaccion'] ?? null;
             if ($rec < 1 || $rec > 4
@@ -81,7 +81,7 @@ class RRHHController
         // PENDIENTE: nombre real de la columna del dueño en EPHAC_Proyectos.
         // Reemplazar COLUMNA_USUARIO tras ver SHOW CREATE TABLE EPHAC_Proyectos.
         $stmt = $this->conn->prepare(
-            'SELECT 1 FROM EPHAC_Proyectos WHERE id_proyecto = ? AND COLUMNA_USUARIO = ? LIMIT 1'
+            'SELECT 1 FROM EPHAC_Proyectos WHERE id_proyecto = ? AND usuario_id = ? LIMIT 1'
         );
         if (!$stmt) throw new RuntimeException('prepare propietario');
         $stmt->bind_param('ii', $proyectoId, $usuarioId);
