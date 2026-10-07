@@ -33,60 +33,74 @@
           <div class="instruccion-indicator">
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">
-              Ingresa la cantidad de profesionales disponibles por recinto y categoría.
-              El sistema usará estos datos para ajustar el equipamiento calculado.
+              Por cada recinto, agrega grupos de personal: cuántas personas, su jornada semanal
+              y cuántos minutos interactúan con el equipo en el procedimiento.
             </span>
           </div>
         </header>
 
-        <section class="rrhh-panel">
+       <section class="rrhh-panel">
           <div v-for="recinto in recintos" :key="recinto.id" class="recinto-card">
             <div class="recinto-title">
               <i class="fa-solid fa-hospital-user"></i>
               {{ recinto.nombre }}
             </div>
+
+            <div class="acciones-recinto">
+              <button class="btn-mini" type="button" @click="agregarGrupo(recinto.id)">
+                <i class="fa-solid fa-plus"></i> Agregar grupo
+              </button>
+              <button class="btn-mini" type="button" @click="todosJornada(recinto.id, 44)">
+                Todos 44 h
+              </button>
+            </div>
+
             <div class="tabla-scroll">
               <table class="tabla-rrhh">
                 <thead>
                   <tr>
-                    <th>Categoría de Personal</th>
-                    <th>Dotación disponible</th>
-                    <th>Equipos que puede operar</th>
-                    <th>Equipos requeridos</th>
-                    <th>Estado</th>
+                    <th>Tipo de RRHH</th>
+                    <th>Cantidad de personas</th>
+                    <th>Jornada semanal (h)</th>
+                    <th>Min. de interacción con el equipo</th>
+                    <th>Min. semanales</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="categoria in categorias" :key="categoria.id">
+                  <tr v-if="dotacion[recinto.id].length === 0">
+                    <td colspan="6" class="fila-vacia">Sin grupos. Usa "Agregar grupo".</td>
+                  </tr>
+                  <tr v-for="(g, i) in dotacion[recinto.id]" :key="g.uid">
                     <td>
-                      <div class="categoria-nombre">{{ categoria.nombre }}</div>
-                      <div class="categoria-hint">{{ categoria.descripcion }}</div>
+                      <select v-model="g.tipo" class="input-dotacion">
+                        <option v-for="c in categorias" :key="c.id" :value="c.nombre">{{ c.nombre }}</option>
+                      </select>
                     </td>
+                    <td><input v-model.number="g.personas" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
                     <td>
-                      <input
-                        v-model.number="dotacion[recinto.id][categoria.id]"
-                        type="number"
-                        min="0"
-                        step="1"
-                        class="input-dotacion"
-                        placeholder="0"
-                      />
+                      <select v-model.number="g.jornada" class="input-dotacion">
+                        <option v-for="h in jornadasSemanales" :key="h" :value="h">{{ h }}</option>
+                      </select>
                     </td>
-                    <td class="td-calculado">
-                      {{ equiposPorPersonal(recinto.id, categoria.id) }}
-                    </td>
-                    <td class="td-requerido">
-                      {{ recinto.equiposRequeridos }}
-                    </td>
-                    <td>
-                      <span class="estado-badge" :class="estadoBadge(recinto.id, categoria.id, recinto.equiposRequeridos)">
-                        {{ estadoTexto(recinto.id, categoria.id, recinto.equiposRequeridos) }}
-                      </span>
-                    </td>
+                    <td><input v-model.number="g.minInteraccion" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
+                    <td class="td-calculado">{{ minutosGrupo(g) }}</td>
+                    <td><button class="btn-mini btn-quitar" type="button" @click="quitarGrupo(recinto.id, i)"><i class="fa-solid fa-trash"></i></button></td>
                   </tr>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4" class="total-label">Total del recinto</td>
+                    <td class="td-calculado">{{ totalRecinto(recinto.id) }}</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
+          </div>
+
+          <div class="total-general">
+            Total general: <strong>{{ totalGeneral() }}</strong> min/semana
           </div>
         </section>
 
@@ -116,51 +130,41 @@ const authStore = useAuthStore()
 const nombreProyectoActivo = ref('')
 const proyectoId = ref(null)
 
-// Categorías de personal (provisional — vendrán de BD)
+// Tipos de RRHH (provisional — vendrán de BD)
 const categorias = ref([
-  { id: 1, nombre: 'Médico Cirujano', descripcion: 'Realiza los procedimientos quirúrgicos', ratioEquipos: 1 },
-  { id: 2, nombre: 'Anestesista', descripcion: 'Administra la anestesia durante el procedimiento', ratioEquipos: 1 },
-  { id: 3, nombre: 'Arsenalera', descripcion: 'Asiste en pabellón y maneja el instrumental', ratioEquipos: 2 },
-  { id: 4, nombre: 'Enfermera/o', descripcion: 'Asistencia clínica en el recinto', ratioEquipos: 3 },
-  { id: 5, nombre: 'Técnico Paramédico', descripcion: 'Apoyo técnico en procedimientos', ratioEquipos: 3 },
+  { id: 1, nombre: 'Médico Cirujano' },
+  { id: 2, nombre: 'Anestesista' },
+  { id: 3, nombre: 'Arsenalera' },
+  { id: 4, nombre: 'Enfermera/o' },
+  { id: 5, nombre: 'Técnico Paramédico' },
 ])
 
-// Recintos con equipamiento calculado (provisional — vendrán de los resultados)
+const jornadasSemanales = [44, 33, 22, 11]
+
+// Recintos (provisional — vendrán de los resultados)
 const recintos = ref([
-  { id: 1, nombre: 'Cubículo UTI', equiposRequeridos: 0 },
-  { id: 2, nombre: 'Cubículo UCI', equiposRequeridos: 0 },
-  { id: 3, nombre: 'Pabellón menor', equiposRequeridos: 0 },
-  { id: 4, nombre: 'Pabellón mayor', equiposRequeridos: 0 },
+  { id: 1, nombre: 'Cubículo UTI' },
+  { id: 2, nombre: 'Cubículo UCI' },
+  { id: 3, nombre: 'Pabellón menor' },
+  { id: 4, nombre: 'Pabellón mayor' },
 ])
 
-// Dotación ingresada por el usuario
-const dotacion = ref({
-  1: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-  2: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-  3: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-  4: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-})
+// Grupos de RRHH por recinto
+const dotacion = ref({ 1: [], 2: [], 3: [], 4: [] })
 
-function equiposPorPersonal(recintoId, categoriaId) {
-  const cat = categorias.value.find(c => c.id === categoriaId)
-  const personal = dotacion.value[recintoId]?.[categoriaId] ?? 0
-  if (!cat || personal <= 0) return 0
-  return personal * cat.ratioEquipos
+let uidSeq = 1
+function nuevoGrupo() {
+  return { uid: uidSeq++, tipo: categorias.value[0].nombre, personas: 0, jornada: 44, minInteraccion: 0 }
 }
 
-function estadoBadge(recintoId, categoriaId, equiposRequeridos) {
-  const capacidad = equiposPorPersonal(recintoId, categoriaId)
-  if (capacidad === 0) return 'badge-sin-datos'
-  if (capacidad >= equiposRequeridos) return 'badge-ok'
-  return 'badge-insuficiente'
-}
+function agregarGrupo(recintoId) { dotacion.value[recintoId].push(nuevoGrupo()) }
+function quitarGrupo(recintoId, i) { dotacion.value[recintoId].splice(i, 1) }
+function todosJornada(recintoId, h) { dotacion.value[recintoId].forEach(g => { g.jornada = h }) }
 
-function estadoTexto(recintoId, categoriaId, equiposRequeridos) {
-  const capacidad = equiposPorPersonal(recintoId, categoriaId)
-  if (capacidad === 0) return 'Sin datos'
-  if (capacidad >= equiposRequeridos) return 'Suficiente'
-  return 'Insuficiente'
-}
+// personas × horas semanales × 60
+function minutosGrupo(g) { return (Number(g.personas) || 0) * (Number(g.jornada) || 0) * 60 }
+function totalRecinto(recintoId) { return dotacion.value[recintoId].reduce((s, g) => s + minutosGrupo(g), 0) }
+function totalGeneral() { return recintos.value.reduce((s, r) => s + totalRecinto(r.id), 0) }
 
 function guardarYContinuar() {
   localStorage.setItem('ephdem_rrhh', JSON.stringify(dotacion.value))
@@ -179,6 +183,20 @@ function cerrarSesion() {
 onMounted(() => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo') || 'Desconocido'
   proyectoId.value = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo')
+
+  // Recuperar lo guardado, si tiene el formato nuevo (arreglos por recinto)
+  try {
+    const raw = localStorage.getItem('ephdem_rrhh')
+    if (raw) {
+      const guardado = JSON.parse(raw)
+      const valido = [1, 2, 3, 4].every(id => Array.isArray(guardado[id]))
+      if (valido) {
+        dotacion.value = guardado
+        const maxUid = Math.max(0, ...Object.values(guardado).flat().map(g => g.uid || 0))
+        uidSeq = maxUid + 1
+      }
+    }
+  } catch (e) { /* formato antiguo o corrupto: se ignora */ }
 })
 </script>
 
@@ -224,18 +242,18 @@ onMounted(() => {
 .tabla-rrhh tr:last-child td { border-bottom: none; }
 .tabla-rrhh tr:nth-child(even) td { background: #f8fbfd; }
 
-.categoria-nombre { font-weight: 600; color: $color-texto-principal; }
-.categoria-hint { font-size: 0.78rem; color: $color-texto-secundario; margin-top: 2px; }
+.acciones-recinto { display: flex; gap: 8px; padding: 8px 14px; }
+.btn-mini { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.16); } }
+.btn-quitar { color: #c62828; }
+.fila-vacia { text-align: center; color: $color-texto-secundario; padding: 14px; }
+.total-label { text-align: right; font-weight: 700; color: $color-primario; }
+.total-general { text-align: right; font-size: 1.05rem; color: $color-primario; padding: 8px 4px; }
+
 
 .input-dotacion { width: 80px; padding: 8px 10px; border: 1.5px solid $color-borde; border-radius: 8px; font-size: 0.95rem; text-align: center; &:focus { outline: none; border-color: $color-primario; } }
 
 .td-calculado { font-weight: 700; color: $color-primario; text-align: center; }
-.td-requerido { text-align: center; color: $color-texto-secundario; }
 
-.estado-badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; }
-.badge-ok { background: rgba(26,158,92,0.12); color: #1a9e5c; }
-.badge-insuficiente { background: rgba(197,40,40,0.1); color: #c62828; }
-.badge-sin-datos { background: rgba(0,0,0,0.06); color: $color-texto-secundario; }
 
 .acciones-finales { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 14px; padding: 16px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .btn-principal { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { opacity: 0.9; } }
