@@ -78,8 +78,7 @@ class RRHHController
 
     private function verificarPropietario(int $proyectoId, int $usuarioId): void
     {
-        // PENDIENTE: nombre real de la columna del dueño en EPHAC_Proyectos.
-        // Reemplazar COLUMNA_USUARIO tras ver SHOW CREATE TABLE EPHAC_Proyectos.
+    
         $stmt = $this->conn->prepare(
             'SELECT 1 FROM EPHAC_Proyectos WHERE id_proyecto = ? AND usuario_id = ? LIMIT 1'
         );

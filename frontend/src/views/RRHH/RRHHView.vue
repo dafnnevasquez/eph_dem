@@ -61,9 +61,9 @@
                   <tr>
                     <th>Tipo de RRHH</th>
                     <th>Cantidad de personas</th>
-                    <th>Jornada semanal (h)</th>
-                    <th>Min. de interacción con el equipo</th>
-                    <th>Min. semanales</th>
+                    <th>Jornada semanal (hrs)</th>
+                    <th>Minutos de interacción con el equipo</th>
+                    <th>Minutos semanales</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -84,18 +84,16 @@
                       </select>
                     </td>
                     <td><input v-model.number="g.minInteraccion" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
-                    <td class="td-calculado">{{ minutosGrupo(g) }}</td>
+                    <td class="td-calculado"><span class="chip-minutos">{{ minutosGrupo(g) }}</span></td>
                     <td><button class="btn-mini btn-quitar" type="button" @click="quitarGrupo(recinto.id, i)"><i class="fa-solid fa-trash"></i></button></td>
                   </tr>
                 </tbody>
-                <tfoot>
-                  <tr>
-                    <td colspan="4" class="total-label">Total del recinto</td>
-                    <td class="td-calculado">{{ totalRecinto(recinto.id) }}</td>
-                    <td></td>
-                  </tr>
-                </tfoot>
               </table>
+            </div>
+            <div class="total-recinto">
+              <span class="total-recinto-label">Total del recinto</span>
+              <span class="total-recinto-valor">{{ totalRecinto(recinto.id) }}</span>
+              <span class="total-recinto-unidad">min/semana</span>
             </div>
           </div>
 
@@ -212,7 +210,7 @@ onMounted(() => {
 .hero-sub { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 700px; line-height: 1.5; margin: 0; }
 
 .rrhh-page { background: $color-fondo; flex: 1; }
-.rrhh-content { max-width: 1200px; margin: 32px auto 72px auto; padding: 0 24px; display: flex; flex-direction: column; gap: 24px; }
+.rrhh-content { max-width: 1480px; margin: 32px auto 48px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 24px; }
 
 .nav-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .nav-buttons { display: flex; gap: 10px; }
@@ -232,29 +230,71 @@ onMounted(() => {
 
 .rrhh-panel { display: flex; flex-direction: column; gap: 20px; }
 
-.recinto-card { background: #fff; border-radius: 16px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; overflow: hidden; }
-.recinto-title { display: flex; align-items: center; gap: 10px; background: #eef5f9; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; color: $color-primario; border-bottom: 1px solid $color-borde; }
+/* Tarjeta de recinto */
+.recinto-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
+.recinto-title { display: flex; align-items: center; gap: 10px; background: #fff; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; color: $color-primario; border-bottom: 1px solid #e5e7eb; }
+.acciones-recinto { display: flex; gap: 8px; padding: 12px 20px; }
 
-.tabla-scroll { overflow-x: auto; }
-.tabla-rrhh { width: 100%; border-collapse: collapse; }
-.tabla-rrhh th { background: #e9f1f6; color: $color-primario; font-size: 0.85rem; font-weight: 700; padding: 10px 14px; text-align: left; }
-.tabla-rrhh td { padding: 12px 14px; border-bottom: 1px solid $color-borde; font-size: 0.9rem; vertical-align: middle; }
-.tabla-rrhh tr:last-child td { border-bottom: none; }
-.tabla-rrhh tr:nth-child(even) td { background: #f8fbfd; }
+/* Tabla a ancho completo de la tarjeta */
+.tabla-scroll { overflow-x: auto; border-top: 1px solid #d1d5db; }
+.tabla-rrhh { width: 100%; min-width: 900px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+.tabla-rrhh th { background: #ddeaf4; color: $color-primario; font-size: 0.85rem; font-weight: 700; padding: 12px 16px; text-align: left; }
+.tabla-rrhh td { padding: 12px 16px; border-bottom: 1px solid $color-borde; font-size: 0.9rem; vertical-align: middle; }
+.tabla-rrhh tbody tr:nth-child(odd) td { background: #f8fbfd; }
+.tabla-rrhh tbody tr:nth-child(even) td { background: #f0f6fb; }
+.tabla-rrhh tbody tr:last-child td { border-bottom: none; }
 
-.acciones-recinto { display: flex; gap: 8px; padding: 8px 14px; }
+/* Anchos de columna: tipo, personas, jornada, min. interacción, min. semanales, quitar */
+.tabla-rrhh th:nth-child(1) { width: 21%; text-align: center; }
+.tabla-rrhh th:nth-child(2) { width: 18%; text-align: center; }
+.tabla-rrhh th:nth-child(3) { width: 19%; text-align: center; }
+.tabla-rrhh th:nth-child(4) { width: 20%; text-align: center; }
+.tabla-rrhh th:nth-child(5) { width: 15%; text-align: center; }
+.tabla-rrhh th:nth-child(6) { width: 7%; }
+
+/* Total del recinto: cuadro azul oscuro abajo a la derecha */
+.total-recinto { display: flex; justify-content: flex-end; align-items: center; padding: 14px 20px 18px; }
+.total-recinto-label,
+.total-recinto-valor,
+.total-recinto-unidad { background: $color-primario; color: #fff; padding: 10px 0; }
+.total-recinto-label { padding-left: 18px; font-size: 0.95rem; font-weight: 600; border-radius: 10px 0 0 10px; }
+.total-recinto-valor { padding: 10px 6px 10px 12px; font-size: 0.95rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.total-recinto-unidad { padding-right: 18px; font-size: 0.95rem; font-weight: 400; color: rgba(255,255,255,0.85); border-radius: 0 10px 10px 0; }
+
 .btn-mini { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.16); } }
-.btn-quitar { color: #c62828; }
+.btn-mini.btn-quitar { background: transparent; border-color: transparent; color: #9ca3af; &:hover { color: #c62828; background: rgba(198,40,40,0.08); } }
 .fila-vacia { text-align: center; color: $color-texto-secundario; padding: 14px; }
-.total-label { text-align: right; font-weight: 700; color: $color-primario; }
 .total-general { text-align: right; font-size: 1.05rem; color: $color-primario; padding: 8px 4px; }
 
+/* Casillas */
+.input-dotacion {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #7fc8e8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-align: center;
+  background: #fff;
+  box-sizing: border-box;
+  &:focus { outline: none; border-color: #2a9fd6; box-shadow: 0 0 0 3px rgba(42,159,214,0.15); }
+}
 
-.input-dotacion { width: 80px; padding: 8px 10px; border: 1.5px solid $color-borde; border-radius: 8px; font-size: 0.95rem; text-align: center; &:focus { outline: none; border-color: $color-primario; } }
+.tabla-rrhh td select.input-dotacion { text-align: center; text-align-last: center; }
 
-.td-calculado { font-weight: 700; color: $color-primario; text-align: center; }
-
-
+.td-calculado { text-align: center; }
+.chip-minutos {
+  display: block;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  text-align: center;
+  background: #ddeaf4;
+  color: $color-primario;
+  border: 1.5px solid #b8d0ef;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
 .acciones-finales { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 14px; padding: 16px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .btn-principal { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { opacity: 0.9; } }
 .btn-secundario { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { background: rgba(0,60,88,0.14); } }
