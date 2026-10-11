@@ -52,3 +52,9 @@ funciones_sigemuv_C_BaseDatos.php
 backend/vendor/
 
 error_log
+
+*.vue.js
+
+frontend/src/main.js
+frontend/src/router/index.js
+frontend/src/stores/*.js
