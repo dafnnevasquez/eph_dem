@@ -47,7 +47,10 @@ class RRHHController
         }
 
         try {
-            $this->verificarPropietario($proyectoId, $usuarioId);
+            if (!$this->verificarPropietario($proyectoId, $usuarioId)) {
+                Response::error('No tienes acceso a este proyecto.', 403);
+                return;
+            }
             $n = $this->service->guardar($proyectoId, $grupos);
             Response::ok(['guardados' => $n]);
         } catch (\Throwable $e) {
@@ -66,7 +69,10 @@ class RRHHController
         if ($proyectoId <= 0 || $usuarioId <= 0) Response::error('proyecto_id y usuario_id son obligatorios.', 400);
 
         try {
-            $this->verificarPropietario($proyectoId, $usuarioId);
+            if (!$this->verificarPropietario($proyectoId, $usuarioId)) {
+                Response::error('No tienes acceso a este proyecto.', 403);
+                return;
+            }
             Response::ok(['grupos' => $this->service->obtener($proyectoId)]);
         } catch (\Throwable $e) {
             error_log('RRHHController::obtener: ' . $e->getMessage());
@@ -76,18 +82,17 @@ class RRHHController
         }
     }
 
-    private function verificarPropietario(int $proyectoId, int $usuarioId): void
+    private function verificarPropietario(int $proyectoId, int $usuarioId): bool
     {
-    
         $stmt = $this->conn->prepare(
             'SELECT 1 FROM EPHAC_Proyectos WHERE id_proyecto = ? AND usuario_id = ? LIMIT 1'
         );
-        if (!$stmt) throw new RuntimeException('prepare propietario');
+        if (!$stmt) throw new \RuntimeException('prepare propietario');
         $stmt->bind_param('ii', $proyectoId, $usuarioId);
         $stmt->execute();
         $ok = $stmt->get_result()->num_rows > 0;
         $stmt->close();
-        if (!$ok) throw new RuntimeException('Proyecto no pertenece al usuario.');
+        return $ok;
     }
 }
 
