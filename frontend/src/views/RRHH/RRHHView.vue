@@ -42,56 +42,59 @@
         <section class="rrhh-panel">
           <template v-for="recinto in recintos" :key="recinto.id">
             <div class="recinto-card">
-              <div class="recinto-title">
-                <i class="fa-solid fa-hospital-user"></i>
-                {{ recinto.nombre }}
+              <div class="recinto-title recinto-title-toggle" @click="toggleRecinto(recinto.id)">
+                <span><i class="fa-solid fa-hospital-user"></i> {{ recinto.nombre }}</span>
+                <i class="fa-solid" :class="abiertos[recinto.id] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
               </div>
 
-              <div class="acciones-recinto">
-                <button class="btn-mini" type="button" @click="agregarGrupo(recinto.id)">
-                  <i class="fa-solid fa-plus"></i> Agregar grupo
-                </button>
-                <button class="btn-mini" type="button" @click="todosJornada(recinto.id, 44)">
-                  Todos 44 h
-                </button>
-              </div>
+              <div v-show="abiertos[recinto.id]">
+                <div class="acciones-recinto">
+                  <button class="btn-mini" type="button" @click="agregarGrupo(recinto.id)">
+                    <i class="fa-solid fa-plus"></i> Agregar grupo
+                  </button>
+                  <button class="btn-mini" type="button" @click="todosJornada(recinto.id, 44)">
+                    Todos 44 h
+                  </button>
+                </div>
 
-              <div class="tabla-scroll">
-                <table class="tabla-rrhh">
-                  <thead>
-                    <tr>
-                      <th>Tipo de RRHH</th>
-                      <th>Cantidad de personas</th>
-                      <th>Jornada semanal (hrs)</th>
-                      <th>Minutos de interacción con el equipo</th>
-                      <th>Minutos semanales</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="dotacion[recinto.id].length === 0">
-                      <td colspan="6" class="fila-vacia">Sin grupos. Usa "Agregar grupo".</td>
-                    </tr>
-                    <tr v-for="(g, i) in dotacion[recinto.id]" :key="g.uid">
-                      <td>
-                        <select v-model="g.tipo" class="input-dotacion">
-                          <option v-for="c in categorias" :key="c.id" :value="c.nombre">{{ c.nombre }}</option>
-                        </select>
-                      </td>
-                      <td><input v-model.number="g.personas" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
-                      <td>
-                        <select v-model.number="g.jornada" class="input-dotacion">
-                          <option v-for="h in jornadasSemanales" :key="h" :value="h">{{ h }}</option>
-                        </select>
-                      </td>
-                      <td><input v-model.number="g.minInteraccion" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
-                      <td class="td-calculado"><span class="chip-minutos">{{ minutosGrupo(g) }}</span></td>
-                      <td><button class="btn-mini btn-quitar" type="button" @click="quitarGrupo(recinto.id, i)"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div class="tabla-scroll">
+                  <table class="tabla-rrhh">
+                    <thead>
+                      <tr>
+                        <th>Tipo de RRHH</th>
+                        <th>Cantidad de personas</th>
+                        <th>Jornada semanal (hrs)</th>
+                        <th>Minutos de interacción con el equipo</th>
+                        <th>Minutos semanales</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-if="dotacion[recinto.id].length === 0">
+                        <td colspan="6" class="fila-vacia">Sin grupos. Usa "Agregar grupo".</td>
+                      </tr>
+                      <tr v-for="(g, i) in dotacion[recinto.id]" :key="g.uid">
+                        <td>
+                          <select v-model="g.tipo" class="input-dotacion">
+                            <option v-for="c in categorias" :key="c.id" :value="c.nombre">{{ c.nombre }}</option>
+                          </select>
+                        </td>
+                        <td><input v-model.number="g.personas" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
+                        <td>
+                          <select v-model.number="g.jornada" class="input-dotacion">
+                            <option v-for="h in jornadasSemanales" :key="h" :value="h">{{ h }}</option>
+                          </select>
+                        </td>
+                        <td><input v-model.number="g.minInteraccion" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
+                        <td class="td-calculado"><span class="chip-minutos">{{ minutosGrupo(g) }}</span></td>
+                        <td><button class="btn-mini btn-quitar" type="button" @click="quitarGrupo(recinto.id, i)"><i class="fa-solid fa-trash"></i></button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
+
 
             <div class="total-recinto">
               <span class="total-recinto-label">Total del recinto</span>
@@ -100,9 +103,21 @@
             </div>
           </template>
 
-          <div class="total-general">
-            Total general: <strong>{{ totalGeneral() }}</strong> min/semana
+          <div class="resumen-final">
+            <div class="calculos-grid">
+              <div class="pastilla-grande">
+                <span class="pastilla-grande-titulo">Total equipos</span>
+                <span class="pastilla-grande-valor">{{ calculoNormal ?? '—' }}</span>
+                <span class="pastilla-grande-sub">cálculo normal, sin restricción de RRHH</span>
+              </div>
+              <div class="pastilla-grande">
+                <span class="pastilla-grande-titulo">Total equipos con restricción</span>
+                <span class="pastilla-grande-valor">{{ calculoRestringido ?? '—' }}</span>
+                <span class="pastilla-grande-sub">según la dotación ingresada</span>
+              </div>
+            </div>
           </div>
+
         </section>
 
         <section class="acciones-finales">
@@ -123,6 +138,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+//import { computed } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -137,7 +153,16 @@ const categorias = ref([
   { id: 2, nombre: 'Anestesista' },
   { id: 3, nombre: 'Arsenalera' },
   { id: 4, nombre: 'Enfermera/o' },
-  { id: 5, nombre: 'Técnico Paramédico' },
+  { id: 5, nombre: 'TENS' },
+  { id: 6, nombre: 'Psiquiatra' },
+  { id: 7, nombre: 'Kinesiólogo/a' },
+  { id: 8, nombre: 'Terapeuta Ocupacional' },
+  { id: 9, nombre: 'Nutricionista' },
+  { id: 10, nombre: 'Fonoaudiólogo/a' },
+  { id: 11, nombre: 'Asistente Social' },
+
+  
+
 ])
 
 const jornadasSemanales = [44, 33, 22, 11]
@@ -199,6 +224,16 @@ onMounted(() => {
     }
   } catch (e) { /* formato antiguo o corrupto: se ignora */ }
 })
+
+const abiertos = ref({ 1: true, 2: true, 3: true, 4: true })
+function toggleRecinto(id) {
+  abiertos.value[id] = !abiertos.value[id]
+}
+
+// Provisorio: se definen cuando esté la regla de restricción
+//const calculoNormal = computed<number | null>(() => null)
+//const calculoRestringido = computed<number | null>(() => null)
+
 </script>
 
 <style lang="scss" scoped>
@@ -237,6 +272,7 @@ onMounted(() => {
 .recinto-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
 .recinto-title { display: flex; align-items: center; gap: 10px; background: #fff; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; color: $color-primario; border-bottom: 1px solid #e5e7eb; }
 .acciones-recinto { display: flex; gap: 8px; padding: 12px 20px; }
+.recinto-title-toggle { justify-content: space-between; cursor: pointer; user-select: none; &:hover { background: #e4eff6; } }
 
 /* Tabla a ancho completo de la tarjeta */
 .tabla-scroll { overflow-x: auto; border-top: 1px solid #d1d5db; }
@@ -267,7 +303,19 @@ onMounted(() => {
 .btn-mini { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.16); } }
 .btn-mini.btn-quitar { background: transparent; border-color: transparent; color: #9ca3af; &:hover { color: #c62828; background: rgba(198,40,40,0.08); } }
 .fila-vacia { text-align: center; color: $color-texto-secundario; padding: 14px; }
-.total-general { text-align: right; font-size: 1.05rem; color: $color-primario; padding: 8px 4px; }
+
+.resumen-final { background: #fff; border-radius: 16px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+//.resumen-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+//.resumen-titulo { margin: 0; font-size: 1.1rem; font-weight: 700; color: $color-primario; }
+//.total-general { display: flex; justify-content: flex-end; align-items: center; }
+.calculos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pastilla-grande { background: $color-primario; color: #fff; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.pastilla-grande-titulo { font-size: 1rem; font-weight: 600; }
+.pastilla-grande-valor { font-size: 2.2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.pastilla-grande-sub { font-size: 0.85rem; color: rgba(255,255,255,0.85); }
+@media (max-width: 700px) { .calculos-grid { grid-template-columns: 1fr; } }
+
+
 
 /* Casillas */
 .input-dotacion {
