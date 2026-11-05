@@ -33,8 +33,9 @@
           <div class="instruccion-indicator">
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">
-              Por cada recinto, agrega grupos de personal: cuántas personas, su jornada semanal
-              y cuántos minutos interactúan con el equipo en el procedimiento.
+              Por cada recinto, agrega un grupo por perfil: cuántas personas hay, su jornada semanal,
+              las semanas efectivas al año y qué porcentaje de su jornada dedican a este equipo.
+              Si el perfil que necesitas no está en la lista, elige "+ Agregar perfil nuevo".
             </span>
           </div>
         </header>
@@ -61,22 +62,30 @@
                   <table class="tabla-rrhh">
                     <thead>
                       <tr>
-                        <th>Tipo de RRHH</th>
+                        <th>Perfil</th>
                         <th>Cantidad de personas</th>
                         <th>Jornada semanal (hrs)</th>
-                        <th>Minutos de interacción con el equipo</th>
-                        <th>Minutos semanales</th>
+                        <th>Semanas efectivas al año</th>
+                        <th>% de jornada para este equipo</th>
+                        <th>Horas disponibles al año</th>
                         <th></th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr v-if="dotacion[recinto.id].length === 0">
-                        <td colspan="6" class="fila-vacia">Sin grupos. Usa "Agregar grupo".</td>
+                        <td colspan="7" class="fila-vacia">Sin grupos. Usa "Agregar grupo".</td>
                       </tr>
                       <tr v-for="(g, i) in dotacion[recinto.id]" :key="g.uid">
                         <td>
-                          <select v-model="g.tipo" class="input-dotacion">
-                            <option v-for="c in categorias" :key="c.id" :value="c.nombre">{{ c.nombre }}</option>
+                          <select v-model="g.tipo" class="input-dotacion" @change="alElegirPerfil(recinto.id, g)">
+                            <option value="" disabled>Elige un perfil</option>
+                            <option
+                              v-for="c in categorias"
+                              :key="c.id"
+                              :value="c.nombre"
+                              :disabled="usadoEnRecinto(recinto.id, c.nombre, g)"
+                            >{{ c.nombre }}</option>
+                            <option :value="NUEVO">+ Agregar perfil nuevo…</option>
                           </select>
                         </td>
                         <td><input v-model.number="g.personas" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
@@ -85,8 +94,9 @@
                             <option v-for="h in jornadasSemanales" :key="h" :value="h">{{ h }}</option>
                           </select>
                         </td>
-                        <td><input v-model.number="g.minInteraccion" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
-                        <td class="td-calculado"><span class="chip-minutos">{{ minutosGrupo(g) }}</span></td>
+                        <td><input v-model.number="g.semanas" type="number" min="1" max="52" step="0.5" class="input-dotacion" placeholder="48" /></td>
+                        <td><input v-model.number="g.porcentaje" type="number" min="1" max="100" step="1" class="input-dotacion" placeholder="100" /></td>
+                        <td class="td-calculado"><span class="chip-minutos">{{ formatoHoras(horasGrupo(g)) }}</span></td>
                         <td><button class="btn-mini btn-quitar" type="button" @click="quitarGrupo(recinto.id, i)"><i class="fa-solid fa-trash"></i></button></td>
                       </tr>
                     </tbody>
@@ -98,8 +108,8 @@
 
             <div class="total-recinto">
               <span class="total-recinto-label">Total del recinto</span>
-              <span class="total-recinto-valor">{{ totalRecinto(recinto.id) }}</span>
-              <span class="total-recinto-unidad">min/semana</span>
+              <span class="total-recinto-valor">{{ formatoHoras(totalRecinto(recinto.id)) }}</span>
+              <span class="total-recinto-unidad">h/año</span>
             </div>
           </template>
 
@@ -138,34 +148,27 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
-//import { computed } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
+const API = import.meta.env.VITE_API_BASE
+
 const nombreProyectoActivo = ref('')
 const proyectoId = ref(null)
 
-// Tipos de RRHH (provisional — vendrán de BD)
-const categorias = ref([
-  { id: 1, nombre: 'Médico Cirujano' },
-  { id: 2, nombre: 'Anestesista' },
-  { id: 3, nombre: 'Arsenalera' },
-  { id: 4, nombre: 'Enfermera/o' },
-  { id: 5, nombre: 'TENS' },
-  { id: 6, nombre: 'Psiquiatra' },
-  { id: 7, nombre: 'Kinesiólogo/a' },
-  { id: 8, nombre: 'Terapeuta Ocupacional' },
-  { id: 9, nombre: 'Nutricionista' },
-  { id: 10, nombre: 'Fonoaudiólogo/a' },
-  { id: 11, nombre: 'Asistente Social' },
+// Valor especial de la opción "+ Agregar perfil nuevo…" del desplegable
+const NUEVO = '__nuevo__'
 
-  
-
-])
+// Perfiles de RRHH: vienen de la tabla EPHAC_Perfil_RRHH
+const categorias = ref([])
 
 const jornadasSemanales = [44, 33, 22, 11]
+
+// Valores por defecto del modelo (semanas efectivas al año y % de jornada)
+const SEMANAS_DEFECTO = 48
+const PORCENTAJE_DEFECTO = 100
 
 // Recintos (provisional — vendrán de los resultados)
 const recintos = ref([
@@ -178,23 +181,198 @@ const recintos = ref([
 // Grupos de RRHH por recinto
 const dotacion = ref({ 1: [], 2: [], 3: [], 4: [] })
 
-let uidSeq = 1
-function nuevoGrupo() {
-  return { uid: uidSeq++, tipo: categorias.value[0].nombre, personas: 0, jornada: 44, minInteraccion: 0 }
+// Recintos abiertos o colapsados
+const abiertos = ref({ 1: true, 2: true, 3: true, 4: true })
+function toggleRecinto(id) {
+  abiertos.value[id] = !abiertos.value[id]
 }
 
-function agregarGrupo(recintoId) { dotacion.value[recintoId].push(nuevoGrupo()) }
+// Provisorio: se definen cuando esté la regla de restricción
+const calculoNormal = ref(null)
+const calculoRestringido = ref(null)
+
+let uidSeq = 1
+
+// ¿Otro grupo del mismo recinto ya usa este perfil?
+function usadoEnRecinto(recintoId, nombre, g) {
+  return dotacion.value[recintoId].some(o => o.uid !== g.uid && o.tipo === nombre)
+}
+
+// Primer perfil que todavía no se usa en el recinto (o null si ya están todos)
+function primerPerfilLibre(recintoId) {
+  const usados = new Set(dotacion.value[recintoId].map(o => o.tipo))
+  const libre = categorias.value.find(c => !usados.has(c.nombre))
+  return libre ? libre.nombre : null
+}
+
+function agregarGrupo(recintoId) {
+  if (categorias.value.length === 0) {
+    alert('La lista de perfiles no está cargada. Recarga la página.')
+    return
+  }
+  const tipo = primerPerfilLibre(recintoId)
+  if (tipo === null) {
+    alert('Ya agregaste todos los perfiles disponibles en este recinto.')
+    return
+  }
+  dotacion.value[recintoId].push({
+    uid: uidSeq++,
+    tipo,
+    personas: 0,
+    jornada: 44,
+    semanas: SEMANAS_DEFECTO,
+    porcentaje: PORCENTAJE_DEFECTO,
+  })
+}
 function quitarGrupo(recintoId, i) { dotacion.value[recintoId].splice(i, 1) }
 function todosJornada(recintoId, h) { dotacion.value[recintoId].forEach(g => { g.jornada = h }) }
 
-// personas × horas semanales × 60
-function minutosGrupo(g) { return (Number(g.personas) || 0) * (Number(g.jornada) || 0) * 60 }
-function totalRecinto(recintoId) { return dotacion.value[recintoId].reduce((s, g) => s + minutosGrupo(g), 0) }
-function totalGeneral() { return recintos.value.reduce((s, r) => s + totalRecinto(r.id), 0) }
+// Horas disponibles al año = personas × horas semanales × semanas efectivas × (% / 100)
+function horasGrupo(g) {
+  return (Number(g.personas) || 0) * (Number(g.jornada) || 0) * (Number(g.semanas) || 0) * ((Number(g.porcentaje) || 0) / 100)
+}
+function totalRecinto(recintoId) { return dotacion.value[recintoId].reduce((s, g) => s + horasGrupo(g), 0) }
+function formatoHoras(h) { return Math.round(h).toLocaleString('es-CL') }
 
-function guardarYContinuar() {
-  localStorage.setItem('ephdem_rrhh', JSON.stringify(dotacion.value))
-  alert('Dotación de RRHH guardada correctamente.')
+// Carga la lista de perfiles desde la base
+async function cargarPerfiles() {
+  const uid = authStore.usuarioId
+  if (!uid) return
+  try {
+    const resp = await fetch(`${API}/rrhh.php?action=perfiles&usuario_id=${uid}`)
+    const data = await resp.json()
+    if (!resp.ok || !data.ok) {
+      alert(data.error || 'No se pudo cargar la lista de perfiles.')
+      return
+    }
+    categorias.value = data.datos.perfiles
+  } catch (e) {
+    alert('Error de conexión al cargar la lista de perfiles.')
+  }
+}
+
+// Crea un perfil nuevo en la base; devuelve {id, nombre} o null si falla
+async function crearPerfil(nombre) {
+  const uid = authStore.usuarioId
+  try {
+    const resp = await fetch(`${API}/rrhh.php?action=perfil_agregar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuario_id: uid, nombre }),
+    })
+    const data = await resp.json()
+    if (!resp.ok || !data.ok) {
+      alert(data.error || 'No se pudo agregar el perfil.')
+      return null
+    }
+    const perfil = data.datos.perfil
+    if (!categorias.value.some(c => c.id === perfil.id)) categorias.value.push(perfil)
+    if (!data.datos.creado) alert(`El perfil «${perfil.nombre}» ya existía; se seleccionó ese.`)
+    return perfil
+  } catch (e) {
+    alert('Error de conexión al agregar el perfil.')
+    return null
+  }
+}
+
+// Si se elige "+ Agregar perfil nuevo…" se pide el nombre y se crea
+async function alElegirPerfil(recintoId, g) {
+  if (g.tipo !== NUEVO) return
+  g.tipo = ''
+  const nombre = window.prompt('Nombre del perfil nuevo (por ejemplo: Técnico/a de esterilización):')
+  if (nombre === null) return
+  const perfil = await crearPerfil(nombre)
+  if (!perfil) return
+  if (usadoEnRecinto(recintoId, perfil.nombre, g)) {
+    alert(`El perfil «${perfil.nombre}» ya está en este recinto.`)
+    return
+  }
+  g.tipo = perfil.nombre
+}
+
+// Carga la dotación guardada del proyecto
+async function cargarDotacion() {
+  const uid = authStore.usuarioId
+  if (!proyectoId.value || !uid) return
+  try {
+    const resp = await fetch(`${API}/rrhh.php?action=obtener&proyecto_id=${Number(proyectoId.value)}&usuario_id=${uid}`)
+    const data = await resp.json()
+    if (!resp.ok || !data.ok) {
+      alert(data.error || 'No se pudo cargar la dotación de RRHH.')
+      return
+    }
+    const nueva = { 1: [], 2: [], 3: [], 4: [] }
+    for (const g of data.datos.grupos) {
+      if (!nueva[g.recinto_id]) continue
+      nueva[g.recinto_id].push({
+        uid: uidSeq++,
+        tipo: g.tipo_rrhh,
+        personas: g.cantidad_personas,
+        jornada: g.jornada_semanal,
+        semanas: g.semanas_efectivas,
+        porcentaje: Math.round(g.fraccion_jornada * 1000) / 10,
+      })
+    }
+    dotacion.value = nueva
+  } catch (e) {
+    alert('Error de conexión al cargar la dotación de RRHH.')
+  }
+}
+
+// Guarda la dotación de todos los recintos
+let guardando = false
+async function guardarYContinuar() {
+  const uid = authStore.usuarioId
+  if (guardando) return
+  if (!proyectoId.value || !uid) {
+    alert('No hay un proyecto activo o una sesión iniciada.')
+    return
+  }
+  const grupos = []
+  for (const r of recintos.value) {
+    for (const g of dotacion.value[r.id]) {
+      if (!g.tipo || g.tipo === NUEVO) {
+        alert(`Falta elegir el perfil de un grupo en «${r.nombre}».`)
+        return
+      }
+      const semanas = Number(g.semanas)
+      const porcentaje = Number(g.porcentaje)
+      if (!(semanas > 0 && semanas <= 52)) {
+        alert(`Las semanas efectivas de «${g.tipo}» en «${r.nombre}» deben estar entre 1 y 52.`)
+        return
+      }
+      if (!(porcentaje > 0 && porcentaje <= 100)) {
+        alert(`El % de jornada de «${g.tipo}» en «${r.nombre}» debe estar entre 1 y 100.`)
+        return
+      }
+      grupos.push({
+        recinto_id: r.id,
+        tipo_rrhh: g.tipo,
+        cantidad_personas: Number(g.personas) || 0,
+        jornada_semanal: Number(g.jornada),
+        semanas_efectivas: semanas,
+        fraccion_jornada: Math.round(porcentaje * 10) / 1000,
+      })
+    }
+  }
+  guardando = true
+  try {
+    const resp = await fetch(`${API}/rrhh.php?action=guardar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proyecto_id: Number(proyectoId.value), usuario_id: uid, grupos }),
+    })
+    const data = await resp.json()
+    if (!resp.ok || !data.ok) {
+      alert(data.error || 'No se pudo guardar la dotación de RRHH.')
+      return
+    }
+    alert('Dotación de RRHH guardada correctamente.')
+  } catch (e) {
+    alert('Error de conexión al guardar la dotación de RRHH.')
+  } finally {
+    guardando = false
+  }
 }
 
 function volverAtras() {
@@ -206,34 +384,13 @@ function cerrarSesion() {
   router.push('/login')
 }
 
-onMounted(() => {
+onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo') || 'Desconocido'
   proyectoId.value = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo')
-
-  // Recuperar lo guardado, si tiene el formato nuevo (arreglos por recinto)
-  try {
-    const raw = localStorage.getItem('ephdem_rrhh')
-    if (raw) {
-      const guardado = JSON.parse(raw)
-      const valido = [1, 2, 3, 4].every(id => Array.isArray(guardado[id]))
-      if (valido) {
-        dotacion.value = guardado
-        const maxUid = Math.max(0, ...Object.values(guardado).flat().map(g => g.uid || 0))
-        uidSeq = maxUid + 1
-      }
-    }
-  } catch (e) { /* formato antiguo o corrupto: se ignora */ }
+  // Primero los perfiles, para que la dotación guardada tenga su lista de opciones
+  await cargarPerfiles()
+  await cargarDotacion()
 })
-
-const abiertos = ref({ 1: true, 2: true, 3: true, 4: true })
-function toggleRecinto(id) {
-  abiertos.value[id] = !abiertos.value[id]
-}
-
-// Provisorio: se definen cuando esté la regla de restricción
-//const calculoNormal = computed<number | null>(() => null)
-//const calculoRestringido = computed<number | null>(() => null)
-
 </script>
 
 <style lang="scss" scoped>
@@ -276,20 +433,21 @@ function toggleRecinto(id) {
 
 /* Tabla a ancho completo de la tarjeta */
 .tabla-scroll { overflow-x: auto; border-top: 1px solid #d1d5db; }
-.tabla-rrhh { width: 100%; min-width: 900px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+.tabla-rrhh { width: 100%; min-width: 1100px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
 .tabla-rrhh th { background: #ddeaf4; color: $color-primario; font-size: 0.85rem; font-weight: 700; padding: 12px 16px; text-align: left; }
 .tabla-rrhh td { padding: 12px 16px; border-bottom: 1px solid $color-borde; font-size: 0.9rem; vertical-align: middle; }
 .tabla-rrhh tbody tr:nth-child(odd) td { background: #f8fbfd; }
 .tabla-rrhh tbody tr:nth-child(even) td { background: #f0f6fb; }
 .tabla-rrhh tbody tr:last-child td { border-bottom: none; }
 
-/* Anchos de columna: tipo, personas, jornada, min. interacción, min. semanales, quitar */
-.tabla-rrhh th:nth-child(1) { width: 21%; text-align: center; }
-.tabla-rrhh th:nth-child(2) { width: 18%; text-align: center; }
-.tabla-rrhh th:nth-child(3) { width: 19%; text-align: center; }
-.tabla-rrhh th:nth-child(4) { width: 20%; text-align: center; }
+/* Anchos de columna: perfil, personas, jornada, semanas, % jornada, horas al año, quitar */
+.tabla-rrhh th:nth-child(1) { width: 22%; text-align: center; }
+.tabla-rrhh th:nth-child(2) { width: 12%; text-align: center; }
+.tabla-rrhh th:nth-child(3) { width: 13%; text-align: center; }
+.tabla-rrhh th:nth-child(4) { width: 14%; text-align: center; }
 .tabla-rrhh th:nth-child(5) { width: 15%; text-align: center; }
-.tabla-rrhh th:nth-child(6) { width: 7%; }
+.tabla-rrhh th:nth-child(6) { width: 17%; text-align: center; }
+.tabla-rrhh th:nth-child(7) { width: 7%; }
 
 /* Total del recinto: pastilla azul oscuro pegada bajo la tarjeta, a la derecha */
 .total-recinto { display: flex; justify-content: flex-end; align-items: center; padding: 0 4px; margin-top: -14px; }

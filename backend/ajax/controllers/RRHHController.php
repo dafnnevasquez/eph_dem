@@ -8,8 +8,6 @@ require_once __DIR__ . '/../../funciones_sigemuv_C_BaseDatos.php';
 
 class RRHHController
 {
-    const JORNADAS = [11, 22, 33, 44];
-
     private $conn;
     private $service;
 
@@ -32,26 +30,30 @@ class RRHHController
         if ($proyectoId <= 0 || $usuarioId <= 0) Response::error('proyecto_id y usuario_id son obligatorios.', 400);
         if (!is_array($grupos)) Response::error('Formato de grupos inválido.', 400);
 
-        foreach ($grupos as $g) {
-            $rec = (int)($g['recinto_id'] ?? 0);
-            $per = $g['cantidad_personas'] ?? null;
-            $jor = (int)($g['jornada_semanal'] ?? 0);
-            $min = $g['min_interaccion'] ?? null;
-            if ($rec < 1 || $rec > 4
-                || !is_numeric($per) || (int)$per < 0
-                || !in_array($jor, self::JORNADAS, true)
-                || !is_numeric($min) || (int)$min < 0
-                || trim((string)($g['tipo_rrhh'] ?? '')) === '') {
-                Response::error('Datos inválidos.', 400);
-            }
-        }
+        // Validacion de cada grupo (rangos, perfil repetido en el mismo recinto).
+        $errorGrupos = RRHHService::validarGrupos($grupos);
+        if ($errorGrupos !== null) Response::error($errorGrupos, 400);
 
         try {
             if (!$this->verificarPropietario($proyectoId, $usuarioId)) {
                 Response::error('No tienes acceso a este proyecto.', 403);
                 return;
             }
-            $n = $this->service->guardar($proyectoId, $grupos);
+
+            // Cada perfil debe existir en el catalogo; se guarda con su escritura oficial.
+            $canon = $this->service->canonizarPerfiles($grupos);
+            if (count($canon['faltan']) > 0) {
+                Response::error('El perfil «' . implode('», «', $canon['faltan']) . '» no existe en el catálogo.', 400);
+                return;
+            }
+            // Se valida de nuevo: dos escrituras distintas pueden ser el mismo perfil.
+            $errorGrupos = RRHHService::validarGrupos($canon['grupos']);
+            if ($errorGrupos !== null) {
+                Response::error($errorGrupos, 400);
+                return;
+            }
+
+            $n = $this->service->guardar($proyectoId, $canon['grupos']);
             Response::ok(['guardados' => $n]);
         } catch (\Throwable $e) {
             error_log('RRHHController::guardar: ' . $e->getMessage());
@@ -82,6 +84,44 @@ class RRHHController
         }
     }
 
+    /** Lista del catalogo de perfiles (para el desplegable de la vista). */
+    public function perfiles(): void
+    {
+        Response::soloGet();
+        $usuarioId = (int)($_GET['usuario_id'] ?? 0);
+        if ($usuarioId <= 0) Response::error('usuario_id es obligatorio.', 400);
+
+        try {
+            Response::ok(['perfiles' => $this->service->listarPerfiles()]);
+        } catch (\Throwable $e) {
+            error_log('RRHHController::perfiles: ' . $e->getMessage());
+            Response::error('No se pudo leer la lista de perfiles.', 500);
+        } finally {
+            mysqli_close($this->conn);
+        }
+    }
+
+    /** Agrega un perfil al catalogo; si ya existia devuelve el existente. */
+    public function perfilAgregar(): void
+    {
+        Response::soloPost();
+        $in = Response::input();
+        $usuarioId = (int)($in['usuario_id'] ?? 0);
+        if ($usuarioId <= 0) Response::error('usuario_id es obligatorio.', 400);
+
+        list($nombre, $error) = RRHHService::normalizarPerfil($in['nombre'] ?? '');
+        if ($error !== null) Response::error($error, 400);
+
+        try {
+            Response::ok($this->service->agregarPerfil($nombre));
+        } catch (\Throwable $e) {
+            error_log('RRHHController::perfilAgregar: ' . $e->getMessage());
+            Response::error('No se pudo agregar el perfil.', 500);
+        } finally {
+            mysqli_close($this->conn);
+        }
+    }
+
     private function verificarPropietario(int $proyectoId, int $usuarioId): bool
     {
         $stmt = $this->conn->prepare(
@@ -100,4 +140,6 @@ $controller = new RRHHController();
 $action = $_GET['action'] ?? '';
 if ($action === 'guardar') $controller->guardar();
 elseif ($action === 'obtener') $controller->obtener();
+elseif ($action === 'perfiles') $controller->perfiles();
+elseif ($action === 'perfil_agregar') $controller->perfilAgregar();
 else Response::error('Acción no válida.', 400);
