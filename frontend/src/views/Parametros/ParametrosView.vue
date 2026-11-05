@@ -37,7 +37,7 @@
             <div class="calculadora-wrapper" ref="calculadoraRef">
               <button type="button" class="calculadora-toggle" :aria-expanded="mostrarCalculadora" @click="mostrarCalculadora = !mostrarCalculadora">
                 <span class="calculadora-icono"><i class="fa-solid fa-calculator"></i></span>
-                <span class="calculadora-texto">Calculadora de días cama para UPC</span>
+                <span class="calculadora-texto">Calculadora Atención Cerrada Pabellones</span>
                 <i class="fa-solid fa-chevron-down calculadora-chevron" :class="{ 'is-open': mostrarCalculadora }"></i>
               </button>
               <section class="calculadora-panel" :class="{ 'is-open': mostrarCalculadora }">
@@ -78,7 +78,7 @@
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">
               Completa las variables para cada prestación seleccionada. En el símbolo <span class="info-icon info-icon--demo" aria-hidden="true">i</span>
-              podrás ver las características de cada parámetro. Para UPC, usa la calculadora para obtener los días cama.
+              podrá ver las características de cada parámetro. Para Atención Cerrada Pabellón, usa la calculadora para obtener los pabellones y sus equipos.
             </span>
           </div>
         </header>
