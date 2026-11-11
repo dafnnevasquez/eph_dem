@@ -33,9 +33,10 @@
           <div class="instruccion-indicator">
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">
-              Por cada recinto, agrega un grupo por perfil: cuántas personas hay, su jornada semanal,
-              las semanas efectivas al año y qué porcentaje de su jornada dedican a este equipo.
-              Si el perfil que necesitas no está en la lista, elige "+ Agregar perfil nuevo".
+              En cada recinto, aprieta los perfiles que trabajan ahí y completa cuántas personas hay,
+              su jornada semanal, las semanas efectivas al año y qué porcentaje de su jornada dedican
+              a este equipo. Usa "Aplicar a todo" para poner el mismo valor en todas las filas.
+              Si el perfil que necesitas no está, aprieta "+ Perfil nuevo".
             </span>
           </div>
         </header>
@@ -49,12 +50,19 @@
               </div>
 
               <div v-show="abiertos[recinto.id]">
-                <div class="acciones-recinto">
-                  <button class="btn-mini" type="button" @click="agregarGrupo(recinto.id)">
-                    <i class="fa-solid fa-plus"></i> Agregar grupo
-                  </button>
-                  <button class="btn-mini" type="button" @click="todosJornada(recinto.id, 44)">
-                    Todos 44 h
+                <!-- Perfiles: un clic agrega la fila, otro clic la quita -->
+                <div class="perfiles-chips">
+                  <button
+                    v-for="c in categorias"
+                    :key="c.id"
+                    type="button"
+                    class="chip-perfil"
+                    :class="{ activo: tieneGrupo(recinto.id, c.nombre) }"
+                    :aria-pressed="tieneGrupo(recinto.id, c.nombre)"
+                    @click="togglePerfil(recinto.id, c.nombre)"
+                  >{{ c.nombre }}</button>
+                  <button type="button" class="chip-perfil chip-nuevo" @click="agregarPerfilNuevo(recinto.id)">
+                    <i class="fa-solid fa-plus"></i> Perfil nuevo
                   </button>
                 </div>
 
@@ -70,24 +78,44 @@
                         <th>Horas disponibles al año</th>
                         <th></th>
                       </tr>
+                      <tr v-if="dotacion[recinto.id].length > 0" class="fila-aplicar">
+                        <th class="aplicar-etiqueta">Mismo valor para todos</th>
+                        <th>
+                          <div class="aplicar-celda">
+                            <input v-model.number="masivo[recinto.id].personas" type="number" min="0" step="1" class="input-dotacion input-mini" placeholder="0" />
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'personas')">Aplicar a todo</button>
+                          </div>
+                        </th>
+                        <th>
+                          <div class="aplicar-celda">
+                            <select v-model.number="masivo[recinto.id].jornada" class="input-dotacion input-mini">
+                              <option v-for="h in jornadasSemanales" :key="h" :value="h">{{ h }}</option>
+                            </select>
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'jornada')">Aplicar a todo</button>
+                          </div>
+                        </th>
+                        <th>
+                          <div class="aplicar-celda">
+                            <input v-model.number="masivo[recinto.id].semanas" type="number" min="1" max="52" step="0.5" class="input-dotacion input-mini" placeholder="48" />
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'semanas')">Aplicar a todo</button>
+                          </div>
+                        </th>
+                        <th>
+                          <div class="aplicar-celda">
+                            <input v-model.number="masivo[recinto.id].porcentaje" type="number" min="1" max="100" step="1" class="input-dotacion input-mini" placeholder="100" />
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'porcentaje')">Aplicar a todo</button>
+                          </div>
+                        </th>
+                        <th></th>
+                        <th></th>
+                      </tr>
                     </thead>
                     <tbody>
                       <tr v-if="dotacion[recinto.id].length === 0">
-                        <td colspan="7" class="fila-vacia">Sin grupos. Usa "Agregar grupo".</td>
+                        <td colspan="7" class="fila-vacia">Elige los perfiles de este recinto con los botones de arriba.</td>
                       </tr>
                       <tr v-for="(g, i) in dotacion[recinto.id]" :key="g.uid">
-                        <td>
-                          <select v-model="g.tipo" class="input-dotacion" @change="alElegirPerfil(recinto.id, g)">
-                            <option value="" disabled>Elige un perfil</option>
-                            <option
-                              v-for="c in categorias"
-                              :key="c.id"
-                              :value="c.nombre"
-                              :disabled="usadoEnRecinto(recinto.id, c.nombre, g)"
-                            >{{ c.nombre }}</option>
-                            <option :value="NUEVO">+ Agregar perfil nuevo…</option>
-                          </select>
-                        </td>
+                        <td class="td-perfil">{{ g.tipo }}</td>
                         <td><input v-model.number="g.personas" type="number" min="0" step="1" class="input-dotacion" placeholder="0" /></td>
                         <td>
                           <select v-model.number="g.jornada" class="input-dotacion">
@@ -97,7 +125,7 @@
                         <td><input v-model.number="g.semanas" type="number" min="1" max="52" step="0.5" class="input-dotacion" placeholder="48" /></td>
                         <td><input v-model.number="g.porcentaje" type="number" min="1" max="100" step="1" class="input-dotacion" placeholder="100" /></td>
                         <td class="td-calculado"><span class="chip-minutos">{{ formatoHoras(horasGrupo(g)) }}</span></td>
-                        <td><button class="btn-mini btn-quitar" type="button" @click="quitarGrupo(recinto.id, i)"><i class="fa-solid fa-trash"></i></button></td>
+                        <td><button class="btn-mini btn-quitar" type="button" title="Quitar este perfil" @click="quitarGrupo(recinto.id, i)"><i class="fa-solid fa-trash"></i></button></td>
                       </tr>
                     </tbody>
                   </table>
@@ -113,30 +141,17 @@
             </div>
           </template>
 
-          <div class="resumen-final">
-            <div class="calculos-grid">
-              <div class="pastilla-grande">
-                <span class="pastilla-grande-titulo">Total equipos</span>
-                <span class="pastilla-grande-valor">{{ calculoNormal ?? '—' }}</span>
-                <span class="pastilla-grande-sub">cálculo normal, sin restricción de RRHH</span>
-              </div>
-              <div class="pastilla-grande">
-                <span class="pastilla-grande-titulo">Total equipos con restricción</span>
-                <span class="pastilla-grande-valor">{{ calculoRestringido ?? '—' }}</span>
-                <span class="pastilla-grande-sub">según la dotación ingresada</span>
-              </div>
-            </div>
-          </div>
-
         </section>
 
         <section class="acciones-finales">
           <button class="btn-secundario" @click="router.push(`/resultados/${proyectoId}`)">
             <i class="fa-solid fa-arrow-left"></i> Volver a Resultados
           </button>
-          <button class="btn-principal" @click="guardarYContinuar">
-            Guardar <i class="fa-solid fa-floppy-disk"></i>
-          </button>
+          <div class="acciones-derecha">
+            <button class="btn-principal" type="button" @click="guardarYContinuar(true)">
+              Guardar y seguir <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
         </section>
       </main>
     </div>
@@ -158,9 +173,6 @@ const API = import.meta.env.VITE_API_BASE
 const nombreProyectoActivo = ref('')
 const proyectoId = ref(null)
 
-// Valor especial de la opción "+ Agregar perfil nuevo…" del desplegable
-const NUEVO = '__nuevo__'
-
 // Perfiles de RRHH: vienen de la tabla EPHAC_Perfil_RRHH
 const categorias = ref([])
 
@@ -181,51 +193,78 @@ const recintos = ref([
 // Grupos de RRHH por recinto
 const dotacion = ref({ 1: [], 2: [], 3: [], 4: [] })
 
+// Valores de la fila "Mismo valor para todos", por recinto
+function valoresMasivos() {
+  return { personas: null, jornada: 44, semanas: SEMANAS_DEFECTO, porcentaje: PORCENTAJE_DEFECTO }
+}
+const masivo = ref({ 1: valoresMasivos(), 2: valoresMasivos(), 3: valoresMasivos(), 4: valoresMasivos() })
+
 // Recintos abiertos o colapsados
 const abiertos = ref({ 1: true, 2: true, 3: true, 4: true })
 function toggleRecinto(id) {
   abiertos.value[id] = !abiertos.value[id]
 }
 
-// Provisorio: se definen cuando esté la regla de restricción
-const calculoNormal = ref(null)
-const calculoRestringido = ref(null)
-
 let uidSeq = 1
 
-// ¿Otro grupo del mismo recinto ya usa este perfil?
-function usadoEnRecinto(recintoId, nombre, g) {
-  return dotacion.value[recintoId].some(o => o.uid !== g.uid && o.tipo === nombre)
+// ¿El recinto ya tiene una fila para este perfil?
+function tieneGrupo(recintoId, nombre) {
+  return dotacion.value[recintoId].some(o => o.tipo === nombre)
 }
 
-// Primer perfil que todavía no se usa en el recinto (o null si ya están todos)
-function primerPerfilLibre(recintoId) {
-  const usados = new Set(dotacion.value[recintoId].map(o => o.tipo))
-  const libre = categorias.value.find(c => !usados.has(c.nombre))
-  return libre ? libre.nombre : null
+// Posición del perfil en el catálogo (las filas siguen el orden de los botones)
+function posicionPerfil(nombre) {
+  const i = categorias.value.findIndex(c => c.nombre === nombre)
+  return i === -1 ? categorias.value.length : i
 }
 
-function agregarGrupo(recintoId) {
-  if (categorias.value.length === 0) {
-    alert('La lista de perfiles no está cargada. Recarga la página.')
-    return
-  }
-  const tipo = primerPerfilLibre(recintoId)
-  if (tipo === null) {
-    alert('Ya agregaste todos los perfiles disponibles en este recinto.')
-    return
-  }
-  dotacion.value[recintoId].push({
+function nuevaFila(nombre) {
+  return {
     uid: uidSeq++,
-    tipo,
+    tipo: nombre,
     personas: 0,
     jornada: 44,
     semanas: SEMANAS_DEFECTO,
     porcentaje: PORCENTAJE_DEFECTO,
-  })
+  }
 }
-function quitarGrupo(recintoId, i) { dotacion.value[recintoId].splice(i, 1) }
-function todosJornada(recintoId, h) { dotacion.value[recintoId].forEach(g => { g.jornada = h }) }
+
+// Agrega la fila del perfil respetando el orden de los botones
+function agregarFila(recintoId, nombre) {
+  const filas = dotacion.value[recintoId]
+  const pos = posicionPerfil(nombre)
+  const i = filas.findIndex(o => posicionPerfil(o.tipo) > pos)
+  if (i === -1) filas.push(nuevaFila(nombre))
+  else filas.splice(i, 0, nuevaFila(nombre))
+}
+
+// Un clic en un perfil: si no está, agrega su fila; si está, la quita
+function togglePerfil(recintoId, nombre) {
+  const filas = dotacion.value[recintoId]
+  const i = filas.findIndex(o => o.tipo === nombre)
+  if (i === -1) {
+    agregarFila(recintoId, nombre)
+    return
+  }
+  quitarGrupo(recintoId, i)
+}
+
+// "Aplicar a todo": copia el valor de la fila de arriba en todas las filas del recinto
+function aplicarATodos(recintoId, campo) {
+  const valor = masivo.value[recintoId][campo]
+  if (valor === null || valor === '' || Number.isNaN(Number(valor))) {
+    alert('Escribe primero el valor que quieres aplicar.')
+    return
+  }
+  dotacion.value[recintoId].forEach(g => { g[campo] = Number(valor) })
+}
+
+// Quita la fila; si ya tiene personas ingresadas pide confirmación
+function quitarGrupo(recintoId, i) {
+  const g = dotacion.value[recintoId][i]
+  if ((Number(g.personas) || 0) > 0 && !window.confirm(`¿Quitar «${g.tipo}» de este recinto? Se pierden sus datos.`)) return
+  dotacion.value[recintoId].splice(i, 1)
+}
 
 // Horas disponibles al año = personas × horas semanales × semanas efectivas × (% / 100)
 function horasGrupo(g) {
@@ -267,7 +306,7 @@ async function crearPerfil(nombre) {
     }
     const perfil = data.datos.perfil
     if (!categorias.value.some(c => c.id === perfil.id)) categorias.value.push(perfil)
-    if (!data.datos.creado) alert(`El perfil «${perfil.nombre}» ya existía; se seleccionó ese.`)
+    if (!data.datos.creado) alert(`El perfil «${perfil.nombre}» ya existía; se usará ese.`)
     return perfil
   } catch (e) {
     alert('Error de conexión al agregar el perfil.')
@@ -275,19 +314,17 @@ async function crearPerfil(nombre) {
   }
 }
 
-// Si se elige "+ Agregar perfil nuevo…" se pide el nombre y se crea
-async function alElegirPerfil(recintoId, g) {
-  if (g.tipo !== NUEVO) return
-  g.tipo = ''
+// "+ Perfil nuevo": pide el nombre, lo crea en el catálogo y agrega su fila
+async function agregarPerfilNuevo(recintoId) {
   const nombre = window.prompt('Nombre del perfil nuevo (por ejemplo: Técnico/a de esterilización):')
   if (nombre === null) return
   const perfil = await crearPerfil(nombre)
   if (!perfil) return
-  if (usadoEnRecinto(recintoId, perfil.nombre, g)) {
+  if (tieneGrupo(recintoId, perfil.nombre)) {
     alert(`El perfil «${perfil.nombre}» ya está en este recinto.`)
     return
   }
-  g.tipo = perfil.nombre
+  agregarFila(recintoId, perfil.nombre)
 }
 
 // Carga la dotación guardada del proyecto
@@ -319,9 +356,10 @@ async function cargarDotacion() {
   }
 }
 
-// Guarda la dotación de todos los recintos
+// Guarda la dotación de todos los recintos.
+// Con seguir = true pasa a la pantalla de tiempos por prestación.
 let guardando = false
-async function guardarYContinuar() {
+async function guardarYContinuar(seguir = false) {
   const uid = authStore.usuarioId
   if (guardando) return
   if (!proyectoId.value || !uid) {
@@ -331,10 +369,6 @@ async function guardarYContinuar() {
   const grupos = []
   for (const r of recintos.value) {
     for (const g of dotacion.value[r.id]) {
-      if (!g.tipo || g.tipo === NUEVO) {
-        alert(`Falta elegir el perfil de un grupo en «${r.nombre}».`)
-        return
-      }
       const semanas = Number(g.semanas)
       const porcentaje = Number(g.porcentaje)
       if (!(semanas > 0 && semanas <= 52)) {
@@ -367,7 +401,8 @@ async function guardarYContinuar() {
       alert(data.error || 'No se pudo guardar la dotación de RRHH.')
       return
     }
-    alert('Dotación de RRHH guardada correctamente.')
+    if (seguir) router.push(`/tiempos-prestacion/${proyectoId.value}`)
+    else alert('Dotación de RRHH guardada correctamente.')
   } catch (e) {
     alert('Error de conexión al guardar la dotación de RRHH.')
   } finally {
@@ -428,12 +463,34 @@ onMounted(async () => {
 /* Tarjeta de recinto */
 .recinto-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
 .recinto-title { display: flex; align-items: center; gap: 10px; background: #fff; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; color: $color-primario; border-bottom: 1px solid #e5e7eb; }
-.acciones-recinto { display: flex; gap: 8px; padding: 12px 20px; }
+/* Botones de perfiles */
+.perfiles-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 20px; }
+.chip-perfil {
+  background: #fff; color: $color-primario; border: 1.5px solid #7fc8e8; border-radius: 999px;
+  padding: 6px 14px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+  &:hover { background: #e4eff6; }
+  &.activo { background: $color-primario; color: #fff; border-color: $color-primario; }
+  &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(42,159,214,0.3); }
+}
+.chip-nuevo { border-style: dashed; color: rgba(0,60,88,0.75); }
+
+/* Fila "Mismo valor para todos" */
+.tabla-rrhh .fila-aplicar th { background: #eef5fa; padding: 8px 12px; font-weight: 600; }
+.aplicar-etiqueta { font-size: 0.8rem; color: rgba(0,60,88,0.75); text-align: center; }
+.aplicar-celda { display: flex; gap: 6px; align-items: center; }
+.input-dotacion.input-mini { padding: 6px 8px; font-size: 0.85rem; min-width: 0; }
+.btn-aplicar {
+  flex: 0 0 auto; background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2);
+  border-radius: 8px; padding: 6px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  &:hover { background: rgba(0,60,88,0.16); }
+}
+.td-perfil { text-align: center; font-weight: 700; color: $color-primario; }
+
 .recinto-title-toggle { justify-content: space-between; cursor: pointer; user-select: none; &:hover { background: #e4eff6; } }
 
 /* Tabla a ancho completo de la tarjeta */
 .tabla-scroll { overflow-x: auto; border-top: 1px solid #d1d5db; }
-.tabla-rrhh { width: 100%; min-width: 1100px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+.tabla-rrhh { width: 100%; min-width: 1250px; table-layout: fixed; border-collapse: separate; border-spacing: 0; }
 .tabla-rrhh th { background: #ddeaf4; color: $color-primario; font-size: 0.85rem; font-weight: 700; padding: 12px 16px; text-align: left; }
 .tabla-rrhh td { padding: 12px 16px; border-bottom: 1px solid $color-borde; font-size: 0.9rem; vertical-align: middle; }
 .tabla-rrhh tbody tr:nth-child(odd) td { background: #f8fbfd; }
@@ -504,6 +561,7 @@ onMounted(async () => {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
+.acciones-derecha { display: flex; align-items: center; gap: 10px; }
 .acciones-finales { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 14px; padding: 16px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .btn-principal { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { opacity: 0.9; } }
 .btn-secundario { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { background: rgba(0,60,88,0.14); } }

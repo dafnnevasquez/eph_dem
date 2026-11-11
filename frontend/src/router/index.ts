@@ -49,11 +49,17 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/tiempos-prestacion/:proyectoId?',
+      name: 'tiempos-prestacion',
+      component: () => import('@/views/RRHH/TiemposPrestacionView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/rrhh/:proyectoId?',
       name: 'rrhh',
       component: () => import('@/views/RRHH/RRHHView.vue'),
       meta: { requiresAuth: true },
-    },
+    },    
     {
       path: '/equipos-oportunidad/:proyectoId?',
       name: 'equipos-oportunidad',
