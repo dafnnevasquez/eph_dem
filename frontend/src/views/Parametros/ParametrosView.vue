@@ -100,6 +100,39 @@
                   <th>Disponibilidad (%) <span class="info-icon" :data-tooltip="infoTexts.disponibilidad" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
                   <th>Jornada laboral (hrs) <span class="info-icon" :data-tooltip="infoTexts.jornadaLaboral" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
                 </tr>
+                <tr class="fila-aplicar">
+                  <th class="aplicar-etiqueta">Mismo valor para todos</th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.demanda" type="number" min="0" step="1" placeholder="0" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('demanda')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.diasAnuales" type="number" min="1" max="366" step="1" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('diasAnuales')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.tiempoProcedimiento" type="number" min="0" step="1" placeholder="60" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('tiempoProcedimiento')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.disponibilidad" type="number" min="0" max="100" step="1" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('disponibilidad')">Aplicar </button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.jornadaLaboral" type="number" min="0" max="24" step="0.5" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('jornadaLaboral')">Aplicar</button>
+                    </div>
+                  </th>
+                </tr>
               </thead>
               <tbody>
                 <tr v-for="fila in filas" :key="fila.id">
@@ -162,6 +195,21 @@ const nombreProyectoActivo = ref('')
 const mostrarCalculadora = ref(false)
 const calculadoraRef = ref(null)
 const calc = ref({ coeficienteTecnico: null, puac: null, promedioEstancia: null })
+
+// Fila "Mismo valor para todos"
+const masivo = ref({ demanda: null, diasAnuales: 365, tiempoProcedimiento: null, disponibilidad: 100, jornadaLaboral: 24 })
+
+function aplicarATodos(campo) {
+  const valor = masivo.value[campo]
+  if (valor === null || valor === '' || Number.isNaN(Number(valor))) {
+    alert('Escribe primero el valor que quieres aplicar.')
+    return
+  }
+  for (const fila of filas.value) {
+    fila[campo] = Number(valor)
+    limpiarError(fila.id, campo)
+  }
+}
 
 const diasCamaCalculados = computed(() => {
   const ct = Number(calc.value.coeficienteTecnico)
@@ -352,7 +400,7 @@ onBeforeUnmount(() => { document.removeEventListener('pointerdown', cerrarCalcul
 .instruccion-icon-circle { display: flex; align-items: center; justify-content: center; color: $color-primario; font-size: 1.4rem; flex: 0 0 auto; }
 .instruccion-texto { font-size: 1.05rem; color: $color-primario; line-height: 1.8; strong { font-weight: 700; } }
 .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 6px; border-radius: 50%; background: rgba(0,60,88,0.14); color: $color-primario; font-size: 0.72rem; font-weight: 700; cursor: help; }
-.info-icon--demo { pointer-events: none; cursor: default; vertical-align: middle; } 
+.info-icon--demo { pointer-events: none; cursor: default; vertical-align: middle; }
 
 .calculadora-wrapper { position: relative; display: flex; flex-direction: column; align-items: flex-end; flex: 0 0 auto; }
 .calculadora-toggle { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1.5px solid $color-primario; border-radius: 999px; background: rgba(0,60,88,0.06); color: $color-primario; font-weight: 700; font-size: 0.93rem; cursor: pointer; white-space: nowrap; &:hover { background: rgba(0,60,88,0.12); } }
@@ -373,10 +421,16 @@ onBeforeUnmount(() => { document.removeEventListener('pointerdown', cerrarCalcul
 .panel-vacio, .tabla-panel { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .panel-vacio { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .tabla-scroll { overflow-x: auto; }
+.tabla-parametros { width: 100%; border-collapse: collapse; }
 .tabla-parametros th { background: #e9f1f6; color: $color-primario; font-size: 0.9rem; font-weight: 700; padding: 10px 8px; text-align: left; white-space: nowrap; position: sticky; top: 0; }
 .tabla-parametros td input { width: 100%; padding: 8px 10px; border: 1px solid $color-borde; border-radius: 8px; background: #fff; font-weight: 500; color: $color-texto-principal; transition: border-color 0.2s ease; }
 .tabla-parametros td input.input-error { border-color: #e53935; background: #fff5f5; box-shadow: 0 0 0 2px rgba(229,57,53,0.18); animation: shake 0.35s ease; }
 .tabla-parametros td { padding: 10px 8px; border-bottom: 1px solid $color-borde; vertical-align: middle; }
+.tabla-parametros .fila-aplicar th { background: #f4f8fb; padding: 8px; position: static; font-weight: 600; }
+.aplicar-etiqueta { font-size: 0.8rem; color: rgba(0,60,88,0.75); }
+.aplicar-celda { display: flex; gap: 6px; align-items: center; input { width: 100%; min-width: 60px; padding: 6px 8px; border: 1px solid $color-borde; border-radius: 8px; font-size: 0.85rem; } }
+.btn-aplicar { flex: 0 0 auto; background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 6px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap; &:hover { background: rgba(0,60,88,0.16); } }
+
 
 @keyframes shake {
   0% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); }

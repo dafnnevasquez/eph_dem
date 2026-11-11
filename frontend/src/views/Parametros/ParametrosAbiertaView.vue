@@ -54,10 +54,49 @@
                   <th>Prestación</th>
                   <th>Demanda <span class="info-icon" :data-tooltip="infoTexts.demanda" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
                   <th>Días al año disponibles <span class="info-icon" :data-tooltip="infoTexts.diasLaborales" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
-                  <th>Tiempo de procedimiento (min) <span class="info-icon" :data-tooltip="infoTexts.tiempo" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
+                  <th>Tiempo de procedimiento <span class="info-icon" :data-tooltip="infoTexts.tiempo" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
                   <th>N° simultáneas <span class="info-icon" :data-tooltip="infoTexts.nSimultaneas" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
                   <th>Disponibilidad (%) <span class="info-icon" :data-tooltip="infoTexts.disponibilidad" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
                   <th>Jornada laboral (hrs) <span class="info-icon" :data-tooltip="infoTexts.jornada" @mouseenter="mostrarTooltip" @mouseleave="ocultarTooltip">i</span></th>
+                </tr>
+                                <tr class="fila-aplicar">
+                  <th class="aplicar-etiqueta">Mismo valor para todos</th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.demanda" type="number" min="0" step="1" placeholder="0" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('demanda')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.diasLaborales" type="number" min="1" max="366" step="1" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('diasLaborales')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.tiempo" type="number" min="0" step="1" placeholder="20" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('tiempo')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.nSimultaneas" type="number" min="1" step="1" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('nSimultaneas')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.disponibilidad" type="number" min="0" max="100" step="1" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('disponibilidad')">Aplicar</button>
+                    </div>
+                  </th>
+                  <th>
+                    <div class="aplicar-celda">
+                      <input v-model.number="masivo.jornada" type="number" min="0" max="24" step="0.5" />
+                      <button type="button" class="btn-aplicar" @click="aplicarATodos('jornada')">Aplicar</button>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -113,6 +152,25 @@ const filas = ref([])
 const errores = ref(new Set())
 const errorValidacion = ref('')
 const nombreProyectoActivo = ref('')
+
+// Fila "Mismo valor para todos"
+const masivo = ref({ demanda: null, diasLaborales: 260, tiempo: null, nSimultaneas: 1, disponibilidad: 100, jornada: 7 })
+
+function aplicarATodos(campo) {
+  const valor = masivo.value[campo]
+  if (valor === null || valor === '' || Number.isNaN(Number(valor))) {
+    alert('Escribe primero el valor que quieres aplicar.')
+    return
+  }
+  const errs = new Set(errores.value)
+  for (const fila of filas.value) {
+    fila[campo] = Number(valor)
+    errs.delete(`${fila.ID_PRESTACION}-${campo}`)
+    calcularEEMM(fila)
+  }
+  errores.value = errs
+  if (errs.size === 0) errorValidacion.value = ''
+}
 
 function calcularEEMM(fila) {
   const { demanda, tiempo, diasLaborales, nSimultaneas, disponibilidad, jornada } = fila
@@ -334,17 +392,26 @@ function ocultarTooltip() { tooltipPosicion.value.visible = false }
 .instruccion-icon-circle { color: $color-primario; font-size: 1.4rem; flex: 0 0 auto; }
 .instruccion-texto { font-size: 1rem; color: $color-primario; line-height: 1.6; }
 
-.botones-dias { display: flex; gap: 10px; margin-top: 8px; }
-.btn-dias { background: rgba(0,60,88,0.08); color: $color-primario; border: 1.5px solid rgba(0,60,88,0.2); border-radius: 999px; padding: 6px 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.88rem; &:hover { background: rgba(0,60,88,0.14); } }
-
 .tabla-panel, .panel-vacio { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .panel-vacio { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .tabla-scroll { overflow-x: auto; }
-.tabla-parametros { width: 100%; min-width: 1100px; border-collapse: separate; border-spacing: 0; }
+.tabla-parametros { width: 100%; min-width: 1100px; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
 .tabla-parametros th { background: #e9f1f6; color: $color-primario; font-size: 0.82rem; font-weight: 700; padding: 10px 8px; text-align: left; }
 .tabla-parametros td { padding: 10px 8px; border-bottom: 1px solid $color-borde; vertical-align: middle; }
 .tabla-parametros td input, .tabla-parametros td select { width: 100%; padding: 7px 8px; border: 1px solid $color-borde; border-radius: 8px; font-size: 0.88rem; }
 .tabla-parametros td input.input-error { border-color: #e53935; background: #fff5f5; }
+.tabla-parametros .fila-aplicar th { background: #f4f8fb; padding: 8px; font-weight: 600; }
+.tabla-parametros th:nth-child(1) { width: 16%; } /* Prestación */
+.tabla-parametros th:nth-child(2) { width: 14%; } /* Demanda */
+.tabla-parametros th:nth-child(3) { width: 14%; } /* Días al año disponibles */
+.tabla-parametros th:nth-child(4) { width: 15%; } /* Tiempo de procedimiento */
+.tabla-parametros th:nth-child(5) { width: 13%; } /* N° simultáneas */
+.tabla-parametros th:nth-child(6) { width: 14%; } /* Disponibilidad (%) */
+.tabla-parametros th:nth-child(7) { width: 14%; } /* Jornada laboral (hrs) */
+.aplicar-etiqueta { font-size: 0.8rem; color: rgba(0,60,88,0.75); }
+.aplicar-celda { display: flex; gap: 6px; align-items: center; input { width: 100%; min-width: 60px; padding: 6px 8px; border: 1px solid $color-borde; border-radius: 8px; font-size: 0.85rem; } }
+.btn-aplicar { flex: 0 0 auto; background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 6px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap; &:hover { background: rgba(0,60,88,0.16); } }
+
 .td-codigo { font-size: 0.85rem; font-weight: 700; color: $color-primario; }
 .td-nombre { font-size: 0.95rem; font-weight: 500; color: $color-texto-principal;}
 .td-area { font-size: 0.78rem; color: $color-texto-secundario; white-space: nowrap; }

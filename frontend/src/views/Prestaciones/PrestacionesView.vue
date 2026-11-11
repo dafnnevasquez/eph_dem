@@ -105,10 +105,16 @@
           <div class="prestaciones-panel">
             <div class="panel-header-seleccionadas">
               <div class="panel-title">Seleccionadas</div>
-              <button type="button" class="btn-limpiar-seleccion" :disabled="prestacionesSeleccionadas.length === 0" @click="limpiarSeleccion">
-                <span class="limpiar-icono"><i class="fa-solid fa-trash-can"></i></span>
-                <span class="limpiar-texto">Limpiar selección</span>
-              </button>
+              <div class="panel-acciones">
+                <button type="button" class="btn-agregar-todas" :disabled="prestacionesFiltradas.length === 0" @click="agregarTodas">
+                  <span class="agregar-icono"><i class="fa-solid fa-plus"></i></span>
+                  <span class="limpiar-texto">Agregar todas ({{ prestacionesFiltradas.length }})</span>
+                </button>
+                <button type="button" class="btn-limpiar-seleccion" :disabled="prestacionesSeleccionadas.length === 0" @click="limpiarSeleccion">
+                  <span class="limpiar-icono"><i class="fa-solid fa-trash-can"></i></span>
+                  <span class="limpiar-texto">Limpiar selección</span>
+                </button>
+              </div>
             </div>
             <div v-if="prestacionesSeleccionadas.length === 0" class="lista-vacia">Aún no has seleccionado prestaciones.</div>
             <div v-else class="prestaciones-lista">
@@ -300,6 +306,12 @@ function agregarPrestacion(prestacion) {
 }
 function quitarPrestacion(prestacion) { seleccionadas.value = seleccionadas.value.filter(p => p.id !== prestacion.id) }
 function limpiarSeleccion() { seleccionadas.value = [] }
+// Agrega todas las prestaciones visibles en "Disponibles" (respeta los filtros activos)
+function agregarTodas() {
+  const nuevas = prestacionesFiltradas.value
+  if (nuevas.length === 0) return
+  seleccionadas.value = [...seleccionadas.value, ...nuevas]
+}
 
 function guardarYConfirmar() {
   if (seleccionadas.value.length === 0) { alert('Debes seleccionar al menos una prestación.'); return }
@@ -368,6 +380,9 @@ function cerrarConsideracionesSiCorresponde(event) {
 .panel-title { font-size: 1.1rem; font-weight: 700; color: $color-primario; margin-bottom: 14px; }
 .btn-limpiar-seleccion { display: flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1.5px solid #dc2626; border-radius: 999px; background: rgba(239,68,68,0.08); color: #991b1b; font-weight: 700; font-size: 0.85rem; cursor: pointer; &:hover:not(:disabled) { background: rgba(239,68,68,0.16); } &:disabled { border-color: #9ca3af; background: rgba(156,163,175,0.08); color: #9ca3af; cursor: not-allowed; } }
 .limpiar-icono { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(239,68,68,0.18); color: #b91c1c; font-size: 0.82rem; }
+.panel-acciones { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.btn-agregar-todas { display: flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1.5px solid #16a34a; border-radius: 999px; background: rgba(34,197,94,0.08); color: #166534; font-weight: 700; font-size: 0.85rem; cursor: pointer; &:hover:not(:disabled) { background: rgba(34,197,94,0.16); } &:disabled { border-color: #9ca3af; background: rgba(156,163,175,0.08); color: #9ca3af; cursor: not-allowed; } }
+.agregar-icono { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: rgba(34,197,94,0.18); color: #15803d; font-size: 0.82rem; }
 
 .prestaciones-lista { display: flex; flex-direction: column; gap: 12px; max-height: min(60vh, 560px); overflow-y: auto; padding-right: 6px; }
 .prestacion-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 12px; background: $color-claro; border: 1px solid $color-borde; }

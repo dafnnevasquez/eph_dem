@@ -69,16 +69,44 @@
       </button>
     </div>  
   </div>
+
+    <!-- Aviso de bienvenida (lateral derecho) -->
+    <transition name="aviso">
+      <aside v-if="mostrarAviso" class="aviso-bienvenida" role="status">
+        <button class="aviso-cerrar" type="button" aria-label="Cerrar aviso" @click="mostrarAviso = false">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="aviso-cabecera">
+          <span class="aviso-icono"><i class="fa-solid fa-hospital"></i></span>
+          <h2 class="aviso-titulo">¡Bienvenid@ a EPHDEM!</h2>
+        </div>
+        <p>
+          Este módulo es una herramienta para estimar el equipamiento médico necesario.
+          Puedes crear un proyecto de <b>atención abierta</b> o <b>atención cerrada</b> y estimar el equipamiento según cada prestación.
+        </p>
+        <button class="aviso-manual" type="button" @click="router.push('/manual')">
+          <i class="fa-solid fa-book"></i> Ver manual de usuario
+        </button>
+      </aside>
+    </transition>
+
+
   </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 const router = useRouter()
 const mostrarOpcionesNuevo = ref(false)
+
+// Aviso de bienvenida: entra desde la derecha al abrir la página
+const mostrarAviso = ref(false)
+onMounted(() => {
+  setTimeout(() => { mostrarAviso.value = true }, 400)
+})
 
 function toggleNuevoProyecto() {
   mostrarOpcionesNuevo.value = !mostrarOpcionesNuevo.value
@@ -175,5 +203,31 @@ function iniciarAtencionCerrada() {
 .material-buttons { display: flex; justify-content: center; gap: 14px; margin-top: 16px; }
 .btn-material { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; &:hover { opacity: 0.85; } }
 
-
+/* Aviso de bienvenida lateral */
+.aviso-bienvenida {
+  position: fixed; top: 110px; right: 24px; z-index: 50; width: min(360px, calc(100vw - 32px));
+  background: #fff; border: 1px solid $color-borde; border-left: 6px solid $color-primario; border-radius: 14px;
+  padding: 20px 22px 18px; box-shadow: 0 16px 36px rgba(0,30,45,0.22);
+  p { margin: 0 0 14px; color: $color-texto-principal; font-size: 0.95rem; line-height: 1.55; }
+  b { color: $color-primario; }
+}
+.aviso-cabecera { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; padding-right: 22px; }
+.aviso-icono {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,60,88,0.08); color: $color-primario; font-size: 1.15rem;
+}
+.aviso-titulo { margin: 0; font-size: 1.2rem; font-weight: 700; color: $color-primario; }
+.aviso-cerrar {
+  position: absolute; top: 10px; right: 10px; background: none; border: none; color: #9ca3af;
+  width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 1rem;
+  &:hover { background: rgba(0,60,88,0.08); color: $color-primario; }
+}
+.aviso-manual {
+  background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 9px 16px;
+  font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  &:hover { opacity: 0.88; }
+}
+.aviso-enter-active, .aviso-leave-active { transition: transform 0.35s ease, opacity 0.35s ease; }
+.aviso-enter-from, .aviso-leave-to { transform: translateX(110%); opacity: 0; }
+@media (max-width: 600px) { .aviso-bienvenida { top: auto; bottom: 16px; right: 16px; } }
 </style>
