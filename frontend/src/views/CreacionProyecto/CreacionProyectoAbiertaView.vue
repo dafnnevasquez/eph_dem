@@ -25,7 +25,7 @@
               </button>
             </div>
           </div>
-          <h2 class="section-title">Crear Proyecto — Atención Abierta</h2>
+          <h2 class="section-title">Crear Proyecto</h2>
           <div class="instruccion-indicator">
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">Ingresa el nombre del proyecto y presiona <strong>Guardar</strong> para registrarlo en el sistema.</span>

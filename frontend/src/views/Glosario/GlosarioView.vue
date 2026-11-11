@@ -68,7 +68,7 @@ const categorias = ['General', 'Tipos de equipamiento', 'Atención cerrada', 'At
 
 const categoriasAbiertas = ref({
   'General': false,
-  'Tipos de equipamiento': false,
+  'Tipología de clases de equipos médicos': false,
   'Atención cerrada': false,
   'Atención abierta': false,
 })
@@ -94,12 +94,13 @@ const terminos = [
   { categoria: 'General', termino: 'Tiempo de procedimiento (TP)', definicion: 'Duración en minutos de una prestación.' },
 
   // TIPOS DE EQUIPAMIENTO
-  { categoria: 'Tipos de equipamiento', termino: 'Tipo 1', definicion: 'Un equipo por unidad o servicio hospitalario, independiente de la demanda.' },
-  { categoria: 'Tipos de equipamiento', termino: 'Tipo 2', definicion: 'Un equipo por módulo de atención (box, cama, sala).' },
-  { categoria: 'Tipos de equipamiento', termino: 'Tipo 3', definicion: 'Al menos 1 equipo por unidad o servicio hospitalario; cifras superiores dependen de la demanda.' },
-  { categoria: 'Tipos de equipamiento', termino: 'Tipo 4', definicion: 'Al menos 1 equipo por módulo de atención; cifras superiores dependen de la demanda.' },
-  { categoria: 'Tipos de equipamiento', termino: 'Tipo 5', definicion: 'La existencia depende de una evaluación de oferta/demanda. Para equipos de alto costo de adquisición, operación y mantención.' },
-  { categoria: 'Tipos de equipamiento', termino: 'Tipo 6', definicion: 'Dimensionamiento según guía o norma técnica correspondiente.' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipología', definicion: 'clasificación de equipamiento médico según su relación con la demanda, en base a esta clasificación se estructura el modelo matemático del módulo' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 1', definicion: 'Un equipo por unidad o servicio hospitalario' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 2', definicion: 'Un equipo por módulo de atención (box, cubículo, cama, puesto o sala de operaciones).' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 3', definicion: 'Al menos 1 equipo por unidad o servicio hospitalario; cifras superiores dependen de la demanda.' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 4', definicion: 'Al menos 1 equipo por módulo de atención; cifras superiores dependen de la demanda.' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 5', definicion: 'La existencia depende de una evaluación de oferta/demanda. Para equipos de alto costo de adquisición, operación y mantención.' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 6', definicion: 'Dimensionamiento según guía o norma correspondiente.' },
 
   // ATENCIÓN CERRADA
   { categoria: 'Atención cerrada', termino: 'Atención Cerrada', definicion: 'Modalidad de atención de salud que requiere la hospitalización del paciente para recibir y administrar las prestaciones necesarias.' },
@@ -111,7 +112,7 @@ const terminos = [
   { categoria: 'Atención cerrada', termino: 'Piso normativo', definicion: 'Cantidad mínima de un equipo garantizada por criterios de dotación fija, con independencia de la demanda calculada.' },
   { categoria: 'Atención cerrada', termino: 'Recinto base', definicion: 'Recinto donde se ejecuta una prestación y del cual esta hereda el kit de equipamiento correspondiente.' },
   { categoria: 'Atención cerrada', termino: 'Recinto Estándar', definicion: 'Catálogo de tipos de recintos hospitalarios considerados por el sistema (por ejemplo, cubículo UCI, cubículo UTI o pabellón), a los cuales se asocia un kit de equipamiento base.' },
-  { categoria: 'Atención cerrada', termino: 'UCI / UTI', definicion: 'Unidad de Cuidados Intensivos y Unidad de Tratamiento Intermedio, respectivamente. Son los componentes que conforman la Unidad de Paciente Crítico.' },
+  { categoria: 'Atención cerrada', termino: 'UCI / UTI', definicion: 'Unidad de Cuidados Intensivos y Unidad de Tratamiento Intermedio, respectivamente. Son los componentes que conforman la Unidad de Paciente Crítico (UPC).' },
   { categoria: 'Atención cerrada', termino: 'UPC', definicion: 'Unidad de Paciente Crítico. Unidad clínica destinada a la atención de pacientes en riesgo vital, que comprende las Unidades de Cuidados Intensivos (UCI) y de Tratamiento Intermedio (UTI).' },
   { categoria: 'Atención cerrada', termino: 'URPA', definicion: 'Unidad de Recuperación Post-Anestésica.' },
 
