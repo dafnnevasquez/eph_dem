@@ -102,6 +102,18 @@ const router = createRouter({
       component: () => import('@/views/Glosario/GlosarioView.vue'),
       meta: { requiresAuth: true },
     },
+        {
+      path: '/biblioteca',
+      name: 'biblioteca',
+      component: () => import('@/views/biblioteca/BibliotecaView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/que-es-eph',
+      name: 'que-es-eph',
+      component: () => import('@/views/eph/QueEsEphView.vue'),
+      meta: { requiresAuth: true },
+    },
     {
       // Redirige cualquier ruta desconocida a /login
       path: '/:pathMatch(.*)*',

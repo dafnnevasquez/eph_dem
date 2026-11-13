@@ -67,7 +67,15 @@
       <button class="btn-material" @click="router.push('/glosario')">
         <i class="fa-solid fa-list"></i> Glosario EPH
       </button>
-    </div>  
+    </div>
+    <div class="material-buttons">
+      <button class="btn-material" @click="router.push('/biblioteca')">
+        <i class="fa-solid fa-book-bookmark"></i> Biblioteca
+      </button>
+      <button class="btn-material" @click="router.push('/que-es-eph')">
+        <i class="fa-solid fa-circle-question"></i> ¿Qué es EPH?
+      </button>
+    </div>
   </div>
 
     <!-- Aviso de bienvenida (lateral derecho) -->
@@ -191,8 +199,10 @@ function iniciarAtencionCerrada() {
   .card-desc  { color: rgba(255,255,255,0.82); }
   .card-hint  { color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.08em; }
 }
-.card-icon      { font-size: 2rem; margin: 0 auto 12px; }
+
+.card-icon      { font-size: 2rem; margin: 0 auto 12px; height: 2.6rem; display: flex; align-items: center; justify-content: center; }
 .card-icon-plus { font-size: 2.4rem; font-weight: 700; }
+.card-column > .card-primary { width: 100%; box-sizing: border-box; min-height: 230px; }
 .card-mini      { width: 160px; padding: 14px 12px; .card-title { margin: 0; font-size: 1rem; } }
 
 .nuevo-menu-enter-active, .nuevo-menu-leave-active { transition: opacity 0.22s ease, transform 0.22s ease; }
@@ -201,8 +211,7 @@ function iniciarAtencionCerrada() {
 
 .manual-link-hint { text-align: center; margin-top: 120px; font-size: 0.95rem; color: $color-texto-secundario; }
 .material-buttons { display: flex; justify-content: center; gap: 14px; margin-top: 16px; }
-.btn-material { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; &:hover { opacity: 0.85; } }
-
+.btn-material { width: 220px; justify-content: center; background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; &:hover { opacity: 0.85; } }
 /* Aviso de bienvenida lateral */
 .aviso-bienvenida {
   position: fixed; top: 110px; right: 24px; z-index: 50; width: min(360px, calc(100vw - 32px));
