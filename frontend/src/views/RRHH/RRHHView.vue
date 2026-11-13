@@ -133,12 +133,6 @@
               </div>
             </div>
 
-
-            <div class="total-recinto">
-              <span class="total-recinto-label">Total del recinto</span>
-              <span class="total-recinto-valor">{{ formatoHoras(totalRecinto(recinto.id)) }}</span>
-              <span class="total-recinto-unidad">h/año</span>
-            </div>
           </template>
 
         </section>
@@ -200,7 +194,7 @@ function valoresMasivos() {
 const masivo = ref({ 1: valoresMasivos(), 2: valoresMasivos(), 3: valoresMasivos(), 4: valoresMasivos() })
 
 // Recintos abiertos o colapsados
-const abiertos = ref({ 1: true, 2: true, 3: true, 4: true })
+const abiertos = ref({ 1: false, 2: false, 3: false, 4: false })
 function toggleRecinto(id) {
   abiertos.value[id] = !abiertos.value[id]
 }
@@ -270,7 +264,6 @@ function quitarGrupo(recintoId, i) {
 function horasGrupo(g) {
   return (Number(g.personas) || 0) * (Number(g.jornada) || 0) * (Number(g.semanas) || 0) * ((Number(g.porcentaje) || 0) / 100)
 }
-function totalRecinto(recintoId) { return dotacion.value[recintoId].reduce((s, g) => s + horasGrupo(g), 0) }
 function formatoHoras(h) { return Math.round(h).toLocaleString('es-CL') }
 
 // Carga la lista de perfiles desde la base
@@ -505,15 +498,6 @@ onMounted(async () => {
 .tabla-rrhh th:nth-child(5) { width: 15%; text-align: center; }
 .tabla-rrhh th:nth-child(6) { width: 17%; text-align: center; }
 .tabla-rrhh th:nth-child(7) { width: 7%; }
-
-/* Total del recinto: pastilla azul oscuro pegada bajo la tarjeta, a la derecha */
-.total-recinto { display: flex; justify-content: flex-end; align-items: center; padding: 0 4px; margin-top: -14px; }
-.total-recinto-label,
-.total-recinto-valor,
-.total-recinto-unidad { flex: 0 0 auto; margin: 0; background: $color-primario; color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 0.95rem; white-space: nowrap; }
-.total-recinto-label { padding-left: 18px; padding-right: 5px; font-weight: 600; border-radius: 10px 0 0 10px; }
-.total-recinto-valor { padding-left: 0; padding-right: 4px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.total-recinto-unidad { padding-left: 0; padding-right: 18px; font-weight: 400; color: rgba(255,255,255,0.85); border-radius: 0 10px 10px 0; }
 
 .btn-mini { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 6px 12px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.16); } }
 .btn-mini.btn-quitar { background: transparent; border-color: transparent; color: #9ca3af; &:hover { color: #c62828; background: rgba(198,40,40,0.08); } }

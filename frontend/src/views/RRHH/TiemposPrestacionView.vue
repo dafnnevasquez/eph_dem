@@ -166,7 +166,7 @@
                 </div>
               </div>
             </div>
-            <p class="resultado-nota">El kit de cada recinto, la norma UPC y la URPA no cambian con la restricción.</p>
+            <p class="resultado-nota"></p>
           </div>
 
           <!-- Sección 2: personal -->
@@ -251,7 +251,7 @@
           </div>
 
           <div v-if="tipo5Cambian.length" class="res-recinto">
-            <div class="res-recinto-cabecera"><span class="res-recinto-nombre">Equipos por demanda (tipo 5) que cambian</span></div>
+            <div class="res-recinto-cabecera"><span class="res-recinto-nombre">Equipos por demanda que cambian</span></div>
             <div class="tabla-scroll">
               <table class="tabla-res">
                 <thead><tr><th>Equipo</th><th>Sin restricción</th><th>Con restricción</th></tr></thead>
