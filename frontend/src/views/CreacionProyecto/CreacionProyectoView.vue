@@ -54,7 +54,7 @@
 
         <section class="proyectos-panel">
           <div class="panel-header">
-            <h3 class="panel-title">Mis proyectos</h3>
+            <h3 class="panel-title">Mis proyectos de Atención Cerrada</h3>
             <div class="panel-actions">
               <div class="sort-control">
                 <label>Ordenar por:</label>

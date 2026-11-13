@@ -94,7 +94,7 @@ const terminos = [
   { categoria: 'General', termino: 'Tiempo de procedimiento (TP)', definicion: 'Duración en minutos de una prestación.' },
 
   // TIPOS DE EQUIPAMIENTO
-  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipología', definicion: 'clasificación de equipamiento médico según su relación con la demanda, en base a esta clasificación se estructura el modelo matemático del módulo' },
+  { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipología', definicion: 'Clasificación de equipamiento médico según su relación con la demanda, en base a esta clasificación se estructura el modelo matemático del módulo' },
   { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 1', definicion: 'Un equipo por unidad o servicio hospitalario' },
   { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 2', definicion: 'Un equipo por módulo de atención (box, cubículo, cama, puesto o sala de operaciones).' },
   { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipo 3', definicion: 'Al menos 1 equipo por unidad o servicio hospitalario; cifras superiores dependen de la demanda.' },
