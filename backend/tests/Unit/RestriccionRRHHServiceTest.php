@@ -177,4 +177,36 @@ class RestriccionRRHHServiceTest extends TestCase
         $this->assertSame($eq['dtec_entero'], $eq['d_entero']);
         $this->assertEqualsWithDelta(self::DTEC_HEMODIALISIS, $eq['d'], 1e-12);
     }
+
+    /* --- R6, R7, R10 y R11 por separado --------------------------------- */
+
+    public function testSuficienciaServicioTomaElMinimoYElLimitante(): void
+    {
+        $r = RestriccionRRHHService::suficienciaServicio(['a' => 0.9, 'b' => 0.6, 'c' => null, 'd' => 1.2]);
+        $this->assertEqualsWithDelta(0.6, $r['rho'], self::TOL);
+        $this->assertSame('b', $r['perfil']);
+
+        $vacio = RestriccionRRHHService::suficienciaServicio(['a' => null]);
+        $this->assertNull($vacio['rho']);
+        $this->assertNull($vacio['perfil']);
+    }
+
+    public function testFactorAlcanzableTopaEnUno(): void
+    {
+        $this->assertEqualsWithDelta(0.6, RestriccionRRHHService::factorAlcanzable(0.6), self::TOL);
+        $this->assertEqualsWithDelta(1.0, RestriccionRRHHService::factorAlcanzable(1.04), self::TOL);
+        $this->assertEqualsWithDelta(1.0, RestriccionRRHHService::factorAlcanzable(null), self::TOL);
+    }
+
+    public function testBrechaPersonal(): void
+    {
+        $this->assertEqualsWithDelta(2.0, RestriccionRRHHService::brechaPersonal(3, 1.0), self::TOL);
+        $this->assertEqualsWithDelta(0.0, RestriccionRRHHService::brechaPersonal(1, 4.0), self::TOL);
+    }
+
+    public function testPrestacionesNoCubiertas(): void
+    {
+        $this->assertEqualsWithDelta(1224.0, RestriccionRRHHService::prestacionesNoCubiertas(1728.0 / 2340.0, 4680.0), self::TOL);
+        $this->assertEqualsWithDelta(0.0, RestriccionRRHHService::prestacionesNoCubiertas(1.0, 4680.0), self::TOL);
+    }
 }

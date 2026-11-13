@@ -209,7 +209,7 @@ class PrestacionPerfilService
     /**
      * Reemplaza en el catalogo las filas de las prestaciones del proyecto por
      * las que llegan (ya validadas). No toca prestaciones de otros proyectos.
-     * Devuelve las filas guardadas.
+     * Devuelve cuantas filas se guardaron.
      */
     public function guardar(int $proyectoId, array $filas): int
     {
