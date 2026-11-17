@@ -46,7 +46,7 @@
               />
             </div>
             <div class="acciones-formulario">
-              <button type="submit" class="btn-principal">Guardar</button>
+              <button type="submit" class="btn-principal" :disabled="guardando">{{ guardando ? 'Guardando…' : 'Guardar' }}</button>
               <button type="button" class="btn-secundario" @click="cancelar">Cancelar</button>
             </div>
           </form>
@@ -107,6 +107,7 @@ const formulario = ref({ nombreProyecto: '' })
 const proyectosPrevios = ref([])
 const cargandoProyectos = ref(true)
 const ordenSeleccionado = ref('fecha_desc')
+const guardando = ref(false)
 
 const proyectosPreviosOrdenados = computed(() => {
   const lista = [...proyectosPrevios.value]
@@ -141,6 +142,8 @@ async function guardarProyecto() {
   if (!nombreProyecto.trim()) { alert('Por favor, ingresa un nombre para el proyecto.'); return }
   const userId = authStore.usuarioId
   if (!userId) { alert('No hay sesión activa.'); router.push('/login'); return }
+  if (guardando.value) return
+  guardando.value = true
   try {
     const url = `${import.meta.env.VITE_API_BASE}/crear_proyecto.php`
     const response = await fetch(url, {
@@ -158,6 +161,8 @@ async function guardarProyecto() {
     router.push('/prestaciones')
   } catch (error) {
     alert('Ocurrió un error de red al intentar comunicarse con el servidor.')
+  } finally {
+    guardando.value = false
   }
 }
 
@@ -217,7 +222,7 @@ function verProyecto(proyecto) {
   &::placeholder { color: $color-texto-secundario; }
 }
 .acciones-formulario { display: flex; gap: 12px; justify-content: flex-end; margin-top: 12px; }
-.btn-principal { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 10px 24px; font-weight: 700; cursor: pointer; &:hover { background: mix(#fff, $color-primario, 8%); } }
+.btn-principal { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 10px 24px; font-weight: 700; cursor: pointer; &:hover { background: mix(#fff, $color-primario, 8%); } &:disabled { opacity: 0.6; cursor: not-allowed; } }
 .btn-secundario { background: rgba(0,60,88,0.12); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 10px; padding: 10px 24px; font-weight: 700; cursor: pointer; &:hover { background: rgba(0,60,88,0.18); } }
 
 .proyectos-panel { background: #fff; border-radius: 16px; padding: 32px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }

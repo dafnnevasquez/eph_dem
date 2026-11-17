@@ -72,14 +72,23 @@ class ProyectoController
             Response::error('Ya tienes un proyecto con este nombre. Por favor, elige otro.', 409);
         }
         mysqli_stmt_close($stmt);
-
-        // Insertar
+        // Insertar. La regla unica uq_proyecto_usuario_nombre protege contra
+        // dos peticiones simultaneas: la segunda falla con error 1062.
         $stmt = mysqli_prepare($this->conn,
             "INSERT INTO EPHAC_Proyectos (Nombre_proyecto, fecha_creacion, usuario_id, Datos_Json) VALUES (?, NOW(), ?, NULL)"
         );
         mysqli_stmt_bind_param($stmt, 'si', $nombreProyecto, $usuarioId);
 
-        if (mysqli_stmt_execute($stmt)) {
+        $errno = 0;
+        try {
+            $ok = mysqli_stmt_execute($stmt);
+            if (!$ok) $errno = mysqli_stmt_errno($stmt);
+        } catch (\mysqli_sql_exception $e) {
+            $ok = false;
+            $errno = (int)$e->getCode();
+        }
+
+        if ($ok) {
             $id = (int)mysqli_insert_id($this->conn);
             mysqli_stmt_close($stmt);
             mysqli_close($this->conn);
@@ -88,11 +97,14 @@ class ProyectoController
                 'nombre_proyecto' => $nombreProyecto,
                 'tipo_proyecto'   => $tipoProyecto,
             ], 201);
-        } else {
-            mysqli_stmt_close($stmt);
-            mysqli_close($this->conn);
-            Response::error('Error al crear el proyecto.', 500);
         }
+
+        mysqli_stmt_close($stmt);
+        mysqli_close($this->conn);
+        if ($errno === 1062) {
+            Response::error('Ya tienes un proyecto con este nombre. Por favor, elige otro.', 409);
+        }
+        Response::error('Error al crear el proyecto.', 500);
     }
 }
 
