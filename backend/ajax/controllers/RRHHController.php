@@ -224,7 +224,8 @@ class RRHHController
                 $pps->catalogoProyecto($proyectoId),
                 $this->service->obtener($proyectoId),
                 $actual['modulos'],
-                $actual['tipo5']
+                $actual['tipo5'],
+                $actual['equipamiento']
             );
             Response::ok($resultado);
         } catch (\Throwable $e) {

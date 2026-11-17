@@ -35,8 +35,8 @@
             <span class="instruccion-texto">
               En cada prestación aprieta los perfiles que participan. <b>Permanente</b>: el perfil está durante
               toda la prestación. <b>Puntual</b>: interviene algunas veces; indica los minutos de cada intervención
-              y cuántas veces al día. La dedicación (φ) no puede ser mayor que 1. Estos datos se comparten con
-              los demás proyectos que tengan las mismas prestaciones.
+              y cuántas veces al día. La dedicación (φ) no puede ser mayor que 1. Estos tiempos son solo de este
+              proyecto: otro hospital puede tener tiempos distintos para la misma prestación.
             </span>
           </div>
         </header>
@@ -166,7 +166,8 @@
                 </div>
               </div>
             </div>
-            <p class="resultado-nota"></p>
+            <p class="resultado-nota">
+            </p>
           </div>
 
           <!-- Sección 2: personal -->
@@ -250,21 +251,56 @@
             </div>
           </div>
 
-          <div v-if="tipo5Cambian.length" class="res-recinto">
-            <div class="res-recinto-cabecera"><span class="res-recinto-nombre">Equipos por demanda que cambian</span></div>
-            <div class="tabla-scroll">
+          <!-- Equipamiento completo: todos los tipos -->
+          <div v-if="equipamiento.length" class="res-recinto">
+            <div class="res-recinto-cabecera">
+              <span class="res-recinto-nombre">Equipamiento</span>
+              <label class="check-todos">
+                <input v-model="mostrarTodos" type="checkbox" /> Mostrar todos los equipos
+              </label>
+            </div>
+            <p v-if="!mostrarTodos && equipamientoCambian.length === 0" class="res-linea res-gris">
+              Ningún equipo cambia con el personal actual.
+            </p>
+            <div v-if="equiposVisibles.length" class="tabla-scroll">
               <table class="tabla-res">
-                <thead><tr><th>Equipo</th><th>Sin restricción</th><th>Con restricción</th></tr></thead>
+                <thead><tr><th>Equipo</th><th>Tipo</th><th>Sin restricción</th><th>Con restricción</th></tr></thead>
                 <tbody>
-                  <tr v-for="e in tipo5Cambian" :key="e.equipo_id">
-                    <td>{{ e.nombre_equipo }}</td><td>{{ e.normal }}</td><td>{{ e.restringido }}</td>
+                  <tr v-for="e in equiposVisibles" :key="e.equipo_id" :class="{ 'fila-cambia': e.restringido !== e.normal }">
+                    <td>{{ e.nombre_equipo }}</td>
+                    <td>{{ e.tipo ? `Tipo ${e.tipo}` : '—' }}</td>
+                    <td>{{ e.normal }}</td>
+                    <td>{{ e.restringido }}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p v-if="resultado.tipo5.length > tipo5Cambian.length" class="res-linea res-gris">
-              {{ resultado.tipo5.length - tipo5Cambian.length === 1 ? 'El otro equipo tipo 5 no cambia.' : `Los otros ${resultado.tipo5.length - tipo5Cambian.length} equipos tipo 5 no cambian.` }}
+            <p v-if="!mostrarTodos && equipamientoCambian.length > 0 && equipamiento.length > equipamientoCambian.length" class="res-linea res-gris">
+              {{ textoNoCambian(equipamiento.length - equipamientoCambian.length) }}
             </p>
+          </div>
+
+          <!-- URPA -->
+          <div v-if="urpa && urpa.normal.pabellones > 0" class="res-recinto">
+            <div class="res-recinto-cabecera"><span class="res-recinto-nombre">URPA (recuperación post-anestésica)</span></div>
+            <p class="res-linea">
+              Camillas: <b>{{ urpa.normal.camillas }}</b> sin restricción → <b>{{ urpa.restringido.camillas }}</b> con restricción ·
+              Salas: <b>{{ urpa.normal.salas }}</b> → <b>{{ urpa.restringido.salas }}</b>
+            </p>
+            <div v-if="urpaCambian.length" class="tabla-scroll">
+              <table class="tabla-res">
+                <thead><tr><th>Equipo</th><th>Tipo</th><th>Sin restricción</th><th>Con restricción</th></tr></thead>
+                <tbody>
+                  <tr v-for="e in urpaCambian" :key="e.equipo_id" class="fila-cambia">
+                    <td>{{ e.nombre_equipo }}</td>
+                    <td>{{ e.tipo ? `Tipo ${e.tipo}` : '—' }}</td>
+                    <td>{{ e.normal }}</td>
+                    <td>{{ e.restringido }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p v-else class="res-linea res-gris">El equipamiento de la URPA no cambia.</p>
           </div>
             </div>
           </details>
@@ -309,6 +345,7 @@ const cargando = ref(true)
 const guardadoComo = ref('') // lo último guardado, para saber si hay cambios
 const resultado = ref(null)   // resultado de la restricción (rrhh.php?action=calcular_restriccion)
 const calculando = ref(false)
+const mostrarTodos = ref(false) // detalle de equipamiento: todos o solo los que cambian
 
 let uidSeq = 1
 
@@ -442,10 +479,19 @@ const brechas = computed(() => {
 const tarjetasEquipos = computed(() => {
   if (!resultado.value) return []
   const t = resultado.value.totales
-  return [
+  const tarjetas = [
     { titulo: 'Pabellones y boxes', normal: t.modulos_normal, restringido: t.modulos_restringido },
-    { titulo: 'Equipos por demanda', normal: t.tipo5_normal, restringido: t.tipo5_restringido },
   ]
+  if (t.equipos_normal !== undefined) {
+    tarjetas.push({ titulo: 'Equipamiento (todos los tipos)', normal: t.equipos_normal, restringido: t.equipos_restringido })
+  } else {
+    tarjetas.push({ titulo: 'Equipos por demanda', normal: t.tipo5_normal, restringido: t.tipo5_restringido })
+  }
+  const u = resultado.value.urpa
+  if (u && u.normal.camillas > 0) {
+    tarjetas.push({ titulo: 'Camillas URPA', normal: u.normal.camillas, restringido: u.restringido.camillas })
+  }
+  return tarjetas
 })
 const totalFaltan = computed(() => (resultado.value
   ? resultado.value.recintos.reduce((s, r) => s + r.por_perfil.reduce((a, p) => a + (p.brecha > 0 ? p.brecha : 0), 0), 0)
@@ -462,7 +508,15 @@ const sinPersonal = computed(() => {
       texto: `${r.perfiles_sin_datos.join(', ')} participa en prestaciones de «${r.nombre}» pero no tiene personal en RRHH: ese recinto queda sin capacidad hasta que lo agregues.`,
     }))
 })
-const tipo5Cambian = computed(() => (resultado.value ? resultado.value.tipo5.filter(e => e.restringido !== e.normal) : []))
+// Equipamiento completo (todos los tipos) y URPA
+const equipamiento = computed(() => (resultado.value && resultado.value.equipamiento) || [])
+const equipamientoCambian = computed(() => equipamiento.value.filter(e => e.restringido !== e.normal))
+const equiposVisibles = computed(() => (mostrarTodos.value ? equipamiento.value : equipamientoCambian.value))
+const urpa = computed(() => (resultado.value && resultado.value.urpa) || null)
+const urpaCambian = computed(() => (urpa.value ? urpa.value.equipos.filter(e => e.restringido !== e.normal) : []))
+function textoNoCambian(n) {
+  return n === 1 ? 'El otro equipo no cambia.' : `Los otros ${n} equipos no cambian.`
+}
 
 function formatoPhi(phi) {
   return phi === null ? '—' : phi.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -726,7 +780,7 @@ onMounted(async () => {
 
 .res-seccion { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid $color-borde; }
 .res-seccion-titulo { margin: 0; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(0,60,88,0.65); }
-.pastillas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pastillas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 @media (max-width: 700px) { .pastillas { grid-template-columns: 1fr; } }
 .pastilla { background: $color-primario; color: #fff; border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .pastilla-clara { background: #eef5fa; color: $color-primario; border: 1px solid #d3e4f0; }
@@ -760,6 +814,8 @@ onMounted(async () => {
 .tabla-res td { padding: 8px 10px; border-bottom: 1px solid $color-borde; text-align: center; font-variant-numeric: tabular-nums; color: $color-primario; }
 .tabla-res td:first-child, .tabla-res th:first-child { text-align: left; }
 .tabla-res .fila-limita td { background: #fff7e6; font-weight: 700; }
+.tabla-res .fila-cambia td:last-child { color: #b86e00; font-weight: 700; }
+.check-todos { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: rgba(0,60,88,0.8); cursor: pointer; }
 
 .acciones-finales { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fff; border-radius: 14px; padding: 16px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .acciones-derecha { display: flex; align-items: center; gap: 12px; }

@@ -5,8 +5,8 @@ require_once __DIR__ . '/RestriccionRRHHService.php';
 
 /**
  * Planilla A del modelo v4: como participa cada perfil en cada prestacion.
- * Se guarda en el catalogo compartido EPHAC_Prestacion_Perfil (lo que llena
- * un proyecto queda disponible para todos los demas).
+ * Se guarda POR PROYECTO en EPHAC_Prestacion_Perfil (columna proyecto_id):
+ * cada hospital puede tener tiempos distintos para la misma prestacion.
  *
  *   permanente: el perfil esta todo el tiempo de la prestacion (tau = t).
  *   puntual:    interviene f veces al dia, e minutos cada vez (tau = e * f * dias).
@@ -102,7 +102,7 @@ class PrestacionPerfilService
 
     /**
      * Arma la respuesta de la pantalla: recintos con sus prestaciones, los
-     * perfiles que el proyecto declaro en la Planilla B y lo que dice el catalogo.
+     * perfiles que el proyecto declaro en la Planilla B y su Planilla A.
      *
      * @param array $prestaciones de prestacionesProyecto()
      * @param array $catalogo     de catalogoProyecto()
@@ -184,14 +184,18 @@ class PrestacionPerfilService
         return $out;
     }
 
-    /** Filas del catalogo para las prestaciones del proyecto. */
+    /**
+     * Planilla A del proyecto. Solo las prestaciones que el proyecto tiene
+     * seleccionadas hoy (si quito una prestacion, sus filas no se muestran).
+     */
     public function catalogoProyecto(int $proyectoId): array
     {
         $st = $this->conn->prepare(
             'SELECT pp.prestacion_id, pp.tipo_rrhh, pp.participacion, pp.e_minutos, pp.f_veces_dia
              FROM ' . self::TBL . ' pp
-             JOIN EPHAC_Proyecto_Demanda d ON d.prestacion_id = pp.prestacion_id
-             WHERE d.proyecto_id = ?
+             JOIN EPHAC_Proyecto_Demanda d
+               ON d.prestacion_id = pp.prestacion_id AND d.proyecto_id = pp.proyecto_id
+             WHERE pp.proyecto_id = ?
              ORDER BY pp.prestacion_id, pp.id_prestacion_perfil'
         );
         if (!$st) throw new RuntimeException('prepare catalogo proyecto');
@@ -207,17 +211,16 @@ class PrestacionPerfilService
     }
 
     /**
-     * Reemplaza en el catalogo las filas de las prestaciones del proyecto por
-     * las que llegan (ya validadas). No toca prestaciones de otros proyectos.
-     * Devuelve cuantas filas se guardaron.
+     * Reemplaza la Planilla A del proyecto por las filas que llegan (ya
+     * validadas). No toca la de otros proyectos. Devuelve cuantas filas
+     * se guardaron.
      */
     public function guardar(int $proyectoId, array $filas): int
     {
         $this->conn->begin_transaction();
         try {
             $del = $this->conn->prepare(
-                'DELETE FROM ' . self::TBL . ' WHERE prestacion_id IN
-                   (SELECT prestacion_id FROM EPHAC_Proyecto_Demanda WHERE proyecto_id = ?)'
+                'DELETE FROM ' . self::TBL . ' WHERE proyecto_id = ?'
             );
             if (!$del) throw new RuntimeException('prepare delete planilla a');
             $del->bind_param('i', $proyectoId);
@@ -225,8 +228,8 @@ class PrestacionPerfilService
             $del->close();
 
             $ins = $this->conn->prepare(
-                'INSERT INTO ' . self::TBL . ' (prestacion_id, tipo_rrhh, participacion, e_minutos, f_veces_dia)
-                 VALUES (?, ?, ?, ?, ?)'
+                'INSERT INTO ' . self::TBL . ' (proyecto_id, prestacion_id, tipo_rrhh, participacion, e_minutos, f_veces_dia)
+                 VALUES (?, ?, ?, ?, ?, ?)'
             );
             if (!$ins) throw new RuntimeException('prepare insert planilla a');
 
@@ -241,7 +244,7 @@ class PrestacionPerfilService
                     $e = (float)$f['e_minutos'];
                     $v = (float)$f['f_veces_dia'];
                 }
-                $ins->bind_param('issdd', $id, $tipo, $part, $e, $v);
+                $ins->bind_param('iissdd', $proyectoId, $id, $tipo, $part, $e, $v);
                 if (!$ins->execute()) throw new RuntimeException('execute insert planilla a');
                 $n++;
             }

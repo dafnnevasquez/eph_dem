@@ -161,4 +161,162 @@ class RestriccionProyectoServiceTest extends TestCase
         $f = ['participacion' => 'permanente', 'e_minutos' => null, 'f_veces_dia' => null];
         $this->assertEqualsWithDelta(1.5, RestriccionProyectoService::tauDe($f, 90.0), self::TOL);
     }
+
+    /* --- Equipamiento completo (tipos 1 a 6) y URPA ------------------- */
+
+    private function configCalculo(): array
+    {
+        return [
+            'mapa_regla_recinto' => ['uci' => 2, 'enfermeria_uci' => 2, 'uti' => 1, 'enfermeria_uti' => 1],
+            'divisores_upc'      => ['uci' => 6, 'uti' => 12, 'enfermeria_uci' => 6, 'enfermeria_uti' => 12],
+            'urpa_camillas_por_pabellon' => 2,
+            'urpa_max_camillas'          => 12,
+        ];
+    }
+
+    /** Fuentes como las entrega el agregador para: UTI 2 boxes, UCI 7, P. menor 2, P. mayor 3. */
+    private function fuentesEjemplo(): array
+    {
+        return [
+            'kit' => ['equipos' => [
+                ['equipo_id' => 10, 'nombre_equipo' => 'Monitor', 'cantidad' => 13, 'por_recinto' => [
+                    ['recinto_id' => 2, 'cantidad_base' => 1, 'nro_recintos' => 7, 'subtotal' => 7],
+                    ['recinto_id' => 4, 'cantidad_base' => 2, 'nro_recintos' => 3, 'subtotal' => 6],
+                ]],
+            ]],
+            'tipo2' => ['equipos' => [
+                ['equipo_id' => 20, 'nombre_equipo' => 'Ventilador', 'cantidad' => 9, 'por_recinto' => [
+                    ['recinto_id' => 1, 'nro_recintos' => 2], ['recinto_id' => 2, 'nro_recintos' => 7],
+                ]],
+            ]],
+            'tipo6' => ['equipos' => [
+                ['equipo_id' => 10, 'nombre_equipo' => 'Monitor', 'cantidad' => 2, 'por_regla' => [
+                    ['regla' => 'uci', 'cantidad_base' => 1, 'dotaciones' => 2, 'subtotal' => 2],
+                ]],
+                ['equipo_id' => 30, 'nombre_equipo' => 'Bomba', 'cantidad' => 4, 'por_regla' => [
+                    ['regla' => 'uti', 'cantidad_base' => 3, 'dotaciones' => 1, 'subtotal' => 3],
+                    ['regla' => 'enfermeria_uti', 'cantidad_base' => 1, 'dotaciones' => 1, 'subtotal' => 1],
+                ]],
+            ]],
+            'tipo5' => ['equipos' => [
+                ['equipo_id' => 10, 'nombre_equipo' => 'Monitor', 'cantidad' => 9, 'por_prestacion' => [['prestacion_id' => 40, 'requerimiento_fraccion' => 8.5]]],
+                ['equipo_id' => 40, 'nombre_equipo' => 'Ecógrafo', 'cantidad' => 5, 'por_prestacion' => [
+                    ['prestacion_id' => 40, 'requerimiento_fraccion' => 3.0], ['prestacion_id' => 41, 'requerimiento_fraccion' => 1.5],
+                ]],
+            ]],
+        ];
+    }
+
+    public function testComponerConConteoNormalReproduceElAgregador(): void
+    {
+        $c = RestriccionProyectoService::componerEquipamiento(
+            $this->fuentesEjemplo(), [1 => 2, 2 => 7, 3 => 2, 4 => 3], [], [40 => 4, 41 => 3], $this->configCalculo()
+        );
+        // Monitor: UCI max(kit 7, norma 2) = 7 + P. mayor max(kit 6, demanda 9) = 9 -> 16
+        $this->assertSame(16, $c[10]['cantidad']);
+        $this->assertSame(9, $c[20]['cantidad']);   // tipo 2: 2 + 7
+        $this->assertSame(4, $c[30]['cantidad']);   // norma UTI 3 + enfermeria 1
+        $this->assertSame(5, $c[40]['cantidad']);   // demanda compartida
+    }
+
+    public function testComponerConModulosRestringidosBajaTodosLosTipos(): void
+    {
+        $c = RestriccionProyectoService::componerEquipamiento(
+            $this->fuentesEjemplo(), [1 => 1, 2 => 4, 3 => 2, 4 => 2], [10 => 6, 40 => 4], [40 => 4, 41 => 3], $this->configCalculo()
+        );
+        // Monitor: UCI max(kit 4, norma techo(4/6)=1) = 4 + P. mayor max(kit 4, demanda 6) = 6 -> 10
+        $this->assertSame(10, $c[10]['cantidad']);
+        $this->assertSame(5, $c[20]['cantidad']);   // 1 + 4
+        $this->assertSame(4, $c[30]['cantidad']);   // techo(1/12) = 1 dotacion: 3 + 1
+        $this->assertSame(4, $c[40]['cantidad']);
+    }
+
+    public function testRecintoEnCeroQuitaSusEquiposFijos(): void
+    {
+        $c = RestriccionProyectoService::componerEquipamiento(
+            $this->fuentesEjemplo(), [1 => 0, 2 => 0, 3 => 0, 4 => 0], [10 => 0, 40 => 0], [40 => 4, 41 => 3], $this->configCalculo()
+        );
+        foreach ([10, 20, 30, 40] as $id) {
+            $this->assertSame(0, $c[$id]['cantidad']);
+        }
+    }
+
+    public function testUrpaConPabellonesRestringidos(): void
+    {
+        $urpa = ['nro_pabellones' => 5, 'nro_camillas' => 10, 'nro_salas' => 1,
+                 'equipos_sala'    => [['equipo_id' => 33, 'nombre_equipo' => 'Carro de paro', 'cantidad_base' => 1, 'cantidad' => 1]],
+                 'equipos_camilla' => [['equipo_id' => 27, 'nombre_equipo' => 'Camilla', 'cantidad_base' => 1, 'cantidad' => 10]]];
+        $u = RestriccionProyectoService::urpaRestringida($urpa, 3, $this->configCalculo());
+        $this->assertSame(6, $u['restringido']['camillas']);
+        $this->assertSame(1, $u['restringido']['salas']);
+        $this->assertSame(6, $u['equipos'][0]['restringido']);   // 27 camilla
+        $this->assertSame(1, $u['equipos'][1]['restringido']);   // 33 sala
+        $cero = RestriccionProyectoService::urpaRestringida($urpa, 0, $this->configCalculo());
+        $this->assertSame(0, $cero['restringido']['salas']);
+        $this->assertSame(0, $cero['equipos'][1]['restringido']);
+    }
+
+    public function testCalcularIncluyeEquipamientoCompletoYUrpa(): void
+    {
+        // Pabellon menor: Q = 1000 h, A = 500 h -> alpha 0,5; 3 pabellones (2,3) -> techo(1,15) = 2.
+        $equipamiento = [
+            'normal'  => [
+                ['equipo_id' => 10, 'nombre_equipo' => 'Lámpara', 'cantidad' => 6],
+                ['equipo_id' => 50, 'nombre_equipo' => 'Electrobisturí', 'cantidad' => 3],
+            ],
+            'fuentes' => [
+                'kit'   => ['equipos' => [['equipo_id' => 10, 'nombre_equipo' => 'Lámpara', 'cantidad' => 6,
+                            'por_recinto' => [['recinto_id' => 3, 'cantidad_base' => 2, 'nro_recintos' => 3, 'subtotal' => 6]]]]],
+                'tipo2' => ['equipos' => []],
+                'tipo6' => ['equipos' => []],
+                'tipo5' => ['equipos' => [['equipo_id' => 50, 'nombre_equipo' => 'Electrobisturí', 'cantidad' => 3,
+                            'por_prestacion' => [['prestacion_id' => 20, 'requerimiento_fraccion' => 2.3]]]]],
+            ],
+            'tipos'  => [10 => 1, 50 => 5],
+            'urpa'   => ['nro_pabellones' => 3, 'nro_camillas' => 6, 'nro_salas' => 1,
+                         'equipos_sala'    => [['equipo_id' => 33, 'nombre_equipo' => 'Carro de paro', 'cantidad_base' => 1, 'cantidad' => 1]],
+                         'equipos_camilla' => [['equipo_id' => 27, 'nombre_equipo' => 'Camilla', 'cantidad_base' => 1, 'cantidad' => 6]]],
+            'config' => $this->configCalculo(),
+        ];
+        $r = RestriccionProyectoService::calcular(
+            [$this->prestacion(20, 3, 'Pabellón menor', 60.0, 1000)],
+            [['prestacion_id' => 20, 'tipo_rrhh' => 'TENS', 'participacion' => 'permanente', 'e_minutos' => null, 'f_veces_dia' => null]],
+            [$this->grupo(3, 'TENS', 1, 10, 50, 1.0)],
+            [3 => ['tipo' => 'pabellones', 'fraccion' => 2.3, 'cantidad' => 3]],
+            $equipamiento['fuentes']['tipo5']['equipos'],
+            $equipamiento
+        );
+        $this->assertSame(2, $this->recinto($r, 3)['modulos']['restringido']);
+        $this->assertSame(4, $r['equipamiento'][0]['restringido']);   // kit tipo 1: 2 x 2 pabellones
+        $this->assertSame(1, $r['equipamiento'][0]['tipo']);
+        $this->assertSame(2, $r['equipamiento'][1]['restringido']);   // tipo 5: techo(0,5 x 2,3)
+        $this->assertSame(9, $r['totales']['equipos_normal']);
+        $this->assertSame(6, $r['totales']['equipos_restringido']);
+        $this->assertSame(4, $r['urpa']['restringido']['camillas']);  // 2 x 2 pabellones
+        $this->assertNotFalse(json_encode($r));
+    }
+
+    public function testSinRestriccionElEquipamientoQuedaIgual(): void
+    {
+        $f = $this->fuentesEjemplo();
+        $normal = [];
+        $c = RestriccionProyectoService::componerEquipamiento($f, [1 => 2, 2 => 7, 3 => 2, 4 => 3], [], [40 => 4, 41 => 3], $this->configCalculo());
+        foreach ($c as $id => $x) {
+            $normal[] = ['equipo_id' => $id, 'nombre_equipo' => $x['nombre'], 'cantidad' => $x['cantidad']];
+        }
+        $eq = ['normal' => $normal, 'fuentes' => $f, 'tipos' => [],
+               'urpa' => ['nro_pabellones' => 5, 'nro_camillas' => 10, 'nro_salas' => 1, 'equipos_sala' => [], 'equipos_camilla' => []],
+               'config' => $this->configCalculo()];
+        $modulos = [1 => ['tipo' => 'boxes', 'fraccion' => 1.5, 'cantidad' => 2], 2 => ['tipo' => 'boxes', 'fraccion' => 6.2, 'cantidad' => 7],
+                    3 => ['tipo' => 'pabellones', 'fraccion' => 1.4, 'cantidad' => 2], 4 => ['tipo' => 'pabellones', 'fraccion' => 2.6, 'cantidad' => 3]];
+        $r = RestriccionProyectoService::calcular(
+            [$this->prestacion(40, 4, 'Pabellón mayor', 60.0, 100), $this->prestacion(41, 3, 'Pabellón menor', 60.0, 100)],
+            [], [], $modulos, $f['tipo5']['equipos'], $eq
+        );
+        foreach ($r['equipamiento'] as $e) {
+            $this->assertSame($e['normal'], $e['restringido']);
+        }
+        $this->assertSame($r['totales']['equipos_normal'], $r['totales']['equipos_restringido']);
+        $this->assertSame(10, $r['urpa']['restringido']['camillas']);
+    }
 }
