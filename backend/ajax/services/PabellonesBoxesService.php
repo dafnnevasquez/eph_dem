@@ -46,8 +46,8 @@ class PabellonesBoxesService
             $del->close();
 
             $stmt = $this->conn->prepare(
-                "INSERT INTO " . self::TBL_DEMANDA . " (proyecto_id, prestacion_id, demanda_anual, dias_laborales, disponibilidad, jornada_efectiva)
-                 VALUES (?, ?, ?, ?, ?, ?)"
+                "INSERT INTO " . self::TBL_DEMANDA . " (proyecto_id, prestacion_id, demanda_anual, dias_laborales, disponibilidad, jornada_efectiva, procedimiento_tiempo)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)"
             );
             if ($stmt === false) {
                 throw new \RuntimeException('prepare INSERT fallo');
@@ -55,7 +55,8 @@ class PabellonesBoxesService
 
             $pid = $prest = $dem = $dias = 0;
             $disp = $jorn = 0.0;
-            $stmt->bind_param('iiiidd', $pid, $prest, $dem, $dias, $disp, $jorn);
+            $tp = null;
+            $stmt->bind_param('iiiiddd', $pid, $prest, $dem, $dias, $disp, $jorn, $tp);
 
             $n = 0;
             foreach ($filas as $f) {
@@ -65,6 +66,11 @@ class PabellonesBoxesService
                 $dias  = (int)($f['dias_laborales']     ?? 0);
                 $disp  = (float)($f['disponibilidad']   ?? 1.0);
                 $jorn  = (float)($f['jornada_efectiva'] ?? 0.0);
+                $tp    = isset($f['procedimiento_tiempo']) ? (float)$f['procedimiento_tiempo'] : null;
+                // Dia cama = 24 h siempre (mismo criterio que CalcularBoxes)
+                if (in_array($prest, EPHDEM_IDS_DIA_CAMA, true)) {
+                    $tp = (float)EPHDEM_TP_DIA_CAMA;
+                }
                 if ($prest <= 0) {
                     continue;
                 }

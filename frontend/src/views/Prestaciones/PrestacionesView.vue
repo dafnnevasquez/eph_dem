@@ -239,11 +239,7 @@ async function cargarDesdeServidor(proyectoId) {
         if (p.id_prestacion != null && p.tiempo_procedimiento != null) tiempoMap.set(p.id_prestacion, p.tiempo_procedimiento)
       }
     }
-    let tpOverrides = {}
-    try {
-      const rawOverrides = localStorage.getItem(`ephdem_tp_overrides_${proyectoId}`)
-      if (rawOverrides) tpOverrides = JSON.parse(rawOverrides)
-    } catch (_) {}
+
     const idsGuardados = new Set(json.datos.map(item => item.id_prestacion))
     seleccionadas.value = prestaciones.value.filter(p => idsGuardados.has(p.id))
     const params = json.datos.map(item => ({
@@ -252,7 +248,7 @@ async function cargarDesdeServidor(proyectoId) {
       diasAnuales: item.valores?.dias_laborales ?? item.defaults?.dias_laborales ?? 365,
       disponibilidad: item.valores ? (item.valores.disponibilidad * 100) : (item.defaults?.disponibilidad ? item.defaults.disponibilidad * 100 : 100),
       jornadaLaboral: item.valores?.jornada_efectiva ?? item.defaults?.jornada_efectiva ?? 24,
-      tiempoProcedimiento: tpOverrides[item.id_prestacion] ?? tiempoMap.get(item.id_prestacion) ?? 60
+      tiempoProcedimiento: item.valores?.procedimiento_tiempo ?? tiempoMap.get(item.id_prestacion) ?? 60
     }))
     localStorage.setItem('ephdem_parametros_prestaciones', JSON.stringify(params))
     localStorage.setItem('ephdem_origen_edicion', 'prestaciones')

@@ -142,7 +142,7 @@
                   </td>
                   <td><input v-model.number="fila.demanda" type="number" min="0" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-demanda`) }" @input="limpiarError(fila.id, 'demanda')" /></td>
                   <td><input v-model.number="fila.diasAnuales" type="number" min="1" max="366" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-diasAnuales`) }" @input="limpiarError(fila.id, 'diasAnuales')" /></td>
-                  <td><input v-model.number="fila.tiempoProcedimiento" type="number" min="0" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-tiempoProcedimiento`) }" @input="limpiarError(fila.id, 'tiempoProcedimiento')" /></td>
+                  <td><input v-model.number="fila.tiempoProcedimiento" type="number" min="0" step="1" :disabled="esDiaCama(fila)" :title="esDiaCama(fila) ? 'Día cama: siempre 1440 min (24 h)' : ''" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-tiempoProcedimiento`) }" @input="limpiarError(fila.id, 'tiempoProcedimiento')" /></td>
                   <td><input v-model.number="fila.disponibilidad" type="number" min="0" max="100" step="1" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-disponibilidad`) }" @input="limpiarError(fila.id, 'disponibilidad')" /></td>
                   <td><input v-model.number="fila.jornadaLaboral" type="number" min="0" max="24" step="0.5" :class="{ 'input-error': erroresCeldas.has(`${fila.id}-jornadaLaboral`) }" @input="limpiarError(fila.id, 'jornadaLaboral')" /></td>
                 </tr>
@@ -175,11 +175,15 @@ const authStore = useAuthStore()
 const PRESTACIONES_STORAGE_KEY = 'ephdem_prestaciones_seleccionadas'
 const PARAMETROS_STORAGE_KEY = 'ephdem_parametros_prestaciones'
 const MINUTOS_POR_HORA = 60
+// Día Cama UCI (149) y UTI (150): siempre 24 h
+const IDS_DIA_CAMA = [149, 150]
+const TP_DIA_CAMA = 1440
+function esDiaCama(fila) { return IDS_DIA_CAMA.includes(Number(fila.id)) }
 
 const infoTexts = {
   demanda: 'Cantidad de atenciones proyectadas para esta prestación en el período.',
   diasAnuales: 'Número de días disponibles al año para operar. Máximo 366 días.',
-  tiempoProcedimiento: 'Minutos que dura el procedimiento.',
+  tiempoProcedimiento: 'Minutos sugeridos por procedimiento (editable). Nota: día cama UCI/UTI equivale siempre a 1440 min.',
   disponibilidad: 'Porcentaje de disponibilidad real del equipo para esta prestación.',
   jornadaLaboral: 'Horas efectivas de operación al día. En atención cerrada normalmente 24.',
   calcCoeficienteTecnico: 'Número de camas UCI o UTI por cada 1.000 habitantes.',
@@ -206,6 +210,7 @@ function aplicarATodos(campo) {
     return
   }
   for (const fila of filas.value) {
+    if (campo === 'tiempoProcedimiento' && esDiaCama(fila)) continue
     fila[campo] = Number(valor)
     limpiarError(fila.id, campo)
   }
@@ -236,7 +241,7 @@ function crearFila(prestacion, parametrosGuardados) {
     nombre_prestacion: prestacion.nombre_prestacion,
     demanda: parametrosGuardados?.demanda ?? 0,
     diasAnuales: parametrosGuardados?.diasAnuales ?? 365,
-    tiempoProcedimiento: parametrosGuardados?.tiempoProcedimiento ?? prestacion.tiempo_procedimiento ?? MINUTOS_POR_HORA,
+    tiempoProcedimiento: IDS_DIA_CAMA.includes(Number(prestacion.id)) ? TP_DIA_CAMA : (parametrosGuardados?.tiempoProcedimiento ?? prestacion.tiempo_procedimiento ?? MINUTOS_POR_HORA),
     disponibilidad: parametrosGuardados?.disponibilidad ?? 100,
     jornadaLaboral: parametrosGuardados?.jornadaLaboral ?? 24,
   }
@@ -288,9 +293,7 @@ async function guardarYCalcular() {
   const idProyectoActual = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo')
   if (!idProyectoActual) { alert('No hay un proyecto activo.'); router.push('/crear-proyecto'); return }
   localStorage.setItem(PARAMETROS_STORAGE_KEY, JSON.stringify(filas.value))
-  const tpOverrides = {}
-  for (const fila of filas.value) tpOverrides[fila.id] = fila.tiempoProcedimiento
-  localStorage.setItem(`ephdem_tp_overrides_${idProyectoActual}`, JSON.stringify(tpOverrides))
+
   const payload = {
     proyecto_id: Number(idProyectoActual),
     filas: filas.value.map(fila => ({
@@ -299,6 +302,7 @@ async function guardarYCalcular() {
       dias_laborales: Number(fila.diasAnuales),
       disponibilidad: Number(fila.disponibilidad) / 100,
       jornada_efectiva: Number(fila.jornadaLaboral),
+      procedimiento_tiempo: Number(fila.tiempoProcedimiento),
     })),
   }
   try {
@@ -340,12 +344,11 @@ async function cargarDesdeServidor(proyectoId) {
         if (p.id_prestacion != null && p.tiempo_procedimiento != null) tiempoMap.set(p.id_prestacion, p.tiempo_procedimiento)
       }
     }
-    let tpOverrides = {}
-    try { const raw = localStorage.getItem(`ephdem_tp_overrides_${proyectoId}`); if (raw) tpOverrides = JSON.parse(raw) } catch (_) {}
+ 
     filas.value = json.datos.map(item => {
       const vals = item.valores
       const defs = item.defaults || {}
-      const tiempoProcedimiento = tpOverrides[item.id_prestacion] ?? tiempoMap.get(item.id_prestacion) ?? MINUTOS_POR_HORA
+      const tiempoProcedimiento = IDS_DIA_CAMA.includes(Number(item.id_prestacion)) ? TP_DIA_CAMA : (vals?.procedimiento_tiempo ?? tiempoMap.get(item.id_prestacion) ?? MINUTOS_POR_HORA)
       return {
         id: item.id_prestacion, codigo_fonasa: item.codigo_fonasa || '', nombre_prestacion: item.nombre_prestacion,
         demanda: vals?.demanda_anual ?? 0,
@@ -427,6 +430,7 @@ onBeforeUnmount(() => { document.removeEventListener('pointerdown', cerrarCalcul
 .tabla-parametros td input.input-error { border-color: #e53935; background: #fff5f5; box-shadow: 0 0 0 2px rgba(229,57,53,0.18); animation: shake 0.35s ease; }
 .tabla-parametros td { padding: 10px 8px; border-bottom: 1px solid $color-borde; vertical-align: middle; }
 .tabla-parametros .fila-aplicar th { background: #f4f8fb; padding: 8px; position: static; font-weight: 600; }
+.tabla-parametros td input:disabled { background: #f1f5f9; color: $color-texto-secundario; cursor: not-allowed; }
 .aplicar-etiqueta { font-size: 0.8rem; color: rgba(0,60,88,0.75); }
 .aplicar-celda { display: flex; gap: 6px; align-items: center; input { width: 100%; min-width: 60px; padding: 6px 8px; border: 1px solid $color-borde; border-radius: 8px; font-size: 0.85rem; } }
 .btn-aplicar { flex: 0 0 auto; background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 6px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; white-space: nowrap; &:hover { background: rgba(0,60,88,0.16); } }

@@ -64,7 +64,8 @@ class PrestacionController
             pd.demanda_anual,
             pd.dias_laborales,
             pd.disponibilidad,
-            pd.jornada_efectiva
+            pd.jornada_efectiva,
+            COALESCE(pd.procedimiento_tiempo, p.tiempo_procedimiento) AS procedimiento_tiempo
          FROM EPHAC_Proyecto_Demanda pd
          JOIN EPHAC_Prestaciones p ON p.id_prestacion = pd.prestacion_id
          WHERE pd.proyecto_id = ?"
@@ -84,6 +85,7 @@ class PrestacionController
                 'dias_laborales'   => (int)$row['dias_laborales'],
                 'disponibilidad'   => (float)$row['disponibilidad'],
                 'jornada_efectiva' => (float)$row['jornada_efectiva'],
+                'procedimiento_tiempo' => $row['procedimiento_tiempo'] !== null ? (float)$row['procedimiento_tiempo'] : null,
             ],
             'defaults' => null,
         ];

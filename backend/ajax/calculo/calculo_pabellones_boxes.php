@@ -171,6 +171,8 @@ function SIGEM_EPHDEM_CERRADA_GuardarDemanda(mysqli $conn, int $proyecto_id, arr
  * 4) Calculo de PABELLONES (urgencia + electivo)
  *    Lee la demanda guardada, aplica EEMM por prestacion, persiste la
  *    fraccion en requerimiento_calculado, suma por pool y redondea.
+ *    Tiempo de procedimiento: el del proyecto (procedimiento_tiempo); si
+ *    esta vacio, el del catalogo. Boxes UPC siguen con TP fijo 1440.
  * ------------------------------------------------------------------- */
 function SIGEM_EPHDEM_CERRADA_CalcularPabellones(mysqli $conn, int $proyecto_id): array {
     $sql = "SELECT pd.id_registro,
@@ -179,7 +181,8 @@ function SIGEM_EPHDEM_CERRADA_CalcularPabellones(mysqli $conn, int $proyecto_id)
                    pd.dias_laborales,
                    pd.disponibilidad,
                    pd.jornada_efectiva,
-                   p.tiempo_procedimiento, p.recinto_base_id
+                   COALESCE(pd.procedimiento_tiempo, p.tiempo_procedimiento) AS tiempo_procedimiento,
+                   p.recinto_base_id
             FROM " . EPHDEM_TBL_DEMANDA . " pd
             INNER JOIN " . EPHDEM_TBL_PRESTACIONES . " p
                     ON p.id_prestacion = pd.prestacion_id

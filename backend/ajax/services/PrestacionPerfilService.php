@@ -157,7 +157,9 @@ class PrestacionPerfilService
     {
         $st = $this->conn->prepare(
             'SELECT p.id_prestacion, p.codigo_fonasa, p.nombre_prestacion, p.recinto_base_id,
-                    r.nombre_recinto, p.tiempo_procedimiento, d.demanda_anual
+                    r.nombre_recinto,
+                    COALESCE(d.procedimiento_tiempo, p.tiempo_procedimiento) AS tiempo_procedimiento,
+                    d.demanda_anual
              FROM EPHAC_Proyecto_Demanda d
              JOIN EPHAC_Prestaciones p ON p.id_prestacion = d.prestacion_id
              JOIN EPHAC_Recinto_Estandar r ON r.id_recinto = p.recinto_base_id

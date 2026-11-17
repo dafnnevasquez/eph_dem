@@ -81,12 +81,16 @@ class DemandaController
             $dias = isset($f['dias_laborales'])   ? (int)$f['dias_laborales']     : 0;
             $disp = isset($f['disponibilidad'])   ? (float)$f['disponibilidad']   : -1.0;
             $jor  = isset($f['jornada_efectiva']) ? (float)$f['jornada_efectiva'] : 0.0;
+            // Tiempo de procedimiento del proyecto (min). Opcional: vacio = usar el del catalogo.
+            $tp   = (isset($f['procedimiento_tiempo']) && $f['procedimiento_tiempo'] !== '')
+                    ? (float)$f['procedimiento_tiempo'] : null;
 
             if ($pid <= 0)               { $errores[] = "fila[$i]: prestacion_id invalido"; continue; }
             if ($dem < 0)                { $errores[] = "fila[$i]: demanda_anual debe ser >= 0"; continue; }
             if ($dias <= 0)              { $errores[] = "fila[$i]: dias_laborales debe ser > 0"; continue; }
             if ($disp <= 0 || $disp > 1) { $errores[] = "fila[$i]: disponibilidad debe estar en (0,1]"; continue; }
             if ($jor <= 0 || $jor > 24)  { $errores[] = "fila[$i]: jornada_efectiva debe estar en (0,24]"; continue; }
+            if ($tp !== null && $tp <= 0) { $errores[] = "fila[$i]: procedimiento_tiempo debe ser > 0"; continue; }
 
             $filasSane[] = [
                 'prestacion_id'    => $pid,
@@ -94,6 +98,7 @@ class DemandaController
                 'dias_laborales'   => $dias,
                 'disponibilidad'   => $disp,
                 'jornada_efectiva' => $jor,
+                'procedimiento_tiempo' => $tp,
             ];
         }
 
