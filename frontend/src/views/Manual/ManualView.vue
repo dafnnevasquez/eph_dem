@@ -6,7 +6,7 @@
         <div class="hero-content">
           <div class="hero-tag">MÓDULO EPHDEM</div>
           <h1 class="hero-title">Manual de Usuario</h1>
-          <p class="hero-sub">Aprende a usar EPHDEM en pocos pasos.</p>
+          <p class="hero-sub">Todo lo que necesitas para usar EPHDEM, paso a paso.</p>
         </div>
       </section>
 
@@ -25,15 +25,35 @@
           </div>
         </div>
 
+        <!-- PESTAÑAS -->
+        <nav class="tabs-manual" role="tablist">
+          <button
+            v-for="t in pestanas"
+            :key="t.id"
+            type="button"
+            role="tab"
+            class="tab-manual"
+            :class="{ activa: pestana === t.id }"
+            :aria-selected="pestana === t.id"
+            @click="pestana = t.id"
+          >
+            <i :class="t.icon"></i>
+            <span>{{ t.label }}</span>
+          </button>
+        </nav>
+
+        <!-- ===================== PESTAÑA LECTURA ===================== -->
+        <template v-if="pestana === 'lectura'">
+
         <!-- INTRODUCCIÓN -->
         <section class="manual-intro">
           <div class="intro-icon"><i class="fa-solid fa-book-open"></i></div>
           <div>
             <h2 class="intro-title">¿Para qué sirve EPHDEM?</h2>
             <p class="intro-desc">
-              EPHDEM te ayuda a estimar cuántos equipos médicos necesita un hospital para atender a sus pacientes.
-              Solo debes ingresar algunas cifras del establecimiento y el sistema calcula el equipamiento necesario automáticamente.
-              El proceso se divide en <strong>5 pasos que debes seguir en orden</strong>.
+              EPHDEM calcula cuántos equipos médicos necesita un hospital.
+              Tú ingresas algunos datos del hospital y el sistema hace el cálculo por ti.
+              Son <strong>5 pasos</strong> y hay que hacerlos <strong>en orden</strong>.
             </p>
           </div>
         </section>
@@ -55,7 +75,7 @@
             <div class="paso-icon"><i class="fa-solid fa-plus-circle"></i></div>
             <div>
               <h3 class="paso-title">Crea un proyecto</h3>
-              <p class="paso-desc">Cada estudio se guarda como un "proyecto". Dale un nombre que te permita identificarlo fácilmente, por ejemplo: <em>"Hospital San Martín 2026"</em>.</p>
+              <p class="paso-desc">Un proyecto es el lugar donde se guarda tu estudio. Ponle un nombre fácil de reconocer, por ejemplo: <em>"Hospital UV 2026"</em>.</p>
             </div>
           </div>
           <div class="paso-body">
@@ -68,16 +88,16 @@
             </div>
             <div class="mockup-form-proyecto">
               <div class="mockup-label">Nombre del proyecto</div>
-              <div class="mockup-input"><span>Hospital San Martín 2026</span></div>
+              <div class="mockup-input"><span>Hospital UV 2026</span></div>
               <div class="mockup-btn-row" style="margin-top:14px">
                 <div class="mockup-btn mockup-btn-primary">Guardar</div>
                 <div class="mockup-btn mockup-btn-out">Cancelar</div>
               </div>
             </div>
             <div class="paso-tips">
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Haz clic en <strong>Nuevo proyecto → Atención cerrada</strong> para comenzar.</div>
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> El nombre debe ser único — no puedes tener dos proyectos con el mismo nombre.</div>
-              <div class="tip"><i class="fa-solid fa-triangle-exclamation tip-icon tip-warn"></i> El proyecto queda guardado a tu nombre de usuario. Nadie más puede verlo.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Para empezar, haz clic en <strong>Nuevo proyecto</strong> y elige <strong>Atención cerrada o abierta</strong>.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Cada proyecto necesita un nombre distinto: no puedes repetir uno que ya usaste.</div>
+              <div class="tip"><i class="fa-solid fa-triangle-exclamation tip-icon tip-warn"></i> El proyecto queda guardado en tu cuenta. Nadie más puede verlo.</div>
             </div>
           </div>
         </section>
@@ -90,8 +110,8 @@
             <div>
               <h3 class="paso-title">Elige las prestaciones</h3>
               <p class="paso-desc">
-                Las prestaciones son los procedimientos médicos que se realizarán en el hospital.
-                Selecciona solo las que son relevantes para tu estudio.
+                Las prestaciones son las atenciones y procedimientos que hará el hospital, por ejemplo una cirugía o consulta.
+                Elige solo las que necesitas para tu estudio de preinversión hospitalaria.
               </p>
             </div>
           </div>
@@ -99,19 +119,19 @@
             <div class="instruccion-indicator">
               <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
               <span class="instruccion-texto">
-                Usa <span class="instruccion-badge instruccion-badge--agregar"><i class="fa-solid fa-plus"></i></span> para agregar una prestación y
+                Aprieta <span class="instruccion-badge instruccion-badge--agregar"><i class="fa-solid fa-plus"></i></span> para agregar una prestación y
                 <span class="instruccion-badge instruccion-badge--quitar"><i class="fa-solid fa-xmark"></i></span> para quitarla.
-                Cuando termines, presiona <strong>Guardar y confirmar</strong>.
+                Cuando termines, aprieta <strong>Guardar y confirmar</strong>.
               </span>
             </div>
             <div class="filtros-panel-mockup">
               <div class="filtro-mockup filtro-buscar-mockup">
                 <div class="filtro-label-mockup">Buscar</div>
-                <div class="mockup-input"><span class="mockup-placeholder">Escribe el nombre o código</span></div>
+                <div class="mockup-input"><span class="mockup-placeholder">Escribe el nombre o código FONASA</span></div>
               </div>
               <div class="filtro-mockup">
                 <div class="filtro-label-mockup">Área</div>
-                <div class="mockup-select"><span>Pabellón quirúrgico</span> <i class="fa-solid fa-chevron-down"></i></div>
+                <div class="mockup-select"><span>UPC</span> <i class="fa-solid fa-chevron-down"></i></div>
               </div>
               <div class="filtro-mockup">
                 <div class="filtro-label-mockup">Subárea</div>
@@ -128,15 +148,15 @@
                 <div class="prestaciones-lista-mockup">
                   <div class="prestacion-item-mockup">
                     <div class="prestacion-info-mockup">
-                      <div class="prestacion-codigo-mockup">08-03-0100</div>
-                      <div class="prestacion-nombre-mockup">Colecistectomía laparoscópica</div>
+                      <div class="prestacion-codigo-mockup">1802081</div>
+                      <div class="prestacion-nombre-mockup">Colecistectomía por videolaparoscopía, proc. completo</div>
                     </div>
                     <div class="accion-mockup accion-agregar-mockup"><i class="fa-solid fa-plus"></i></div>
                   </div>
                   <div class="prestacion-item-mockup">
                     <div class="prestacion-info-mockup">
-                      <div class="prestacion-codigo-mockup">08-03-0200</div>
-                      <div class="prestacion-nombre-mockup">Apendicectomía</div>
+                      <div class="prestacion-codigo-mockup">1802053</div>
+                      <div class="prestacion-nombre-mockup">Apendicectomía y/o dren. absceso apendicular (proc. aut.)</div>
                     </div>
                     <div class="accion-mockup accion-agregar-mockup"><i class="fa-solid fa-plus"></i></div>
                   </div>
@@ -147,8 +167,8 @@
                 <div class="prestaciones-lista-mockup">
                   <div class="prestacion-item-mockup prestacion-seleccionada-mockup">
                     <div class="prestacion-info-mockup">
-                      <div class="prestacion-codigo-mockup">08-03-0100</div>
-                      <div class="prestacion-nombre-mockup">Colecistectomía laparoscópica</div>
+                      <div class="prestacion-codigo-mockup">1802081</div>
+                      <div class="prestacion-nombre-mockup">Colecistectomía por videolaparoscopía, proc. completo</div>
                     </div>
                     <div class="accion-mockup accion-quitar-mockup"><i class="fa-solid fa-xmark"></i></div>
                   </div>
@@ -161,8 +181,9 @@
               <div class="mockup-btn mockup-btn-primary">Guardar y confirmar</div>
             </div>
             <div class="paso-tips">
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Usa el buscador para encontrar una prestación rápidamente por nombre o código FONASA.</div>
-              <div class="tip"><i class="fa-solid fa-triangle-exclamation tip-icon tip-warn"></i> Si tu estudio incluye prestaciones de UCI o UTI, primero agrega la prestación <strong>"Día Cama UCI"</strong> o <strong>"Día Cama UTI"</strong> según corresponda.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Puedes buscar una prestación por su nombre o por su código FONASA.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> ¿Quieres todas las de la lista? Aprieta <strong>Agregar todas</strong> y se seleccionan de una vez.</div>
+              <div class="tip"><i class="fa-solid fa-triangle-exclamation tip-icon tip-warn"></i> ¿Vas a usar UCI o UTI? Primero agrega <strong>"Día Cama UCI"</strong> o <strong>"Día Cama UTI"</strong>. Sin eso, el sistema no puede calcular los cubículos.</div>
             </div>
           </div>
         </section>
@@ -175,8 +196,8 @@
             <div>
               <h3 class="paso-title">Ingresa los parámetros</h3>
               <p class="paso-desc">
-                Para cada prestación debes completar una tabla con los datos operacionales del hospital.
-                Estos números le dicen al sistema con qué intensidad se realizará cada procedimiento.
+                Para cada prestación llena una fila con los datos del hospital.
+                Con estos números el sistema sabe cuánto se va a usar cada recinto.
               </p>
             </div>
           </div>
@@ -185,13 +206,13 @@
               <div class="mockup-params-head mockup-params-head-real">
                 <span>Prestación</span>
                 <span>Demanda</span>
-                <span>Días al año</span>
-                <span>Tiempo (min)</span>
-                <span>Disponibilidad</span>
-                <span>Jornada (hrs)</span>
+                <span>Días al año disponibles</span>
+                <span>Tiempo procedimiento (min)</span>
+                <span>Disponibilidad (%)</span>
+                <span>Jornada laboral(hrs)</span>
               </div>
               <div class="mockup-params-row mockup-params-row-real">
-                <span class="mockup-row-name">Colecistectomía laparoscópica</span>
+                <span class="mockup-row-name">Colecistectomía por videolaparoscopía, proc. completo</span>
                 <span><div class="mockup-input-sm">450</div></span>
                 <span><div class="mockup-input-sm">250</div></span>
                 <span><div class="mockup-input-sm">60</div></span>
@@ -200,20 +221,21 @@
               </div>
             </div>
             <div class="paso-tips">
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Demanda:</strong> cuántas veces se realizará ese procedimiento en el año.</div>
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Días al año:</strong> cuántos días al año estará disponible el recinto (normalmente 365).</div>
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Tiempo (min):</strong> cuánto dura el procedimiento en minutos.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Demanda:</strong> cuántas veces al año se va a hacer la prestación.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Días al año disponibles:</strong> cuántos días al año funciona el recinto.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Tiempo procedimiento (min):</strong> cuántos minutos dura el procedimiento.</div>
               <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Disponibilidad (%):</strong> qué porcentaje del tiempo el equipo está disponible para usarse.</div>
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Jornada (hrs):</strong> cuántas horas al día opera el recinto (en atención cerrada normalmente 24).</div>
-              <div class="tip"><i class="fa-solid fa-triangle-exclamation tip-icon tip-warn"></i> Ningún campo puede quedar en 0 o vacío — el sistema mostrará un error si falta algún dato.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> <strong>Jornada laboral (hrs):</strong> cuántas horas al día opera el recinto.</div>
+              <div class="tip"><i class="fa-solid fa-triangle-exclamation tip-icon tip-warn"></i> No dejes casillas vacías ni en 0. Si falta algo, el sistema te avisa.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> ¿Un dato es igual para todas las prestaciones? Escríbelo una sola vez en la fila de arriba y haz click en <strong>Aplicar</strong>.</div>
             </div>
             <div class="mockup-calc-toggle-row">
               <div class="mockup-calc-toggle">
                 <span class="mockup-calc-icono"><i class="fa-solid fa-calculator"></i></span>
-                <span class="mockup-calc-texto">Calculadora de días cama para UPC</span>
+                <span class="mockup-calc-texto">Calculadora Atencion Cerrada Pabellones</span>
                 <i class="fa-solid fa-chevron-down mockup-calc-chevron"></i>
               </div>
-              <p class="mockup-calc-desc">Si necesitas calcular los días cama para UCI o UTI, usa esta calculadora auxiliar. Solo necesitas el coeficiente técnico, la población asignada y el promedio de estadía.</p>
+              <p class="mockup-calc-desc">¿No sabes cuántos días cama poner en UCI o UTI? Esta calculadora te ayuda. Solo pide el coeficiente técnico, la población que atiende el hospital y cuántos días se queda en promedio un paciente.</p>
             </div>
             <div class="mockup-btn-row">
               <div class="mockup-btn mockup-btn-primary"><i class="fa-solid fa-calculator"></i> Calcular y ver Resultados</div>
@@ -227,10 +249,10 @@
             <div class="paso-num">Paso 4</div>
             <div class="paso-icon"><i class="fa-solid fa-chart-bar"></i></div>
             <div>
-              <h3 class="paso-title">Revisa los resultados</h3>
+              <h3 class="paso-title">Mira los resultados</h3>
               <p class="paso-desc">
-                Aquí verás el equipamiento médico calculado para tu proyecto.
-                Los resultados se organizan por recinto (UCI, UTI, Pabellón, etc.) y puedes descargar un informe completo.
+                Aquí ves cuántos equipos necesita el hospital, separados por recinto (UCI, UTI, pabellón, etc.).
+                También puedes descargar el proyecto en pdf o excel.
               </p>
             </div>
           </div>
@@ -264,8 +286,8 @@
               <div class="mockup-btn mockup-btn-pdf"><i class="fa-solid fa-file-pdf"></i> Descargar PDF</div>
             </div>
             <div class="paso-tips">
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Haz clic en cada recinto para ver el detalle de los equipos que necesita.</div>
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Descarga el informe en Excel o PDF para compartirlo o presentarlo.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Haz clic en un recinto para ver la lista de sus equipos.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Descarga el informe en Excel o PDF para guardarlo o compartirlo.</div>
             </div>
           </div>
         </section>
@@ -276,10 +298,10 @@
             <div class="paso-num">Paso 5</div>
             <div class="paso-icon"><i class="fa-solid fa-folder-open"></i></div>
             <div>
-              <h3 class="paso-title">Administra tus proyectos</h3>
+              <h3 class="paso-title">Vuelve a tus proyectos</h3>
               <p class="paso-desc">
-                Todos tus proyectos quedan guardados y puedes volver a verlos cuando quieras.
-                También puedes modificar las prestaciones o los parámetros de un proyecto existente.
+                Tus proyectos quedan guardados y puedes abrirlos cuando quieras.
+                También puedes cambiarles las prestaciones o los datos sin empezar de cero.
               </p>
             </div>
           </div>
@@ -289,26 +311,26 @@
                 <span>Nombre del proyecto</span><span>Fecha</span><span>Tipo</span><span>Acciones</span>
               </div>
               <div class="mockup-table-row">
-                <span class="mockup-row-name">Hospital San Martín 2026</span>
+                <span class="mockup-row-name">Hospital UV 2026</span>
                 <span>12/06/2026</span>
                 <span><div class="mockup-chip">Atención cerrada</div></span>
                 <span class="mockup-actions"><div class="mockup-btn mockup-btn-sm mockup-btn-primary">Ver</div></span>
               </div>
             </div>
             <div class="paso-tips">
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Solo tú puedes ver tus proyectos — están vinculados a tu cuenta.</div>
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Haz clic en <strong>Ver</strong> para abrir un proyecto y revisar sus resultados.</div>
-              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Desde los resultados puedes volver a editar los parámetros o cambiar las prestaciones sin crear un proyecto nuevo.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Solo tú ves tus proyectos, porque están en tu cuenta.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Aprieta <strong>Ver</strong> para abrir un proyecto y mirar sus resultados.</div>
+              <div class="tip"><i class="fa-solid fa-circle-info tip-icon"></i> Desde los resultados puedes volver a cambiar los datos o las prestaciones.</div>
             </div>
-            <h4 class="sub-title-mockup"><i class="fa-solid fa-share-nodes"></i> ¿Necesitas modificar algo?</h4>
+            <h4 class="sub-title-mockup"><i class="fa-solid fa-share-nodes"></i> ¿Necesitas cambiar algo?</h4>
             <div class="mockup-action-cards">
               <div class="mockup-action-card">
                 <div class="mockup-btn mockup-btn-primary"><i class="fa-solid fa-sliders"></i> Editar parámetros</div>
-                <p>Cambia los valores numéricos del estudio sin tener que empezar de cero.</p>
+                <p>Cambia los números del estudio sin empezar de cero.</p>
               </div>
               <div class="mockup-action-card">
                 <div class="mockup-btn mockup-btn-primary"><i class="fa-solid fa-list-check"></i> Modificar prestaciones</div>
-                <p>Agrega o quita prestaciones del proyecto y recalcula los resultados.</p>
+                <p>Agrega o quita prestaciones y vuelve a calcular.</p>
               </div>
             </div>
           </div>
@@ -316,16 +338,16 @@
 
         <!-- BARRA DE NAVEGACIÓN -->
         <section class="manual-navbar-guide">
-          <h3 class="guide-title"><i class="fa-solid fa-compass"></i> Cómo moverse por la plataforma</h3>
-          <p class="guide-desc">En todas las pantallas encontrarás esta barra de navegación en la parte superior:</p>
+          <h3 class="guide-title"><i class="fa-solid fa-compass"></i> Cómo moverte por la página</h3>
+          <p class="guide-desc">Arriba de cada pantalla tienes estos botones:</p>
           <div class="navbar-guide-row">
             <div class="navbar-guide-item">
               <div class="mockup-btn mockup-btn-primary"><i class="fa-solid fa-arrow-left"></i> Volver</div>
-              <p>Regresa a la pantalla anterior.</p>
+              <p>Te lleva a la pantalla anterior.</p>
             </div>
             <div class="navbar-guide-item">
               <div class="mockup-btn mockup-btn-primary"><i class="fa-solid fa-house-user"></i> Inicio</div>
-              <p>Vuelve a la pantalla de inicio del módulo.</p>
+              <p>Te lleva a la pantalla de inicio.</p>
             </div>
             <div class="navbar-guide-item">
               <div class="mockup-session">
@@ -333,9 +355,31 @@
                 <span>usuario@uv.cl</span>
                 <div class="mockup-btn-logout"><i class="fa-solid fa-right-from-bracket"></i></div>
               </div>
-              <p>Muestra tu sesión activa. El ícono <i class="fa-solid fa-right-from-bracket"></i> cierra tu sesión.</p>
+              <p>Muestra con qué cuenta entraste. El ícono <i class="fa-solid fa-right-from-bracket"></i> cierra tu sesión.</p>
             </div>
           </div>
+        </section>
+
+        </template>
+
+        <!-- ===================== PESTAÑA VIDEO ===================== -->
+        <section v-else class="video-card">
+          <div class="video-wrap">
+            <iframe
+              v-if="VIDEO_YOUTUBE_ID"
+              :src="`https://www.youtube-nocookie.com/embed/${VIDEO_YOUTUBE_ID}?rel=0`"
+              title="Manual de usuario EPHDEM"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+            <video v-else-if="VIDEO_MP4" :src="VIDEO_MP4" controls preload="metadata"></video>
+            <div v-else class="video-placeholder">
+              <i class="fa-solid fa-circle-play"></i>
+              <span>Video del manual disponible próximamente</span>
+            </div>
+          </div>
+          <p class="video-desc">Recorre en video los 5 pasos para usar EPHDEM, desde crear un proyecto hasta descargar los resultados.</p>
         </section>
 
       </main>
@@ -343,6 +387,7 @@
   </AppLayout>
 </template>
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -350,12 +395,23 @@ import AppLayout from '@/layouts/AppLayout.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 
+// Pestañas del manual
+const pestanas = [
+  { id: 'lectura', label: 'Lectura', icon: 'fa-solid fa-book-open' },
+  { id: 'video',   label: 'Video',   icon: 'fa-solid fa-circle-play' },
+]
+const pestana = ref('lectura')
+
+// Video del manual: completar UNA de las dos opciones
+const VIDEO_YOUTUBE_ID = ''  // solo el ID de YouTube, ej: 'AbC123xYz'
+const VIDEO_MP4 = ''         // o un .mp4 del servidor, ej: '/__v2/modulo_eph/docs/manual.mp4'
+
 const flujoGeneral = [
   { icon: 'fa-solid fa-plus-circle',  label: 'Crear proyecto',           id: 'paso-1' },
-  { icon: 'fa-solid fa-list-check',   label: 'Selección de prestaciones', id: 'paso-2' },
-  { icon: 'fa-solid fa-sliders',      label: 'Parámetros',               id: 'paso-3' },
-  { icon: 'fa-solid fa-chart-bar',    label: 'Resultados',               id: 'paso-4' },
-  { icon: 'fa-solid fa-folder-open',  label: 'Gestión de proyectos',     id: 'paso-5' },
+  { icon: 'fa-solid fa-list-check',   label: 'Elegir prestaciones',      id: 'paso-2' },
+  { icon: 'fa-solid fa-sliders',      label: 'Completar datos',         id: 'paso-3' },
+  { icon: 'fa-solid fa-chart-bar',    label: 'Ver resultados',          id: 'paso-4' },
+  { icon: 'fa-solid fa-folder-open',  label: 'Mis proyectos',           id: 'paso-5' },
 ]
 
 function scrollToPaso(id) {
@@ -382,7 +438,7 @@ function cerrarSesion() {
 @import '@/assets/styles/variables';
 
 .manual-page { background: $color-fondo; flex: 1; }
-.manual-content { max-width: 1100px; margin: 32px auto 72px auto; padding: 0 24px; display: flex; flex-direction: column; gap: 32px; }
+.manual-content { width: 100%; max-width: none; margin: 32px 0 72px; padding: 0 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 32px; }
 
 .hero { background: $color-secundario; position: relative; padding: 38px 48px; overflow: hidden; text-align: center; }
 .hero-compact { padding: 28px 48px; }
@@ -519,4 +575,24 @@ function cerrarSesion() {
 .navbar-guide-item { display: flex; flex-direction: column; gap: 8px; p { margin: 0; font-size: 0.85rem; color: $color-texto-secundario; } }
 .mockup-session { display: flex; align-items: center; gap: 8px; background: rgba(0,60,88,0.06); border: 1.5px solid rgba(0,60,88,0.18); border-radius: 999px; padding: 6px 14px 6px 10px; color: $color-primario; font-size: 0.88rem; font-weight: 600; }
 .mockup-btn-logout { background: none; border: none; color: $color-primario; cursor: pointer; font-size: 0.95rem; opacity: 0.7; }
-</style>
+/* Pestañas */
+.tabs-manual { display: flex; justify-content: center; gap: 40px; border-bottom: 1px solid $color-borde; }
+.tab-manual {
+  background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 8px 4px 12px; margin-bottom: -1px;
+  color: $color-texto-secundario; font-size: 1rem; font-weight: 500;
+  border-bottom: 3px solid transparent;
+  i { font-size: 1.25rem; }
+  &:hover { color: $color-primario; }
+  &.activa { color: $color-primario; border-bottom-color: $color-primario; font-weight: 600; }
+  &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(42,159,214,0.3); border-radius: 6px; }
+}
+
+/* Video */
+.video-card { background: #fff; border-radius: 16px; padding: 16px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; display: flex; flex-direction: column; gap: 14px; }
+.video-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0b1f2a; }
+.video-wrap iframe, .video-wrap video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: rgba(255,255,255,0.7); font-weight: 600; i { font-size: 3.5rem; opacity: 0.6; } }
+.video-desc { margin: 0; text-align: center; color: $color-texto-secundario; }
+</style> 
