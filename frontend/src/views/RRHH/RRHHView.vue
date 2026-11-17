@@ -35,7 +35,7 @@
             <span class="instruccion-texto">
               En cada recinto, aprieta los perfiles que trabajan ahí y completa cuántas personas hay,
               su jornada semanal, las semanas efectivas al año y qué porcentaje de su jornada dedican
-              a este equipo. Usa "Aplicar a todo" para poner el mismo valor en todas las filas.
+              a este equipo. Usa "Aplicar" para poner el mismo valor en todas las filas.
               Si el perfil que necesitas no está, aprieta "+ Perfil nuevo".
             </span>
           </div>
@@ -83,7 +83,7 @@
                         <th>
                           <div class="aplicar-celda">
                             <input v-model.number="masivo[recinto.id].personas" type="number" min="0" step="1" class="input-dotacion input-mini" placeholder="0" />
-                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'personas')">Aplicar a todo</button>
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'personas')">Aplicar</button>
                           </div>
                         </th>
                         <th>
@@ -91,19 +91,19 @@
                             <select v-model.number="masivo[recinto.id].jornada" class="input-dotacion input-mini">
                               <option v-for="h in jornadasSemanales" :key="h" :value="h">{{ h }}</option>
                             </select>
-                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'jornada')">Aplicar a todo</button>
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'jornada')">Aplicar</button>
                           </div>
                         </th>
                         <th>
                           <div class="aplicar-celda">
                             <input v-model.number="masivo[recinto.id].semanas" type="number" min="1" max="52" step="0.5" class="input-dotacion input-mini" placeholder="48" />
-                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'semanas')">Aplicar a todo</button>
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'semanas')">Aplicar</button>
                           </div>
                         </th>
                         <th>
                           <div class="aplicar-celda">
                             <input v-model.number="masivo[recinto.id].porcentaje" type="number" min="1" max="100" step="1" class="input-dotacion input-mini" placeholder="100" />
-                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'porcentaje')">Aplicar a todo</button>
+                            <button type="button" class="btn-aplicar" @click="aplicarATodos(recinto.id, 'porcentaje')">Aplicar</button>
                           </div>
                         </th>
                         <th></th>
@@ -309,7 +309,7 @@ async function crearPerfil(nombre) {
 
 // "+ Perfil nuevo": pide el nombre, lo crea en el catálogo y agrega su fila
 async function agregarPerfilNuevo(recintoId) {
-  const nombre = window.prompt('Nombre del perfil nuevo (por ejemplo: Técnico/a de esterilización):')
+  const nombre = window.prompt('Nombre del perfil nuevo (por ejemplo: Técnico/a Paramédico/a):')
   if (nombre === null) return
   const perfil = await crearPerfil(nombre)
   if (!perfil) return

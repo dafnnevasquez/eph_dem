@@ -74,7 +74,38 @@ const libros = [
     anio: 2018,
     descripcion: 'Guía del BID con la metodología de referencia para elaborar estudios de preinversión hospitalaria. DOI: 10.18235/0002110',
     archivo: 'Guia_de_referencia_para_estudios_de_preinversion_hospitalaria_es.pdf',
-  }
+  }, 
+    {
+    titulo: 'Guía Metodológica para Estudios de Preinversión Hospitalaria',
+    autor: 'Ministerio de Salud, División de Inversiones y Desarrollo de la Red Asistencial · Chile',
+    anio: 2001,
+    descripcion: 'Guía metodológica oficial del Ministerio de Salud de Chile para la formulación, desarrollo y evaluación de estudios de preinversión en proyectos hospitalarios.',
+    archivo: '17421_guia_estudios_preinversion_hospitalaria.pdf'
+  },
+
+    {
+    titulo: 'Orientaciones Técnicas para la Puesta en Marcha de Proyectos Hospitalarios',
+    autor: 'Ministerio de Salud, Subsecretaría de Redes Asistenciales (DIGERA) · Chile',
+    anio: 2022,
+    descripcion: 'Documento metodológico oficial del Ministerio de Salud para la ejecución de la puesta en marcha de hospitales en Chile.',
+    archivo: 'orientaciones_tecnicas_para_la_puesta_en_marcha.pdf'
+  },
+    {
+    titulo: 'Orientaciones Técnicas Para Diseño de Anteproyectos de Hospitales Complejos',
+    autor: 'Ministerio de Salud, División de Inversiones (Departamento de Arquitectura) · Chile',
+    anio: 2017,
+    descripcion: 'Guía con los lineamientos y orientaciones técnicas fundamentales a considerar en el diseño de anteproyectos arquitectónicos para hospitales de alta complejidad.',
+    archivo: 'ORIENTACIONES.pdf'
+  },
+    {
+    titulo: 'Guía de Diseño para Establecimientos Hospitalarios de Mediana Complejidad (B. Generalidades)',
+    autor: 'Ministerio de Salud, Subsecretaría de Redes Asistenciales · Chile',
+    anio: 2019,
+    descripcion: 'Documento técnico que establece normativas, definiciones y aspectos de diseño requeridos para proyectos hospitalarios de mediana complejidad.',
+    archivo: 'B.Guia_ Hospitales_ Mediana_(generalidades).pdf'
+  },
+
+
 ]
 
 const librosFiltrados = computed(() => {
