@@ -27,19 +27,9 @@
 
         <section class="video-card">
           <div class="video-wrap">
-            <iframe
-              v-if="VIDEO_YOUTUBE_ID"
-              :src="`https://www.youtube-nocookie.com/embed/${VIDEO_YOUTUBE_ID}?rel=0`"
-              title="¿Qué es EPH?"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-            ></iframe>
-            <video v-else-if="VIDEO_MP4" :src="VIDEO_MP4" controls preload="metadata"></video>
-            <div v-else class="video-placeholder">
-              <i class="fa-solid fa-circle-play"></i>
-              <span>Video disponible próximamente</span>
-            </div>
+            <video :src="VIDEO_MP4" controls preload="metadata">
+              Tu navegador no puede reproducir este video.
+            </video>
           </div>
         </section>
 
@@ -78,12 +68,8 @@ import AppLayout from '@/layouts/AppLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
-
-// ⚠️ Completar UNA de las dos opciones:
-// YouTube: solo el ID. Ej: en https://www.youtube.com/watch?v=AbC123xYz el ID es 'AbC123xYz'
-const VIDEO_YOUTUBE_ID = ''
-// o un .mp4 subido al servidor. Ej: '/__v2/modulo_eph/docs/que-es-eph.mp4'
-const VIDEO_MP4 = ''
+// Video subido al servidor, en la misma carpeta que los PDF de la Biblioteca
+const VIDEO_MP4 = '/__v2/modulo_eph/docs/explicacioneph.mp4'
 
 function cerrarSesion() {
   authStore.logout()
@@ -113,9 +99,8 @@ function cerrarSesion() {
 .btn-back { background: $color-primario; color: #fff; border: 1px solid $color-primario; border-radius: 999px; padding: 6px 12px; font-weight: 600; cursor: pointer; &:hover { background: mix(#fff, $color-primario, 6%); } }
 
 .video-card { background: #fff; border-radius: 16px; padding: 16px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
-.video-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0b1f2a; }
-.video-wrap iframe, .video-wrap video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.video-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: rgba(255,255,255,0.7); font-weight: 600; i { font-size: 3.5rem; opacity: 0.6; } }
+.video-wrap { width: 100%; border-radius: 10px; overflow: hidden; }
+.video-wrap video { display: block; width: 100%; height: auto; }
 
 .texto-card { display: flex; align-items: flex-start; gap: 20px; background: #fff; border-radius: 16px; padding: 24px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .texto-icon { font-size: 2rem; color: $color-primario; flex: 0 0 auto; }

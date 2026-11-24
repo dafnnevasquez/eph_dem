@@ -123,7 +123,7 @@
 }
 .sigem-bottomline-content {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   max-width: 1400px;
   margin: 0 auto;
@@ -152,5 +152,8 @@
   font-size: 0.95rem;
   opacity: 0.8;
   margin-top: 4px;
+}
+@media (max-width: 900px) {
+  .sigem-bottomline-content { grid-template-columns: 1fr; gap: 16px; }
 }
 </style>

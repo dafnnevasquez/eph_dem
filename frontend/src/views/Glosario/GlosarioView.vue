@@ -20,36 +20,84 @@
             <div class="session-badge">
               <i class="fa-solid fa-circle-user"></i>
               <span class="session-nombre">{{ authStore.correoUsuario }}</span>
-              <button class="btn-logout" type="button" @click="cerrarSesion">
+              <button class="btn-logout" type="button" title="Cerrar sesión" @click="cerrarSesion">
                 <i class="fa-solid fa-right-from-bracket"></i>
               </button>
             </div>
           </div>
+
           <h2 class="section-title">Glosario EPH</h2>
-          <div class="filtro-buscar">
-            <input v-model="busqueda" type="text" placeholder="Buscar término..." />
+
+          <div class="herramientas">
+            <div class="filtro-buscar">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input v-model="busqueda" type="text" placeholder="Buscar término o definición..." />
+              <button v-if="busqueda" class="btn-limpiar" type="button" title="Borrar búsqueda" @click="busqueda = ''">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <div class="chips-categoria">
+              <button type="button" class="chip" :class="{ activo: categoriaActiva === '' }" @click="categoriaActiva = ''">Todas</button>
+              <button
+                v-for="categoria in categorias"
+                :key="categoria.nombre"
+                type="button"
+                class="chip"
+                :class="{ activo: categoriaActiva === categoria.nombre }"
+                @click="categoriaActiva = categoria.nombre"
+              >
+                <i :class="categoria.icono"></i> {{ categoria.nombre }}
+              </button>
+            </div>
+            <div class="barra-acciones">
+              <span class="contador">{{ terminosFiltrados.length }} {{ terminosFiltrados.length === 1 ? 'término' : 'términos' }}</span>
+              <div class="acciones">
+                <button type="button" class="btn-texto" @click="abrirTodos">
+                  <i class="fa-regular fa-square-plus"></i> Abrir todos
+                </button>
+                <button type="button" class="btn-texto" @click="cerrarTodos">
+                  <i class="fa-regular fa-square-minus"></i> Cerrar todos
+                </button>
+              </div>
+            </div>
           </div>
         </header>
 
-        <section class="terminos-panel">
-          <div class="categorias-container">
-            <div v-for="categoria in categorias" :key="categoria" class="categoria-section">
-              <div class="categoria-titulo" @click="toggleCategoria(categoria)">
-                <span>{{ categoria }}</span>
-                <i class="fa-solid" :class="categoriasAbiertas[categoria] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+        <section v-for="categoria in categoriasVisibles" :key="categoria.nombre" class="categoria-section">
+          <h3 class="categoria-titulo">
+            <i :class="categoria.icono"></i>
+            <span>{{ categoria.nombre }}</span>
+            <span class="categoria-cuenta">{{ terminosPorCategoria(categoria.nombre).length }}</span>
+          </h3>
+
+          <div class="terminos-lista">
+            <article
+              v-for="termino in terminosPorCategoria(categoria.nombre)"
+              :key="termino.termino"
+              class="termino-card"
+              :class="{ abierto: estaAbierto(termino) }"
+            >
+              <button
+                type="button"
+                class="termino-cabecera"
+                :aria-expanded="estaAbierto(termino)"
+                @click="alternar(termino)"
+              >
+                <i class="termino-toggle" :class="estaAbierto(termino) ? 'fa-regular fa-square-minus' : 'fa-regular fa-square-plus'"></i>
+                <span class="termino-titulo">{{ termino.termino }}</span>
+              </button>
+
+              <div v-show="estaAbierto(termino)" class="termino-cuerpo">
+                <p class="termino-definicion">{{ termino.definicion }}</p>
               </div>
-              <div v-show="categoriasAbiertas[categoria]">
-                <div v-if="terminosPorCategoria(categoria).length === 0" class="lista-vacia">No se encontraron términos.</div>
-                <div v-for="(termino, index) in terminosPorCategoria(categoria)" :key="termino.termino"
-                    class="termino-card" :class="index % 2 === 0 ? 'termino-par' : 'termino-impar'">
-                  <div class="termino-titulo">{{ termino.termino }}</div>
-                  <div class="termino-definicion">{{ termino.definicion }}</div>
-                </div>
-              </div>
-            </div>
-            <div v-if="terminosFiltrados.length === 0" class="lista-vacia">No se encontraron términos.</div>
+            </article>
           </div>
         </section>
+
+        <div v-if="terminosFiltrados.length === 0" class="lista-vacia">
+          <i class="fa-regular fa-face-frown"></i>
+          No se encontraron términos para «{{ busqueda }}».
+        </div>
       </main>
     </div>
   </AppLayout>
@@ -63,19 +111,17 @@ import AppLayout from '@/layouts/AppLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
 const busqueda = ref('')
-const categorias = ['General', 'Tipos de equipamiento', 'Atención cerrada', 'Atención abierta']
+const categoriaActiva = ref('')   // '' = todas
+const abiertos = ref({})          // términos abiertos, por nombre
 
-const categoriasAbiertas = ref({
-  'General': false,
-  'Tipología de clases de equipos médicos': false,
-  'Atención cerrada': false,
-  'Atención abierta': false,
-})
-
-function toggleCategoria(categoria) {
-  categoriasAbiertas.value[categoria] = !categoriasAbiertas.value[categoria]
-}
+const categorias = [
+  { nombre: 'General', icono: 'fa-solid fa-book' },
+  { nombre: 'Tipología de clases de equipos médicos', icono: 'fa-solid fa-layer-group' },
+  { nombre: 'Atención cerrada', icono: 'fa-solid fa-hospital' },
+  { nombre: 'Atención abierta', icono: 'fa-solid fa-user-doctor' },
+]
 
 const terminos = [
   // GENERALES
@@ -124,17 +170,42 @@ const terminos = [
   { categoria: 'Atención abierta', termino: 'N° de prestaciones simultáneas', definicion: 'Cantidad de procedimientos de un mismo tipo que pueden realizarse en paralelo con el mismo equipo.' },
   { categoria: 'Atención abierta', termino: 'Tiempo de procedimiento', definicion: 'Duración estimada en minutos de una prestación ambulatoria, utilizada en la fórmula EEMM.' },
 ]
+
+function normalizar(texto) {
+  return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
+// Filtra por búsqueda (sin importar tildes) y por categoría; ordena alfabéticamente
 const terminosFiltrados = computed(() => {
-  const texto = busqueda.value.toLowerCase().trim()
-  if (!texto) return terminos
-  return terminos.filter(t =>
-    t.termino.toLowerCase().includes(texto) ||
-    t.definicion.toLowerCase().includes(texto)
-  )
+  const texto = normalizar(busqueda.value.trim())
+  return terminos
+    .filter(t => !categoriaActiva.value || t.categoria === categoriaActiva.value)
+    .filter(t => !texto || normalizar(t.termino).includes(texto) || normalizar(t.definicion).includes(texto))
+    .sort((a, b) => a.termino.localeCompare(b.termino, 'es'))
 })
 
 function terminosPorCategoria(cat) {
   return terminosFiltrados.value.filter(t => t.categoria === cat)
+}
+
+const categoriasVisibles = computed(() =>
+  categorias.filter(c => terminosPorCategoria(c.nombre).length > 0)
+)
+
+// Mientras se busca, los resultados se muestran abiertos
+function estaAbierto(t) {
+  return busqueda.value.trim() !== '' || !!abiertos.value[t.termino]
+}
+function alternar(t) {
+  if (busqueda.value.trim() !== '') return
+  abiertos.value[t.termino] = !abiertos.value[t.termino]
+}
+function abrirTodos() {
+  terminosFiltrados.value.forEach(t => { abiertos.value[t.termino] = true })
+}
+function cerrarTodos() {
+  abiertos.value = {}
+  busqueda.value = ''
 }
 
 function cerrarSesion() {
@@ -155,29 +226,63 @@ function cerrarSesion() {
 .hero-sub { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 700px; line-height: 1.5; margin: 0; }
 
 .glosario-page { background: $color-fondo; flex: 1; }
-.glosario-content { max-width: 900px; margin: 32px auto 72px auto; padding: 0 24px; display: flex; flex-direction: column; gap: 24px; }
+.glosario-content { max-width: 960px; margin: 32px auto 72px auto; padding: 0 24px; display: flex; flex-direction: column; gap: 28px; }
 
 .nav-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .nav-buttons { display: flex; gap: 10px; }
 .session-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: rgba(0,60,88,0.06); border: 1.5px solid rgba(0,60,88,0.18); border-radius: 999px; color: $color-primario; font-size: 0.88rem; font-weight: 600; }
 .session-nombre { white-space: nowrap; }
-.btn-logout { background: none; border: none; color: $color-primario; cursor: pointer; padding: 2px 4px; opacity: 0.7; }
+.btn-logout { background: none; border: none; color: $color-primario; cursor: pointer; padding: 2px 4px; opacity: 0.7; &:hover { opacity: 1; color: #c62828; } }
 .btn-back { background: $color-primario; color: #fff; border: 1px solid $color-primario; border-radius: 999px; padding: 6px 12px; font-weight: 600; cursor: pointer; }
-.section-title { font-size: 1.6rem; font-weight: 700; color: $color-primario; margin: 0 0 6px; }
+.section-title { font-size: 1.6rem; font-weight: 700; color: $color-primario; margin: 0 0 14px; }
 
-.filtro-buscar input { width: 100%; padding: 10px 14px; border: 1px solid $color-borde; border-radius: 10px; font-size: 0.95rem; color: $color-texto-principal; }
+/* Búsqueda y filtros */
+.herramientas { display: flex; flex-direction: column; gap: 14px; }
+.filtro-buscar {
+  position: relative; display: flex; align-items: center;
+  > i { position: absolute; left: 14px; color: $color-texto-secundario; font-size: .9rem; }
+  input { width: 100%; box-sizing: border-box; padding: 12px 40px 12px 40px; background: #fff; border: 1px solid $color-borde; border-radius: 12px; font-size: 0.95rem; color: $color-texto-principal;
+    &:focus { outline: none; border-color: $color-primario; box-shadow: 0 0 0 3px rgba(0,60,88,0.12); } }
+}
+.btn-limpiar { position: absolute; right: 8px; background: none; border: none; color: $color-texto-secundario; cursor: pointer; padding: 6px; &:hover { color: $color-primario; } }
+.chips-categoria { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; cursor: pointer;
+  background: #fff; border: 1px solid $color-borde; color: $color-primario; font-size: .85rem; font-weight: 600;
+  &:hover { background: rgba(0,60,88,0.06); }
+  &.activo { background: $color-primario; border-color: $color-primario; color: #fff; }
+}
+.barra-acciones { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.contador { font-size: .85rem; color: $color-texto-secundario; }
+.acciones { display: flex; gap: 14px; }
+.btn-texto { background: none; border: none; padding: 0; cursor: pointer; color: $color-primario; font-size: .85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; &:hover { text-decoration: underline; } }
 
-.categorias-container { border: 1px solid $color-borde; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px $color-sombra-suave; }
-.categoria-titulo { display: flex; align-items: center; justify-content: space-between; background: #fff; color: $color-primario; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; cursor: pointer; user-select: none; border-bottom: 1px solid $color-borde; &:hover { background: #eef5f9; } i { font-size: 0.85rem; opacity: 0.6; } }
-.categoria-section { margin-bottom: 0; border-radius: 0; overflow: hidden; border: none; border-bottom: 1px solid $color-borde; box-shadow: none; &:first-child { border-radius: 14px 14px 0 0; } &:last-child { border-radius: 0 0 14px 14px; border-bottom: none; } }
-.categoria-titulo { display: flex; align-items: center; justify-content: space-between; background: $color-primario; color: #fff; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; cursor: pointer; user-select: none; &:hover { background: mix(#fff, $color-primario, 8%); } i { font-size: 0.85rem; opacity: 0.8; } }
+/* Categorías */
+.categoria-section { display: flex; flex-direction: column; gap: 12px; }
+.categoria-titulo {
+  display: flex; align-items: center; gap: 10px; margin: 0; padding-bottom: 8px;
+  font-size: 1.1rem; font-weight: 700; color: $color-primario; border-bottom: 2px solid $color-borde;
+}
+.categoria-cuenta { margin-left: auto; background: rgba(0,60,88,0.08); color: $color-primario; border-radius: 999px; padding: 2px 10px; font-size: .78rem; font-weight: 700; }
 
-.termino-card { padding: 14px 20px; border-bottom: 1px solid $color-borde; &:last-child { border-bottom: none; } }
-.termino-par { background: #f8fbfd; }
-.termino-impar { background: #eef5f9; }
-.termino-titulo { font-size: 0.95rem; font-weight: 700; color: #0a5c7a; margin-bottom: 4px; }
-.termino-definicion { font-size: 0.88rem; color: $color-texto-secundario; line-height: 1.6; }
-.lista-vacia { color: $color-texto-secundario; padding: 16px 20px; text-align: center; background: #fff; }
+/* Tarjetas de términos */
+.terminos-lista { display: flex; flex-direction: column; gap: 12px; }
+.termino-card {
+  background: #fff; border-radius: 12px; border: 1px solid transparent;
+  box-shadow: 0 2px 8px $color-sombra-suave; overflow: hidden; transition: border-color .15s, box-shadow .15s;
+  &:hover { box-shadow: 0 4px 14px $color-sombra-suave; }
+  &.abierto { border-color: $color-borde; }
+}
+.termino-cabecera {
+  width: 100%; display: flex; align-items: center; gap: 16px; padding: 16px 20px;
+  background: none; border: none; cursor: pointer; text-align: left; font: inherit;
+  &:focus-visible { outline: none; box-shadow: inset 0 0 0 3px rgba(42,159,214,0.3); }
+}
+.termino-toggle { color: $color-primario; font-size: 1.05rem; opacity: .75; flex: 0 0 auto; }
+.termino-titulo { font-size: 1.05rem; font-weight: 700; color: $color-texto-principal; }
+.termino-card.abierto .termino-titulo { color: $color-primario; }
+.termino-cuerpo { padding: 0 20px 18px 56px; }
+.termino-definicion { margin: 0; font-size: .92rem; color: $color-texto-secundario; line-height: 1.65; }
 
-
+.lista-vacia { display: flex; align-items: center; justify-content: center; gap: 10px; color: $color-texto-secundario; padding: 28px 20px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px $color-sombra-suave; }
 </style>

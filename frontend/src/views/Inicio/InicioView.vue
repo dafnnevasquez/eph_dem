@@ -64,16 +64,16 @@
       <button class="btn-material" @click="router.push('/manual')">
         <i class="fa-solid fa-book"></i> Manual de usuario
       </button>
-      <button class="btn-material" @click="router.push('/glosario')">
-        <i class="fa-solid fa-list"></i> Glosario EPH
+      <button class="btn-material" @click="router.push('/que-es-eph')">
+        <i class="fa-solid fa-circle-question"></i> ¿Qué es EPH?
       </button>
     </div>
     <div class="material-buttons">
       <button class="btn-material" @click="router.push('/biblioteca')">
         <i class="fa-solid fa-book-bookmark"></i> Biblioteca
       </button>
-      <button class="btn-material" @click="router.push('/que-es-eph')">
-        <i class="fa-solid fa-circle-question"></i> ¿Qué es EPH?
+      <button class="btn-material" @click="router.push('/glosario')">
+        <i class="fa-solid fa-list"></i> Glosario EPH
       </button>
     </div>
   </div>
@@ -92,13 +92,8 @@
           Este módulo es una herramienta para estimar el equipamiento médico necesario.
           Puedes crear un proyecto de <b>atención abierta</b> o <b>atención cerrada</b> y estimar el equipamiento según cada prestación.
         </p>
-        <button class="aviso-manual" type="button" @click="router.push('/manual')">
-          <i class="fa-solid fa-book"></i> Ver manual de usuario
-        </button>
       </aside>
     </transition>
-
-
   </AppLayout>
 </template>
 
@@ -217,7 +212,7 @@ function iniciarAtencionCerrada() {
   position: fixed; top: 110px; right: 24px; z-index: 50; width: min(360px, calc(100vw - 32px));
   background: #fff; border: 1px solid $color-borde; border-left: 6px solid $color-primario; border-radius: 14px;
   padding: 20px 22px 18px; box-shadow: 0 16px 36px rgba(0,30,45,0.22);
-  p { margin: 0 0 14px; color: $color-texto-principal; font-size: 0.95rem; line-height: 1.55; }
+  p { margin: 0; color: $color-texto-principal; font-size: 0.95rem; line-height: 1.55; }
   b { color: $color-primario; }
 }
 .aviso-cabecera { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; padding-right: 22px; }
@@ -230,11 +225,6 @@ function iniciarAtencionCerrada() {
   position: absolute; top: 10px; right: 10px; background: none; border: none; color: #9ca3af;
   width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 1rem;
   &:hover { background: rgba(0,60,88,0.08); color: $color-primario; }
-}
-.aviso-manual {
-  background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 9px 16px;
-  font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
-  &:hover { opacity: 0.88; }
 }
 .aviso-enter-active, .aviso-leave-active { transition: transform 0.35s ease, opacity 0.35s ease; }
 .aviso-enter-from, .aviso-leave-to { transform: translateX(110%); opacity: 0; }
