@@ -33,10 +33,11 @@
           <div class="instruccion-indicator">
             <span class="instruccion-icon-circle"><i class="fa-solid fa-circle-info"></i></span>
             <span class="instruccion-texto">
-              En cada prestación aprieta los perfiles que participan. <b>Permanente</b>: el perfil está durante
-              toda la prestación. <b>Puntual</b>: interviene algunas veces; indica los minutos de cada intervención
-              y cuántas veces al día. La dedicación (φ) no puede ser mayor que 1. Estos tiempos son solo de este
-              proyecto: otro hospital puede tener tiempos distintos para la misma prestación.
+              En cada prestación aprieta los perfiles que participan y elige si su participación es
+              <b>Permanente</b><InfoTip titulo="Permanente">El perfil está presente durante toda la prestación. Ejemplo: el cirujano durante una cirugía y su dedicación (φ) es 1.</InfoTip>
+              o <b>Puntual</b><InfoTip titulo="Puntual">El perfil interviene solo algunas veces. Ejemplo: el kinesiólogo que atiende 3 veces al día, 20 minutos cada vez (e = 20, f = 3).</InfoTip>.
+              En los perfiles puntuales completa <b>e</b>, los minutos que dura cada intervención, y <b>f</b>, cuántas veces al día interviene.
+              También puedes replicar el valor de un perfil en todas las prestaciones del recinto.
             </span>
           </div>
         </header>
@@ -58,13 +59,13 @@
             <div v-show="abiertos[recinto.id]">
               <div v-if="recinto.perfilesRrhh.length === 0" class="aviso-rrhh">
                 <i class="fa-solid fa-triangle-exclamation"></i>
-                No ingresaste personal para este recinto en la pantalla de RRHH. Los perfiles que marques aquí
+                No ingresaste personal para este recinto en la pantalla de Dotación. Los perfiles que marques aquí
                 se considerarán sin personal disponible.
               </div>
 
               <!-- Aplicar un perfil a todas las prestaciones del recinto -->
               <div class="masivo">
-                <span class="masivo-titulo">Aplicar a todas las prestaciones de este recinto:</span>
+                <span class="masivo-titulo">Aplicar a todas las prestaciones de este recinto:<InfoTip titulo="Aplicar a todas">Marca el mismo perfil, con la misma participación, en todas las prestaciones de este recinto. Después puedes ajustar cada prestación por separado.</InfoTip></span>
                 <div class="masivo-controles">
                   <select v-model="masivo[recinto.id].tipo" class="input-tp">
                     <option value="" disabled>Perfil</option>
@@ -79,6 +80,7 @@
                   <template v-if="masivo[recinto.id].participacion === 'puntual'">
                     <label class="campo-corto">e <input v-model.number="masivo[recinto.id].e" type="number" min="0" step="1" class="input-tp input-num" /> min</label>
                     <label class="campo-corto">f <input v-model.number="masivo[recinto.id].f" type="number" min="0" step="1" class="input-tp input-num" /> veces/día</label>
+                    <InfoTip titulo="e y f">e: minutos que dura cada intervención. <br><b>f:</b> cuántas veces al día interviene el perfil.</InfoTip>
                   </template>
                   <button type="button" class="btn-aplicar" @click="aplicarATodas(recinto)">Aplicar</button>
                   <button type="button" class="btn-quitar-todas" @click="quitarDeTodas(recinto)">Quitar de todas</button>
@@ -90,8 +92,8 @@
                 <div class="prestacion-cabecera">
                   <span class="prestacion-nombre">{{ p.nombre }}</span>
                   <span class="prestacion-datos">
-                    <span v-if="p.codigo">Código {{ p.codigo }}</span>
-                    <span>t = {{ formatoTiempo(p.tMin) }}</span>
+                    <span v-if="p.codigo">Código FONASA {{ p.codigo }}</span>
+                    <span>t = {{ formatoTiempo(p.tMin) }}<InfoTip titulo="t: duración de la prestación" izquierda>Tiempo que demora en realizarse el procedimiento. En día cama es siempre 24 hrs.</InfoTip></span>
                     <span>Demanda {{ formatoNumero(p.demanda) }}/año</span>
                   </span>
                 </div>
@@ -127,10 +129,10 @@
                     <label class="campo-corto">e <input v-model.number="fila.e" type="number" min="0" step="1" class="input-tp input-num" /> min</label>
                     <label class="campo-corto">f <input v-model.number="fila.f" type="number" min="0" step="1" class="input-tp input-num" /> veces/día</label>
                   </template>
-                  <span class="phi" :class="{ 'phi-error': fila.participacion === 'puntual' && !phiValido(phiDe(p, fila)) }"
-                    title="Dedicación: fracción del tiempo de la prestación que ocupa este perfil">
+                  <span class="phi" :class="{ 'phi-error': fila.participacion === 'puntual' && !phiValido(phiDe(p, fila)) }">
                     φ = {{ formatoPhi(phiDe(p, fila)) }}
                   </span>
+                  <InfoTip titulo="φ: dedicación" izquierda>Qué parte de la duración de la prestación ocupa este perfil. 1 = está todo el tiempo; 0,25 = una cuarta parte. Si da más de 1, revisa e y f: el perfil no puede dedicar más tiempo del que dura la prestación.</InfoTip>
                   <button class="btn-quitar" type="button" title="Quitar este perfil" @click="togglePerfil(p, fila.tipo)">
                     <i class="fa-solid fa-trash"></i>
                   </button>
@@ -142,178 +144,14 @@
           </div>
         </section>
 
-        <section v-if="resultado" class="resultado">
-          <div class="resultado-cabecera">
-            <h3 class="resultado-titulo">Resultado con restricción de RRHH</h3>
-            <span v-if="haySinGuardar" class="sin-guardar">Hay cambios sin guardar: el resultado puede estar desactualizado</span>
-          </div>
-          <!-- Sección 1: equipamiento -->
-          <div class="res-seccion">
-            <h4 class="res-seccion-titulo">Equipamiento</h4>
-            <div class="pastillas">
-              <div v-for="t in tarjetasEquipos" :key="t.titulo" class="pastilla">
-                <span class="pastilla-titulo">{{ t.titulo }}</span>
-                <div class="pastilla-valores">
-                  <div class="pastilla-dato">
-                    <span class="pastilla-numero">{{ t.normal }}</span>
-                    <span class="pastilla-etiqueta">Necesidad tecnológica</span>
-                  </div>
-                  <span class="pastilla-flecha" aria-hidden="true">→</span>
-                  <div class="pastilla-dato">
-                    <span class="pastilla-numero" :class="{ 'numero-baja': t.restringido < t.normal }">{{ t.restringido }}</span>
-                    <span class="pastilla-etiqueta">Con el personal actual</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p class="resultado-nota">
-            </p>
-          </div>
-
-          <!-- Sección 2: personal -->
-          <div class="res-seccion">
-            <h4 class="res-seccion-titulo">Personal</h4>
-            <div class="pastillas">
-              <div class="pastilla pastilla-clara">
-                <span class="pastilla-titulo">Personal que falta</span>
-                <span class="pastilla-numero" :class="{ 'numero-alerta': totalFaltan > 0 }">{{ formatoNumero(totalFaltan) }}</span>
-                <span class="pastilla-etiqueta">{{ totalFaltan === 1 ? 'persona' : 'personas' }} para cubrir toda la demanda</span>
-                <ul v-if="brechas.length" class="pastilla-lista">
-                  <li v-for="b in brechas" :key="b.id"><b>{{ b.nombre }}:</b> {{ b.texto }}</li>
-                </ul>
-              </div>
-              <div class="pastilla pastilla-clara">
-                <span class="pastilla-titulo">Prestaciones no cubiertas</span>
-                <span class="pastilla-numero" :class="{ 'numero-alerta': noCubiertas > 0 }">{{ formatoNumero(noCubiertas) }}</span>
-                <span class="pastilla-etiqueta">al año, mientras falte personal</span>
-              </div>
-            </div>
-            <div v-for="a in sinPersonal" :key="a.id" class="aviso-rrhh aviso-en-resultado">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-              {{ a.texto }}
-            </div>
-          </div>
-
-          <details class="detalle">
-            <summary>Ver detalle por recinto y equipo</summary>
-            <div class="detalle-contenido">
-          <div v-for="r in resultado.recintos" :key="r.id" class="res-recinto">
-            <div class="res-recinto-cabecera">
-              <span class="res-recinto-nombre">{{ r.nombre }}</span>
-              <span class="chip-alpha" :class="claseAlpha(r)">{{ textoAlpha(r) }}</span>
-            </div>
-
-            <p v-if="!r.con_datos_planilla_a" class="res-linea res-gris">
-              Sin tiempos cargados en este recinto: no se aplica restricción.
-            </p>
-            <template v-else>
-              <p class="res-linea">
-                <template v-if="r.alpha >= 1">El personal alcanza para toda la demanda.</template>
-                <template v-else>
-                  El personal alcanza para el <b>{{ formatoPorcentaje(r.alpha) }}</b> de la demanda.
-                  <span v-if="r.perfil_limitante">Limita: <b>{{ r.perfil_limitante }}</b>.</span>
-                </template>
-              </p>
-              <p v-if="r.prestaciones_no_cubiertas > 0.5" class="res-linea">
-                Prestaciones no cubiertas: <b>{{ formatoNumero(Math.round(r.prestaciones_no_cubiertas)) }}</b> al año.
-              </p>
-            </template>
-            <p v-if="r.modulos" class="res-linea">
-              {{ r.modulos.tipo === 'boxes' ? 'Boxes' : 'Pabellones' }}:
-              <b>{{ r.modulos.normal }}</b> sin restricción → <b>{{ r.modulos.restringido }}</b> con restricción
-            </p>
-
-            <div v-if="r.por_perfil.length" class="tabla-scroll">
-              <table class="tabla-res">
-                <thead>
-                  <tr>
-                    <th>Perfil</th>
-                    <th>Horas requeridas al año</th>
-                    <th>Horas disponibles al año</th>
-                    <th>Suficiencia</th>
-                    <th>Personas</th>
-                    <th>Mínimo necesario</th>
-                    <th>Faltan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="p in r.por_perfil" :key="p.perfil" :class="{ 'fila-limita': p.perfil === r.perfil_limitante && r.alpha < 1 }">
-                    <td>{{ p.perfil }}</td>
-                    <td>{{ formatoNumero(Math.round(p.q)) }}</td>
-                    <td>{{ formatoNumero(Math.round(p.a)) }}</td>
-                    <td>{{ p.rho === null ? '—' : (p.rho >= 1 ? 'Alcanza' : formatoPorcentaje(p.rho)) }}</td>
-                    <td>{{ formatoNumero(p.n) }}</td>
-                    <td>{{ p.n_min === null ? '—' : formatoNumero(p.n_min) }}</td>
-                    <td>{{ p.brecha === null ? '—' : formatoNumero(p.brecha) }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Equipamiento completo: todos los tipos -->
-          <div v-if="equipamiento.length" class="res-recinto">
-            <div class="res-recinto-cabecera">
-              <span class="res-recinto-nombre">Equipamiento</span>
-              <label class="check-todos">
-                <input v-model="mostrarTodos" type="checkbox" /> Mostrar todos los equipos
-              </label>
-            </div>
-            <p v-if="!mostrarTodos && equipamientoCambian.length === 0" class="res-linea res-gris">
-              Ningún equipo cambia con el personal actual.
-            </p>
-            <div v-if="equiposVisibles.length" class="tabla-scroll">
-              <table class="tabla-res">
-                <thead><tr><th>Equipo</th><th>Tipo</th><th>Sin restricción</th><th>Con restricción</th></tr></thead>
-                <tbody>
-                  <tr v-for="e in equiposVisibles" :key="e.equipo_id" :class="{ 'fila-cambia': e.restringido !== e.normal }">
-                    <td>{{ e.nombre_equipo }}</td>
-                    <td>{{ e.tipo ? `Tipo ${e.tipo}` : '—' }}</td>
-                    <td>{{ e.normal }}</td>
-                    <td>{{ e.restringido }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p v-if="!mostrarTodos && equipamientoCambian.length > 0 && equipamiento.length > equipamientoCambian.length" class="res-linea res-gris">
-              {{ textoNoCambian(equipamiento.length - equipamientoCambian.length) }}
-            </p>
-          </div>
-
-          <!-- URPA -->
-          <div v-if="urpa && urpa.normal.pabellones > 0" class="res-recinto">
-            <div class="res-recinto-cabecera"><span class="res-recinto-nombre">URPA (recuperación post-anestésica)</span></div>
-            <p class="res-linea">
-              Camillas: <b>{{ urpa.normal.camillas }}</b> sin restricción → <b>{{ urpa.restringido.camillas }}</b> con restricción ·
-              Salas: <b>{{ urpa.normal.salas }}</b> → <b>{{ urpa.restringido.salas }}</b>
-            </p>
-            <div v-if="urpaCambian.length" class="tabla-scroll">
-              <table class="tabla-res">
-                <thead><tr><th>Equipo</th><th>Tipo</th><th>Sin restricción</th><th>Con restricción</th></tr></thead>
-                <tbody>
-                  <tr v-for="e in urpaCambian" :key="e.equipo_id" class="fila-cambia">
-                    <td>{{ e.nombre_equipo }}</td>
-                    <td>{{ e.tipo ? `Tipo ${e.tipo}` : '—' }}</td>
-                    <td>{{ e.normal }}</td>
-                    <td>{{ e.restringido }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p v-else class="res-linea res-gris">El equipamiento de la URPA no cambia.</p>
-          </div>
-            </div>
-          </details>
-        </section>
-
         <section class="acciones-finales">
           <button class="btn-secundario" type="button" @click="salir(`/rrhh/${proyectoId}`)">
-            <i class="fa-solid fa-arrow-left"></i> Volver a RRHH
+            <i class="fa-solid fa-arrow-left"></i> Volver a Dotación
           </button>
           <div class="acciones-derecha">
             <span v-if="haySinGuardar" class="sin-guardar">Hay cambios sin guardar</span>
-            <button class="btn-principal" type="button" :disabled="recintos.length === 0 || calculando" @click="guardar(true)">
-              {{ calculando ? 'Calculando…' : 'Guardar y calcular' }} <i class="fa-solid fa-calculator"></i>
+            <button class="btn-principal" type="button" :disabled="recintos.length === 0 || guardandoUI" @click="guardar(true)">
+              {{ guardandoUI ? 'Guardando…' : 'Guardar y ver resultados' }} <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
         </section>
@@ -327,6 +165,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import InfoTip from '@/components/ui/InfoTip.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -343,9 +182,7 @@ const abiertos = ref({})     // recinto abierto o colapsado
 const masivo = ref({})       // valores de "Aplicar a todas", por recinto
 const cargando = ref(true)
 const guardadoComo = ref('') // lo último guardado, para saber si hay cambios
-const resultado = ref(null)   // resultado de la restricción (rrhh.php?action=calcular_restriccion)
-const calculando = ref(false)
-const mostrarTodos = ref(false) // detalle de equipamiento: todos o solo los que cambian
+const guardandoUI = ref(false) // muestra "Guardando…" en el botón
 
 let uidSeq = 1
 
@@ -454,70 +291,6 @@ function formatoTiempo(tMin) {
   if (t < 60) return `${t.toLocaleString('es-CL')} min`
   return `${(t / 60).toLocaleString('es-CL', { maximumFractionDigits: 1 })} h`
 }
-function formatoPorcentaje(x) {
-  return `${(x * 100).toLocaleString('es-CL', { maximumFractionDigits: 0 })} %`
-}
-function textoAlpha(r) {
-  if (!r.con_datos_planilla_a || r.alpha >= 1) return 'Sin restricción'
-  return `α = ${r.alpha.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-function claseAlpha(r) {
-  if (!r.con_datos_planilla_a || r.alpha >= 1) return 'alpha-ok'
-  return r.alpha <= 0 ? 'alpha-cero' : 'alpha-baja'
-}
-// Resumen: personal que falta por recinto, prestaciones no cubiertas y perfiles sin personal
-const brechas = computed(() => {
-  if (!resultado.value) return []
-  return resultado.value.recintos
-    .map(r => ({
-      id: r.id,
-      nombre: r.nombre,
-      texto: r.por_perfil.filter(p => p.brecha > 0).map(p => `${formatoNumero(p.brecha)} ${p.perfil}`).join(', '),
-    }))
-    .filter(b => b.texto !== '')
-})
-const tarjetasEquipos = computed(() => {
-  if (!resultado.value) return []
-  const t = resultado.value.totales
-  const tarjetas = [
-    { titulo: 'Pabellones y boxes', normal: t.modulos_normal, restringido: t.modulos_restringido },
-  ]
-  if (t.equipos_normal !== undefined) {
-    tarjetas.push({ titulo: 'Equipamiento (todos los tipos)', normal: t.equipos_normal, restringido: t.equipos_restringido })
-  } else {
-    tarjetas.push({ titulo: 'Equipos por demanda', normal: t.tipo5_normal, restringido: t.tipo5_restringido })
-  }
-  const u = resultado.value.urpa
-  if (u && u.normal.camillas > 0) {
-    tarjetas.push({ titulo: 'Camillas URPA', normal: u.normal.camillas, restringido: u.restringido.camillas })
-  }
-  return tarjetas
-})
-const totalFaltan = computed(() => (resultado.value
-  ? resultado.value.recintos.reduce((s, r) => s + r.por_perfil.reduce((a, p) => a + (p.brecha > 0 ? p.brecha : 0), 0), 0)
-  : 0))
-const noCubiertas = computed(() => (resultado.value
-  ? Math.round(resultado.value.recintos.reduce((s, r) => s + (r.prestaciones_no_cubiertas || 0), 0))
-  : 0))
-const sinPersonal = computed(() => {
-  if (!resultado.value) return []
-  return resultado.value.recintos
-    .filter(r => r.perfiles_sin_datos.length > 0)
-    .map(r => ({
-      id: r.id,
-      texto: `${r.perfiles_sin_datos.join(', ')} participa en prestaciones de «${r.nombre}» pero no tiene personal en RRHH: ese recinto queda sin capacidad hasta que lo agregues.`,
-    }))
-})
-// Equipamiento completo (todos los tipos) y URPA
-const equipamiento = computed(() => (resultado.value && resultado.value.equipamiento) || [])
-const equipamientoCambian = computed(() => equipamiento.value.filter(e => e.restringido !== e.normal))
-const equiposVisibles = computed(() => (mostrarTodos.value ? equipamiento.value : equipamientoCambian.value))
-const urpa = computed(() => (resultado.value && resultado.value.urpa) || null)
-const urpaCambian = computed(() => (urpa.value ? urpa.value.equipos.filter(e => e.restringido !== e.normal) : []))
-function textoNoCambian(n) {
-  return n === 1 ? 'El otro equipo no cambia.' : `Los otros ${n} equipos no cambian.`
-}
-
 function formatoPhi(phi) {
   return phi === null ? '—' : phi.toLocaleString('es-CL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
@@ -572,6 +345,7 @@ async function guardar(calcular = false) {
 
   const filas = filasParaGuardar()
   guardando = true
+  guardandoUI.value = true
   try {
     const resp = await fetch(`${API}/rrhh.php?action=planilla_a_guardar`, {
       method: 'POST',
@@ -584,30 +358,13 @@ async function guardar(calcular = false) {
       return
     }
     guardadoComo.value = JSON.stringify(filas)
-    if (calcular) await calcularResultado()
+    if (calcular) router.push(`/resultados-restriccion/${proyectoId.value}`)
     else alert('Tiempos por prestación guardados correctamente.')
   } catch (e) {
     alert('Error de conexión al guardar.')
   } finally {
     guardando = false
-  }
-}
-
-/* ---------- Resultado con restricción ---------- */
-
-async function calcularResultado() {
-  const uid = authStore.usuarioId
-  if (!proyectoId.value || !uid) return
-  calculando.value = true
-  try {
-    const resp = await fetch(`${API}/rrhh.php?action=calcular_restriccion&proyecto_id=${Number(proyectoId.value)}&usuario_id=${uid}`)
-    const data = await resp.json()
-    if (!resp.ok || !data.ok) { alert(data.error || 'No se pudo calcular la restricción.'); return }
-    resultado.value = data.datos
-  } catch (e) {
-    alert('Error de conexión al calcular la restricción.')
-  } finally {
-    calculando.value = false
+    guardandoUI.value = false
   }
 }
 
@@ -677,8 +434,6 @@ onMounted(async () => {
   await cargarPerfiles()
   await cargarPlanilla()
   cargando.value = false
-  // Si ya hay tiempos guardados, muestra el resultado de inmediato
-  if (filasParaGuardar().length > 0) await calcularResultado()
 })
 </script>
 
@@ -717,9 +472,9 @@ onMounted(async () => {
 .tp-panel { display: flex; flex-direction: column; gap: 20px; }
 
 /* Tarjeta de recinto */
-.recinto-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
+.recinto-card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 .recinto-title { display: flex; align-items: center; gap: 10px; background: #fff; padding: 14px 20px; font-size: 1.1rem; font-weight: 700; color: $color-primario; border-bottom: 1px solid #e5e7eb; }
-.recinto-title-toggle { justify-content: space-between; cursor: pointer; user-select: none; &:hover { background: #e4eff6; } }
+.recinto-title-toggle { justify-content: space-between; cursor: pointer; user-select: none; border-radius: 12px 12px 0 0; &:hover { background: #e4eff6; } }
 .recinto-cuenta { font-size: 0.8rem; font-weight: 600; color: rgba(0,60,88,0.6); margin-left: 8px; }
 
 .aviso-rrhh { margin: 12px 20px 0; padding: 10px 14px; border-radius: 8px; background: #fff7e6; border: 1px solid #f5c26b; color: #8a5300; font-size: 0.9rem; i { margin-right: 6px; } }
@@ -771,51 +526,6 @@ onMounted(async () => {
 .btn-aplicar { background: $color-primario; color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer; &:hover { opacity: 0.9; } }
 .btn-quitar-todas { background: transparent; color: rgba(0,60,88,0.75); border: 1px solid rgba(0,60,88,0.2); border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; cursor: pointer; &:hover { color: #c62828; border-color: #e7a1a1; } }
 .btn-quitar { margin-left: auto; background: transparent; border: none; color: #9ca3af; padding: 6px 10px; border-radius: 8px; cursor: pointer; &:hover { color: #c62828; background: rgba(198,40,40,0.08); } }
-
-/* Resultado */
-.resultado { background: #fff; border-radius: 16px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-.resultado-cabecera { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
-.resultado-titulo { margin: 0; font-size: 1.2rem; font-weight: 700; color: $color-primario; }
-.resultado-nota { margin: 0; font-size: 0.88rem; color: $color-texto-secundario; }
-
-.res-seccion { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid $color-borde; }
-.res-seccion-titulo { margin: 0; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(0,60,88,0.65); }
-.pastillas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-@media (max-width: 700px) { .pastillas { grid-template-columns: 1fr; } }
-.pastilla { background: $color-primario; color: #fff; border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-.pastilla-clara { background: #eef5fa; color: $color-primario; border: 1px solid #d3e4f0; }
-.pastilla-titulo { font-size: 1rem; font-weight: 700; }
-.pastilla-valores { display: flex; align-items: center; justify-content: center; gap: 18px; }
-.pastilla-dato { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 110px; }
-.pastilla-numero { font-size: 2.2rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.pastilla-etiqueta { font-size: 0.8rem; opacity: 0.85; }
-.pastilla-flecha { font-size: 1.6rem; opacity: 0.7; }
-.numero-baja { color: #ffc266; }
-.numero-alerta { color: #b86e00; }
-.pastilla-lista { margin: 4px 0 0; padding: 0; list-style: none; font-size: 0.88rem; li { margin: 2px 0; } }
-.detalle { border-top: 1px solid $color-borde; padding-top: 12px; }
-.detalle summary { cursor: pointer; font-weight: 700; color: $color-primario; font-size: 0.92rem; }
-.detalle-contenido { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
-
-.res-recinto { border: 1px solid #e3ebf2; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
-.res-recinto-cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
-.res-recinto-nombre { font-weight: 700; color: $color-primario; font-size: 1.02rem; }
-.res-linea { margin: 0; font-size: 0.92rem; color: $color-primario; }
-.res-gris { color: $color-texto-secundario; }
-.chip-alpha { border-radius: 999px; padding: 4px 12px; font-size: 0.82rem; font-weight: 700; }
-.alpha-ok { background: #e6f4ea; color: #1e6b34; }
-.alpha-baja { background: #fff1db; color: #8a5300; }
-.alpha-cero { background: #fdecea; color: #b71c1c; }
-.aviso-en-resultado { margin: 0; }
-
-.tabla-scroll { overflow-x: auto; }
-.tabla-res { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 0.88rem; }
-.tabla-res th { background: #ddeaf4; color: $color-primario; font-weight: 700; padding: 8px 10px; text-align: center; }
-.tabla-res td { padding: 8px 10px; border-bottom: 1px solid $color-borde; text-align: center; font-variant-numeric: tabular-nums; color: $color-primario; }
-.tabla-res td:first-child, .tabla-res th:first-child { text-align: left; }
-.tabla-res .fila-limita td { background: #fff7e6; font-weight: 700; }
-.tabla-res .fila-cambia td:last-child { color: #b86e00; font-weight: 700; }
-.check-todos { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: rgba(0,60,88,0.8); cursor: pointer; }
 
 .acciones-finales { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: #fff; border-radius: 14px; padding: 16px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .acciones-derecha { display: flex; align-items: center; gap: 12px; }

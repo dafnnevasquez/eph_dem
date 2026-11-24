@@ -41,7 +41,12 @@
           </div>
         </header>
 
-        <section class="rrhh-panel">
+        <div v-if="cargandoRecintos" class="aviso-estado">Cargando recintos…</div>
+        <div v-else-if="recintos.length === 0" class="aviso-estado">
+          Este proyecto no tiene prestaciones seleccionadas. Elígelas primero en la pantalla de Prestaciones.
+        </div>
+
+        <section v-else class="rrhh-panel">
           <template v-for="recinto in recintos" :key="recinto.id">
             <div class="recinto-card">
               <div class="recinto-title recinto-title-toggle" @click="toggleRecinto(recinto.id)">
@@ -142,7 +147,7 @@
             <i class="fa-solid fa-arrow-left"></i> Volver a Resultados
           </button>
           <div class="acciones-derecha">
-            <button class="btn-principal" type="button" @click="guardarYContinuar(true)">
+            <button class="btn-principal" type="button" :disabled="recintos.length === 0" @click="guardarYContinuar(true)">
               Guardar y seguir <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
@@ -176,25 +181,40 @@ const jornadasSemanales = [44, 33, 22, 11]
 const SEMANAS_DEFECTO = 48
 const PORCENTAJE_DEFECTO = 100
 
-// Recintos (provisional — vendrán de los resultados)
-const recintos = ref([
-  { id: 1, nombre: 'Cubículo UTI' },
-  { id: 2, nombre: 'Cubículo UCI' },
-  { id: 3, nombre: 'Pabellón menor' },
-  { id: 4, nombre: 'Pabellón mayor' },
-])
+// Recintos del proyecto: solo los de las prestaciones seleccionadas
+const recintos = ref([])
+const cargandoRecintos = ref(true)
 
-// Grupos de RRHH por recinto
-const dotacion = ref({ 1: [], 2: [], 3: [], 4: [] })
+// Grupos de RRHH, fila "Mismo valor para todos" y abierto/cerrado, por recinto
+const dotacion = ref({})
+const masivo = ref({})
+const abiertos = ref({})
 
-// Valores de la fila "Mismo valor para todos", por recinto
 function valoresMasivos() {
   return { personas: null, jornada: 44, semanas: SEMANAS_DEFECTO, porcentaje: PORCENTAJE_DEFECTO }
 }
-const masivo = ref({ 1: valoresMasivos(), 2: valoresMasivos(), 3: valoresMasivos(), 4: valoresMasivos() })
 
-// Recintos abiertos o colapsados
-const abiertos = ref({ 1: false, 2: false, 3: false, 4: false })
+// Lee los recintos del proyecto (misma fuente que Tiempos por prestación)
+async function cargarRecintos() {
+  const uid = authStore.usuarioId
+  if (!proyectoId.value || !uid) { cargandoRecintos.value = false; return }
+  try {
+    const resp = await fetch(`${API}/rrhh.php?action=planilla_a&proyecto_id=${Number(proyectoId.value)}&usuario_id=${uid}`)
+    const data = await resp.json()
+    if (!resp.ok || !data.ok) { alert(data.error || 'No se pudieron cargar los recintos del proyecto.'); return }
+    recintos.value = data.datos.recintos.map(r => ({ id: r.id, nombre: r.nombre }))
+    for (const r of recintos.value) {
+      dotacion.value[r.id] = []
+      masivo.value[r.id] = valoresMasivos()
+      abiertos.value[r.id] = true
+    }
+  } catch (e) {
+    alert('Error de conexión al cargar los recintos del proyecto.')
+  } finally {
+    cargandoRecintos.value = false
+  }
+}
+
 function toggleRecinto(id) {
   abiertos.value[id] = !abiertos.value[id]
 }
@@ -331,7 +351,8 @@ async function cargarDotacion() {
       alert(data.error || 'No se pudo cargar la dotación de RRHH.')
       return
     }
-    const nueva = { 1: [], 2: [], 3: [], 4: [] }
+    const nueva = {}
+    for (const r of recintos.value) nueva[r.id] = []
     for (const g of data.datos.grupos) {
       if (!nueva[g.recinto_id]) continue
       nueva[g.recinto_id].push({
@@ -417,6 +438,7 @@ onMounted(async () => {
   proyectoId.value = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo')
   // Primero los perfiles, para que la dotación guardada tenga su lista de opciones
   await cargarPerfiles()
+  await cargarRecintos()
   await cargarDotacion()
 })
 </script>
@@ -503,19 +525,6 @@ onMounted(async () => {
 .btn-mini.btn-quitar { background: transparent; border-color: transparent; color: #9ca3af; &:hover { color: #c62828; background: rgba(198,40,40,0.08); } }
 .fila-vacia { text-align: center; color: $color-texto-secundario; padding: 14px; }
 
-.resumen-final { background: #fff; border-radius: 16px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
-//.resumen-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-//.resumen-titulo { margin: 0; font-size: 1.1rem; font-weight: 700; color: $color-primario; }
-//.total-general { display: flex; justify-content: flex-end; align-items: center; }
-.calculos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.pastilla-grande { background: $color-primario; color: #fff; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
-.pastilla-grande-titulo { font-size: 1rem; font-weight: 600; }
-.pastilla-grande-valor { font-size: 2.2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
-.pastilla-grande-sub { font-size: 0.85rem; color: rgba(255,255,255,0.85); }
-@media (max-width: 700px) { .calculos-grid { grid-template-columns: 1fr; } }
-
-
-
 /* Casillas */
 .input-dotacion {
   width: 100%;
@@ -547,6 +556,9 @@ onMounted(async () => {
 }
 .acciones-derecha { display: flex; align-items: center; gap: 10px; }
 .acciones-finales { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 14px; padding: 16px 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
-.btn-principal { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { opacity: 0.9; } }
+.btn-principal { background: $color-primario; color: #fff; border: none; border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { opacity: 0.9; } &:disabled { opacity: 0.5; cursor: not-allowed; }}
 .btn-secundario { background: rgba(0,60,88,0.08); color: $color-primario; border: 1px solid rgba(0,60,88,0.2); border-radius: 10px; padding: 12px 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; &:hover { background: rgba(0,60,88,0.14); } }
+
+.aviso-estado { background: #fff; border: 1px solid $color-borde; border-radius: 12px; padding: 24px; text-align: center; color: $color-texto-secundario; }
+
 </style>

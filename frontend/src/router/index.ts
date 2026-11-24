@@ -55,6 +55,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/resultados-restriccion/:proyectoId?',
+      name: 'resultados-restriccion',
+      component: () => import('@/views/Resultados/ResultadosRestriccionView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/rrhh/:proyectoId?',
       name: 'rrhh',
       component: () => import('@/views/RRHH/RRHHView.vue'),
