@@ -11,6 +11,7 @@
       </section>
 
       <main class="resultados-content">
+        <PantallaEspera :visible="cargando" titulo="Cargando resultados" mensaje="Calculando el equipamiento del proyecto…" icono="fa-solid fa-boxes-stacked" />        
   <header class="resultados-header">
     <div class="nav-bar">
       <div class="nav-buttons">
@@ -65,7 +66,7 @@
             <h3>Proyecto</h3>
             <p class="banner-sub">{{ nombreProyecto }}</p>
           </div>
-          <div class="banner-total" v-if="cargando"><span class="metric-label">Cargando...</span></div>
+          <div class="banner-total" v-if="cargando"><span class="metric-label"><i class="fa-solid fa-spinner fa-spin"></i> Cargando…</span></div>
           <div class="banner-total" v-else-if="error"><span class="metric-label" style="color:#ffaaaa">{{ error }}</span></div>
           <div class="banner-total" v-else>
             <span class="metric-value">{{ totalUnidadesEquipos }}</span>
@@ -278,6 +279,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import PantallaEspera from '@/components/ui/PantallaEspera.vue'
 
 const router = useRouter()
 const route = useRoute()

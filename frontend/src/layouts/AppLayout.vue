@@ -1,4 +1,7 @@
 <template>
+  <!-- Barra de progreso: aparece al cambiar de pantalla o mientras se espera al servidor -->
+  <BarraProgreso />
+
   <!-- TOP BAR 1: Logos institucionales -->
   <div class="sigem-topbar1">
     <div class="sigem-topbar1-center">
@@ -71,7 +74,12 @@
 </template>
 
 <script setup>
-// Sin lógica — solo estructura de layout
+import { useRouter } from 'vue-router'
+import BarraProgreso from '@/components/ui/BarraProgreso.vue'
+import { instalarProgreso } from '@/utils/progreso'
+
+// Se instala una sola vez, aunque AppLayout se monte en cada pantalla
+instalarProgreso(useRouter())
 </script>
 
 <style lang="scss" scoped>

@@ -41,7 +41,11 @@
 
         </header>
 
-        <section v-if="filas.length === 0" class="panel-vacio">
+        <section v-if="cargandoFilas" class="panel-vacio panel-cargando">
+          <p><i class="fa-solid fa-spinner fa-spin"></i> Cargando prestaciones del proyecto…</p>
+        </section>
+
+        <section v-else-if="filas.length === 0" class="panel-vacio">
           <p>No hay prestaciones seleccionadas.</p>
           <button class="btn-secundario" @click="irAPrestaciones">Volver a prestaciones</button>
         </section>
@@ -122,9 +126,9 @@
                 <i class="fa-solid fa-triangle-exclamation"></i> {{ errorValidacion }}
               </div>
             </transition>
-            <button class="btn-principal" @click="guardarYCalcular">
+            <BotonGuardar class="btn-principal" :cargando="calculando" texto-cargando="Calculando…" @click="guardarYCalcular">
               <i class="fa-solid fa-calculator"></i> Guardar y calcular
-            </button>
+            </BotonGuardar>
           </div>
         </section>
       </main>
@@ -135,6 +139,9 @@
       <div class="tooltip-contenido">{{ tooltipPosicion.texto }}</div>
     </div>
 
+    <!-- Pantalla de espera mientras se calcula -->
+    <PantallaEspera :visible="calculando" titulo="Calculando el equipamiento" mensaje="Calculando los equipos por prestación…" icono="fa-solid fa-stethoscope" />
+
   </AppLayout>
 </template>
 
@@ -143,6 +150,8 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import BotonGuardar from '@/components/ui/BotonGuardar.vue'
+import PantallaEspera from '@/components/ui/PantallaEspera.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -152,6 +161,8 @@ const filas = ref([])
 const errores = ref(new Set())
 const errorValidacion = ref('')
 const nombreProyectoActivo = ref('')
+const cargandoFilas = ref(true) // true hasta que se carguen las prestaciones del proyecto
+const calculando = ref(false)   // true mientras el servidor calcula
 
 // Fila "Mismo valor para todos"
 const masivo = ref({ demanda: null, diasLaborales: 260, tiempo: null, nSimultaneas: 1, disponibilidad: 100, jornada: 7 })
@@ -241,7 +252,7 @@ async function cargarDesdeServidor(proyectoId) {
     const resp = await fetch(url)
     const json = await resp.json()
     if (!json.ok || !Array.isArray(json.datos) || json.datos.length === 0) {
-      cargarDatos()
+      await cargarDatos()
       return
     }
     filas.value = json.datos.map(p => ({
@@ -260,7 +271,7 @@ async function cargarDesdeServidor(proyectoId) {
     filas.value.forEach(f => calcularEEMM(f))
   } catch (e) {
     console.error('Error al cargar desde servidor:', e)
-    cargarDatos()
+    await cargarDatos()
   }
 }
 
@@ -295,6 +306,7 @@ async function guardarYCalcular() {
 
   const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
   const userId = authStore.usuarioId
+  if (calculando.value) return
 
   const payload = {
     proyecto_id: Number(proyectoId),
@@ -311,6 +323,7 @@ async function guardarYCalcular() {
     }))
   }
 
+  calculando.value = true
   try {
     const resp = await fetch(`${import.meta.env.VITE_API_BASE}/calcular_demanda_abierta.php`, {
       method: 'POST',
@@ -322,9 +335,11 @@ async function guardarYCalcular() {
     localStorage.setItem('ephdem_resultado_abierta', JSON.stringify(data.datos))
     localStorage.removeItem('ephdem_prestaciones_abierta')
     localStorage.removeItem('ephdem_prestaciones_abierta_pid')
-    router.push(`/resultados-abierta/${proyectoId}`)
+    await router.push(`/resultados-abierta/${proyectoId}`)
   } catch (e) {
     alert('No se pudo conectar con el servidor.')
+  } finally {
+    calculando.value = false
   }
 }
 
@@ -342,10 +357,14 @@ onMounted(async () => {
   const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
   const rawLocal = localStorage.getItem('ephdem_prestaciones_abierta')
   const pidLocal = localStorage.getItem('ephdem_prestaciones_abierta_pid')
-  if (rawLocal && proyectoId && String(pidLocal) === String(proyectoId)) {
-    await cargarDatos()
-  } else if (proyectoId) {
-    await cargarDesdeServidor(proyectoId)
+  try {
+    if (rawLocal && proyectoId && String(pidLocal) === String(proyectoId)) {
+      await cargarDatos()
+    } else if (proyectoId) {
+      await cargarDesdeServidor(proyectoId)
+    }
+  } finally {
+    cargandoFilas.value = false
   }
 })
 
@@ -394,6 +413,7 @@ function ocultarTooltip() { tooltipPosicion.value.visible = false }
 
 .tabla-panel, .panel-vacio { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .panel-vacio { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.panel-cargando { justify-content: center; color: $color-texto-secundario; p { margin: 0; display: flex; align-items: center; gap: 8px; } }
 .tabla-scroll { overflow-x: auto; }
 .tabla-parametros { width: 100%; min-width: 1100px; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
 .tabla-parametros th { background: #e9f1f6; color: $color-primario; font-size: 0.82rem; font-weight: 700; padding: 10px 8px; text-align: left; }

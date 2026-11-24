@@ -56,11 +56,11 @@
             <div class="subarea-chip">Consultas y atención médica</div>
           </div>
         </section>
-                
+    
         <section class="prestaciones-grid">
           <div class="prestaciones-panel">
             <div class="panel-title">Disponibles</div>
-            <div v-if="isLoading" class="lista-vacia">Cargando prestaciones...</div>
+            <div v-if="isLoading || cargandoSeleccion" class="lista-vacia"><i class="fa-solid fa-spinner fa-spin"></i> Cargando prestaciones…</div>
             <div v-else-if="prestacionesFiltradas.length === 0" class="lista-vacia">No hay prestaciones disponibles.</div>
             <div v-else class="prestaciones-lista">
               <div v-for="prestacion in prestacionesFiltradas" :key="prestacion.ID_PRESTACION" class="prestacion-item">
@@ -87,7 +87,9 @@
                   <i class="fa-solid fa-trash-can"></i> Limpiar
                 </button>
               </div>
-            </div>            <div v-if="seleccionadas.length === 0" class="lista-vacia">Aún no has seleccionado prestaciones.</div>
+            </div>
+            <div v-if="cargandoSeleccion" class="lista-vacia"><i class="fa-solid fa-spinner fa-spin"></i> Cargando prestaciones…</div>
+            <div v-else-if="seleccionadas.length === 0" class="lista-vacia">Aún no has seleccionado prestaciones.</div>
             <div v-else class="prestaciones-lista">
               <div v-for="prestacion in seleccionadas" :key="prestacion.ID_PRESTACION" class="prestacion-item">
                 <div class="prestacion-info">
@@ -129,11 +131,13 @@ const prestaciones = ref([])
 const seleccionadas = ref([])
 const isLoading = ref(false)
 const nombreProyectoActivo = ref('')
+const cargandoSeleccion = ref(true) // true hasta que termine de cargar el catálogo y lo guardado del proyecto
 
 function normalizarTexto(valor) {
   return String(valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 }
 
+// Aún no se usan: el área y la subárea están fijas. Quedan para cuando se agreguen más opciones al filtro.
 const opcionesArea = computed(() => [...new Set(prestaciones.value.map(p => p.area))])
 const opcionesSubarea = [
   'consultas y atencion medica',
@@ -221,9 +225,13 @@ async function cargarDesdeServidor(proyectoId) {
 
 onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo_abierta') || 'Desconocido'
-  await cargarPrestaciones()
-  const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
-  if (proyectoId) await cargarDesdeServidor(proyectoId)
+  try {
+    await cargarPrestaciones()
+    const proyectoId = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo_abierta')
+    if (proyectoId) await cargarDesdeServidor(proyectoId)
+  } finally {
+    cargandoSeleccion.value = false
+  }
 })
 </script>
 
@@ -270,7 +278,6 @@ onMounted(async () => {
 .btn-limpiar-seleccion { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1.5px solid #dc2626; border-radius: 999px; background: rgba(239,68,68,0.08); color: #991b1b; font-weight: 700; font-size: 0.82rem; cursor: pointer; &:disabled { opacity: 0.4; cursor: not-allowed; } }
 .panel-acciones { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .btn-agregar-todas { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1.5px solid #16a34a; border-radius: 999px; background: rgba(34,197,94,0.08); color: #166534; font-weight: 700; font-size: 0.82rem; cursor: pointer; &:hover:not(:disabled) { background: rgba(34,197,94,0.16); } &:disabled { opacity: 0.4; cursor: not-allowed; } }
-
 
 .prestaciones-lista { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; }
 .prestacion-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 10px; background: $color-claro; border: 1px solid $color-borde; }

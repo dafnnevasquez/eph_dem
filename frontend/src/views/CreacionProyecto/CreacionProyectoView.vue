@@ -46,7 +46,7 @@
               />
             </div>
             <div class="acciones-formulario">
-              <button type="submit" class="btn-principal" :disabled="guardando">{{ guardando ? 'Guardando…' : 'Guardar' }}</button>
+              <BotonGuardar type="submit" class="btn-principal" :cargando="guardando">Guardar</BotonGuardar>
               <button type="button" class="btn-secundario" @click="cancelar">Cancelar</button>
             </div>
           </form>
@@ -100,6 +100,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import BotonGuardar from '@/components/ui/BotonGuardar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

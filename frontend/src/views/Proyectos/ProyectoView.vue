@@ -33,7 +33,7 @@
           <div class="panel-header">
             <div>
               <h3 class="panel-title">Listado de proyectos</h3>
-              <p class="panel-hint">Fuente: tabla proyectos</p>
+              <p class="panel-hint">Proyectos de atención cerrada y abierta.</p>
             </div>
             <div class="panel-actions">
               <div class="sort-control">
@@ -60,7 +60,7 @@
           </div>
 
           <div v-if="cargando" class="lista-vacia">
-            <i class="fa-solid fa-spinner fa-spin"></i> Cargando proyectos...
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando proyectos…
           </div>
           <div v-else-if="errorCarga" class="lista-vacia lista-error">
             <i class="fa-solid fa-triangle-exclamation"></i> {{ errorCarga }}
@@ -76,11 +76,14 @@
               <div>Tipo de proyecto</div>
               <div class="table-actions">Acciones</div>
             </div>
-            <div v-for="proyecto in proyectosOrdenados" :key="proyecto.id" class="table-row">
+            <div v-if="proyectosOrdenados.length === 0" class="lista-vacia">
+              No hay proyectos de este tipo.
+            </div>
+            <div v-for="proyecto in proyectosOrdenados" :key="proyecto.tipo_atencion + proyecto.id" class="table-row">
               <div class="table-name">{{ proyecto.nombre_proyecto }}</div>
               <div>{{ proyecto.fecha_creacion }}</div>
               <div class="table-chip" :class="proyecto.tipo_atencion === 'Atención abierta' ? 'chip-abierta' : 'chip-cerrada'">
-              {{ proyecto.tipo_proyecto }}
+                {{ proyecto.tipo_proyecto }}
               </div>
               <div class="table-actions">
                 <button class="btn-primary" @click="verProyecto(proyecto)">Ver</button>
@@ -103,14 +106,14 @@ const router = useRouter()
 const authStore = useAuthStore()
 const mostrarMenuNuevo = ref(false)
 const proyectos = ref([])
-const cargando = ref(false)
+const cargando = ref(true)
 const errorCarga = ref('')
 const ordenSeleccionado = ref('fecha_desc')
 const filtroTipo = ref('todos')
 
 const proyectosOrdenados = computed(() => {
   let lista = [...proyectos.value]
-  
+
   // Filtro por tipo de atención
   if (filtroTipo.value === 'cerrada') lista = lista.filter(p => p.tipo_atencion !== 'Atención abierta')
   if (filtroTipo.value === 'abierta') lista = lista.filter(p => p.tipo_atencion === 'Atención abierta')
@@ -128,7 +131,7 @@ onMounted(async () => { await cargarProyectos() })
 
 async function cargarProyectos() {
   const userId = authStore.usuarioId
-  if (!userId) return
+  if (!userId) { cargando.value = false; return }
   cargando.value = true
   errorCarga.value = ''
   try {
@@ -155,7 +158,6 @@ async function cargarProyectos() {
       : []
 
     proyectos.value = [...cerrada, ...abierta].sort((a, b) => b.id_proyecto - a.id_proyecto)
-
   } catch (error) {
     errorCarga.value = 'Error de conexión al cargar proyectos.'
   } finally {
@@ -240,15 +242,24 @@ function cerrarSesion() {
 }
 .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .panel-actions { position: relative; display: flex; align-items: center; gap: 16px; }
+.panel-title { margin: 0; font-size: 1.2rem; color: $color-texto-principal; }
+.panel-hint { margin: 4px 0 0; font-size: 0.9rem; color: $color-texto-secundario; }
+
 .sort-control { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: $color-texto-secundario; }
 .sort-select {
   padding: 6px 12px; border: 1px solid $color-borde; border-radius: 8px;
   font-size: 0.9rem; color: $color-texto-principal; background: #fff; cursor: pointer;
   &:focus { border-color: $color-primario; outline: none; }
-  .filtro-tipo { display: flex; gap: 8px; }
-.btn-filtro { background: rgba(0,60,88,0.06); color: $color-primario; border: 1.5px solid rgba(0,60,88,0.2); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.12); } }
-.btn-filtro-active { background: $color-primario; color: #fff; border-color: $color-primario; }
 }
+
+.filtro-tipo { display: flex; gap: 8px; }
+.btn-filtro {
+  background: rgba(0,60,88,0.06); color: $color-primario; border: 1.5px solid rgba(0,60,88,0.2);
+  border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+  &:hover { background: rgba(0,60,88,0.12); }
+}
+.btn-filtro-active { background: $color-primario; color: #fff; border-color: $color-primario; }
+
 .nuevo-menu {
   position: absolute; top: calc(100% + 10px); right: 0;
   display: flex; flex-direction: column; gap: 8px;
@@ -260,8 +271,6 @@ function cerrarSesion() {
   color: $color-primario; font-weight: 600; padding: 10px 12px; border-radius: 10px; cursor: pointer;
   &:hover { background: rgba(0,60,88,0.12); }
 }
-.panel-title { margin: 0; font-size: 1.2rem; color: $color-texto-principal; }
-.panel-hint { margin: 4px 0 0; font-size: 0.9rem; color: $color-texto-secundario; }
 
 .btn-primary {
   background: $color-primario; color: #fff; border: none; border-radius: 10px;
@@ -289,11 +298,7 @@ function cerrarSesion() {
   padding: 6px 12px; border-radius: 999px;
   background: rgba(0,60,88,0.08); color: $color-primario; font-weight: 600; font-size: 0.85rem;
 }
-.table-actions { display: flex; gap: 10px; justify-content: flex-end; }
 .chip-cerrada { background: rgba(0,60,88,0.08); color: $color-primario; }
 .chip-abierta { background: rgba(26,158,92,0.12); color: #1a6e3c; }
-
-.filtro-tipo { display: flex; gap: 8px; }
-.btn-filtro { background: rgba(0,60,88,0.06); color: $color-primario; border: 1.5px solid rgba(0,60,88,0.2); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; cursor: pointer; &:hover { background: rgba(0,60,88,0.12); } }
-.btn-filtro-active { background: $color-primario; color: #fff; border-color: $color-primario; }
+.table-actions { display: flex; gap: 10px; justify-content: flex-end; }
 </style>

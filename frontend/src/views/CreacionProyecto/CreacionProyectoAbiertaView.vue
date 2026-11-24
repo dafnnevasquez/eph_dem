@@ -48,10 +48,7 @@
               <span v-if="errorNombre" class="form-error">{{ errorNombre }}</span>
             </div>
             <div class="acciones-formulario">
-              <button type="submit" class="btn-principal" :disabled="cargando">
-                <span v-if="cargando"><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
-                <span v-else>Guardar</span>
-              </button>
+              <BotonGuardar type="submit" class="btn-principal" :cargando="cargando">Guardar</BotonGuardar>
               <button type="button" class="btn-secundario" @click="cancelar">Cancelar</button>
             </div>
           </form>
@@ -92,6 +89,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import BotonGuardar from '@/components/ui/BotonGuardar.vue' 
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -132,6 +130,7 @@ async function guardarProyecto() {
   }
   const userId = authStore.usuarioId
   if (!userId) { router.push('/login'); return }
+  if (cargando.value) return
 
   cargando.value = true
   try {

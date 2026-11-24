@@ -41,7 +41,7 @@
           </div>
         </header>
 
-        <div v-if="cargandoRecintos" class="aviso-estado">Cargando recintos…</div>
+        <div v-if="cargandoRecintos" class="aviso-estado"><i class="fa-solid fa-spinner fa-spin"></i> Cargando recintos…</div>
         <div v-else-if="recintos.length === 0" class="aviso-estado">
           Este proyecto no tiene prestaciones seleccionadas. Elígelas primero en la pantalla de Prestaciones.
         </div>
@@ -79,7 +79,7 @@
                         <th>Cantidad de personas</th>
                         <th>Jornada semanal (hrs)</th>
                         <th>Semanas efectivas al año</th>
-                        <th>% de jornada para este equipo</th>
+                        <th>% de jornada para este perfil</th>
                         <th>Horas disponibles al año</th>
                         <th></th>
                       </tr>
@@ -147,9 +147,9 @@
             <i class="fa-solid fa-arrow-left"></i> Volver a Resultados
           </button>
           <div class="acciones-derecha">
-            <button class="btn-principal" type="button" :disabled="recintos.length === 0" @click="guardarYContinuar(true)">
+            <BotonGuardar class="btn-principal" :cargando="guardando" :disabled="recintos.length === 0" @click="guardarYContinuar(true)">
               Guardar y seguir <i class="fa-solid fa-arrow-right"></i>
-            </button>
+            </BotonGuardar>
           </div>
         </section>
       </main>
@@ -162,6 +162,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import BotonGuardar from '@/components/ui/BotonGuardar.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -197,7 +198,7 @@ function valoresMasivos() {
 // Lee los recintos del proyecto (misma fuente que Tiempos por prestación)
 async function cargarRecintos() {
   const uid = authStore.usuarioId
-  if (!proyectoId.value || !uid) { cargandoRecintos.value = false; return }
+  if (!proyectoId.value || !uid) return
   try {
     const resp = await fetch(`${API}/rrhh.php?action=planilla_a&proyecto_id=${Number(proyectoId.value)}&usuario_id=${uid}`)
     const data = await resp.json()
@@ -210,8 +211,6 @@ async function cargarRecintos() {
     }
   } catch (e) {
     alert('Error de conexión al cargar los recintos del proyecto.')
-  } finally {
-    cargandoRecintos.value = false
   }
 }
 
@@ -437,9 +436,13 @@ onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo') || 'Desconocido'
   proyectoId.value = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo')
   // Primero los perfiles, para que la dotación guardada tenga su lista de opciones
-  await cargarPerfiles()
-  await cargarRecintos()
-  await cargarDotacion()
+  try {
+    await cargarPerfiles()
+    await cargarRecintos()
+    await cargarDotacion()
+  } finally {
+    cargandoRecintos.value = false
+  }
 })
 </script>
 

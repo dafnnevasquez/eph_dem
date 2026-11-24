@@ -88,7 +88,7 @@
         <section class="prestaciones-grid">
           <div class="prestaciones-panel">
             <div class="panel-title">Disponibles</div>
-            <div v-if="isLoading" class="lista-vacia">Cargando prestaciones...</div>
+            <div v-if="isLoading || cargandoSeleccion" class="lista-vacia"><i class="fa-solid fa-spinner fa-spin"></i> Cargando prestaciones…</div>
             <div v-else-if="loadError" class="lista-vacia">{{ loadError }}</div>
             <div v-else-if="prestacionesFiltradas.length === 0" class="lista-vacia">No hay prestaciones disponibles.</div>
             <div v-else class="prestaciones-lista">
@@ -116,7 +116,8 @@
                 </button>
               </div>
             </div>
-            <div v-if="prestacionesSeleccionadas.length === 0" class="lista-vacia">Aún no has seleccionado prestaciones.</div>
+            <div v-if="cargandoSeleccion" class="lista-vacia"><i class="fa-solid fa-spinner fa-spin"></i> Cargando prestaciones…</div>
+            <div v-else-if="prestacionesSeleccionadas.length === 0" class="lista-vacia">Aún no has seleccionado prestaciones.</div>
             <div v-else class="prestaciones-lista">
               <div v-for="prestacion in prestacionesSeleccionadas" :key="prestacion.id" class="prestacion-item">
                 <div class="prestacion-info">
@@ -162,6 +163,8 @@ const mostrarConsideraciones = ref(false)
 const consideracionesRef = ref(null)
 const seleccionadas = ref([])
 const nombreProyectoActivo = ref('')
+const cargandoSeleccion = ref(true) // true hasta que termine de cargar el catálogo y lo guardado del proyecto
+
 
 function normalizarTexto(valor) {
   return String(valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
@@ -211,11 +214,15 @@ const prestacionesSeleccionadas = computed(() => seleccionadas.value)
 
 onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo') || 'Desconocido'
-  await cargarPrestaciones()
-  if (route.params.proyectoId) {
-    await cargarDesdeServidor(route.params.proyectoId)
-  } else {
-    cargarSeleccionadas()
+  try {
+    await cargarPrestaciones()
+    if (route.params.proyectoId) {
+      await cargarDesdeServidor(route.params.proyectoId)
+    } else {
+      cargarSeleccionadas()
+    }
+  } finally {
+    cargandoSeleccion.value = false
   }
   document.addEventListener('pointerdown', cerrarConsideracionesSiCorresponde)
 })

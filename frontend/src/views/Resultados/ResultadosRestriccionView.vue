@@ -11,6 +11,12 @@
       </section>
 
       <main class="rr-content">
+        <PantallaEspera
+          :visible="cargando"
+          titulo="Calculando la restricción de personal"
+          mensaje="Revisando la dotación de cada recinto…"
+          icono="fa-solid fa-user-nurse"
+        />
         <header class="rr-header">
           <div class="nav-bar">
             <div class="nav-buttons">
@@ -77,18 +83,28 @@
           <div class="res-seccion">
             <h4 class="res-seccion-titulo">Personal</h4>
             <div class="pastillas">
-              <div class="pastilla pastilla-clara">
+              <div class="pastilla pastilla-clara pastilla-compacta">
                 <span class="pastilla-titulo">Personal que falta<InfoTip titulo="Personal que falta">Cuántas personas habría que sumar, por perfil, para cubrir toda la demanda. Se calcula como el mínimo necesario (horas requeridas ÷ horas que aporta una persona al año) menos las personas que ya hay.</InfoTip></span>
-                <span class="pastilla-numero" :class="{ 'numero-alerta': totalFaltan > 0 }">{{ formatoNumero(totalFaltan) }}</span>
-                <span class="pastilla-etiqueta">{{ totalFaltan === 1 ? 'persona' : 'personas' }} para cubrir toda la demanda</span>
-                <ul v-if="brechas.length" class="pastilla-lista">
-                  <li v-for="b in brechas" :key="b.id"><b>{{ b.nombre }}:</b> {{ b.texto }}</li>
-                </ul>
+                <div class="falta-lista">
+                  <template v-if="faltantes.length">
+                    <div v-for="f in faltantes" :key="f.clave" class="falta-linea">
+                      <span class="falta-numero">{{ formatoNumero(f.cantidad) }}</span>
+                      <span class="falta-perfil">{{ f.perfil }}</span>
+                      <span class="falta-recinto">{{ f.recinto }}</span>
+                    </div>
+                  </template>
+                  <div v-else class="falta-linea">
+                    <span class="falta-numero falta-numero-ok">0</span>
+                    <span class="falta-perfil">El personal alcanza para toda la demanda</span>
+                  </div>
+                </div>
               </div>
-              <div class="pastilla pastilla-clara">
+              <div class="pastilla pastilla-clara pastilla-compacta">
                 <span class="pastilla-titulo">Prestaciones no cubiertas<InfoTip titulo="Prestaciones no cubiertas" izquierda>Atenciones al año que no se alcanzan a realizar con el personal actual: (1 − α) × demanda anual de cada recinto. En UCI y UTI suma días cama y otras prestaciones.</InfoTip></span>
-                <span class="pastilla-numero" :class="{ 'numero-alerta': noCubiertas > 0 }">{{ formatoNumero(noCubiertas) }}</span>
-                <span class="pastilla-etiqueta">al año, mientras falte personal</span>
+                <div class="falta-linea falta-centro">
+                  <span class="falta-numero falta-numero-grande" :class="{ 'falta-numero-ok': noCubiertas === 0 }">{{ formatoNumero(noCubiertas) }}</span>
+                  <span class="falta-perfil">al año</span>
+                </div>
               </div>
             </div>
             <div v-for="a in sinPersonal" :key="a.id" class="aviso-rrhh aviso-en-resultado">
@@ -250,6 +266,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
 import InfoTip from '@/components/ui/InfoTip.vue'
+import PantallaEspera from '@/components/ui/PantallaEspera.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -282,15 +299,12 @@ function claseAlpha(r) {
 
 /* ---------- Resumen ---------- */
 
-const brechas = computed(() => {
+// Una línea por perfil que falta, con su recinto: "1 Anestesiólogo/a · Pabellón mayor"
+const faltantes = computed(() => {
   if (!resultado.value) return []
-  return resultado.value.recintos
-    .map(r => ({
-      id: r.id,
-      nombre: r.nombre,
-      texto: r.por_perfil.filter(p => p.brecha > 0).map(p => `${formatoNumero(p.brecha)} ${p.perfil}`).join(', '),
-    }))
-    .filter(b => b.texto !== '')
+  return resultado.value.recintos.flatMap(r => r.por_perfil
+    .filter(p => p.brecha > 0)
+    .map(p => ({ clave: `${r.id}-${p.perfil}`, cantidad: p.brecha, perfil: p.perfil, recinto: r.nombre })))
 })
 const tarjetasEquipos = computed(() => {
   if (!resultado.value) return []
@@ -313,9 +327,6 @@ const tarjetasEquipos = computed(() => {
   }
   return tarjetas
 })
-const totalFaltan = computed(() => (resultado.value
-  ? resultado.value.recintos.reduce((s, r) => s + r.por_perfil.reduce((a, p) => a + (p.brecha > 0 ? p.brecha : 0), 0), 0)
-  : 0))
 const noCubiertas = computed(() => (resultado.value
   ? Math.round(resultado.value.recintos.reduce((s, r) => s + (r.prestaciones_no_cubiertas || 0), 0))
   : 0))
@@ -401,11 +412,9 @@ onMounted(() => {
 .hero-title { font-size: 26px; font-weight: 500; color: #fff; margin: 0; }
 .hero-sub { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 700px; line-height: 1.5; margin: 0; }
 
-.tp-page { background: $color-fondo; flex: 1; }
-.tp-content { max-width: 1480px; margin: 32px auto 48px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 24px; }
-
 .nav-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.nav-buttons { display: flex; gap: 10px; }
+.nav-buttons { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.nav-divider { width: 1px; height: 24px; background-color: #cbd5e1; margin: 0 4px; }
 .session-badge { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 10px; background: rgba(0,60,88,0.06); border: 1.5px solid rgba(0,60,88,0.18); border-radius: 999px; color: $color-primario; font-size: 0.88rem; font-weight: 600; }
 .session-nombre { white-space: nowrap; }
 .btn-logout { background: none; border: none; color: $color-primario; cursor: pointer; padding: 2px 4px; opacity: 0.7; &:hover { opacity: 1; color: #c62828; } }
@@ -414,8 +423,6 @@ onMounted(() => {
 .rr-page { background: $color-fondo; flex: 1; }
 .rr-content { max-width: 1480px; margin: 32px auto 48px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 24px; }
 .rr-header { display: flex; flex-direction: column; gap: 10px; }
-.nav-buttons { flex-wrap: wrap; align-items: center; }
-.nav-divider { width: 1px; height: 24px; background-color: #cbd5e1; margin: 0 4px; }
 
 .section-title { font-size: 1.6rem; font-weight: 700; color: $color-primario; margin: 0 0 4px; }
 .section-subtitle { margin: 0; color: $color-texto-secundario; }
@@ -431,14 +438,10 @@ onMounted(() => {
 .aviso-estado { background: #fff; border: 1px solid $color-borde; border-radius: 12px; padding: 24px; text-align: center; color: $color-texto-secundario; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .aviso-error { color: #b71c1c; border-color: #f5a3a3; background: #fdecea; }
 .aviso-rrhh { padding: 10px 14px; border-radius: 8px; background: #fff7e6; border: 1px solid #f5c26b; color: #8a5300; font-size: 0.9rem; i { margin-right: 6px; } }
-.chip-alpha-wrap { display: inline-flex; align-items: center; }
-.res-leyenda { margin: 0; font-size: 0.8rem; color: $color-texto-secundario; }
+.aviso-en-resultado { margin: 0; }
 
 /* Resultado */
 .resultado { background: #fff; border-radius: 16px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-.resultado-cabecera { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
-.resultado-titulo { margin: 0; font-size: 1.2rem; font-weight: 700; color: $color-primario; }
-.resultado-nota { margin: 0; font-size: 0.88rem; color: $color-texto-secundario; }
 
 .res-seccion { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid $color-borde; }
 .res-seccion-titulo { margin: 0; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: rgba(0,60,88,0.65); }
@@ -453,22 +456,40 @@ onMounted(() => {
 .pastilla-etiqueta { font-size: 0.8rem; opacity: 0.85; }
 .pastilla-flecha { font-size: 1.6rem; opacity: 0.7; }
 .numero-baja { color: #ffc266; }
-.numero-alerta { color: #b86e00; }
-.pastilla-lista { margin: 4px 0 0; padding: 0; list-style: none; font-size: 0.88rem; li { margin: 2px 0; } }
+/* Tarjetas de personal: título arriba a la izquierda y contenido centrado */
+.pastilla-compacta { align-items: flex-start; text-align: left; padding: 14px 18px; gap: 4px; }
+.falta-linea { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; }
+.falta-numero { font-size: 1.6rem; font-weight: 700; line-height: 1.2; color: #b86e00; font-variant-numeric: tabular-nums; }
+.falta-numero-ok { color: #1e6b34; }
+.falta-perfil { font-size: 0.95rem; font-weight: 700; color: $color-primario; }
+.falta-recinto { font-size: 0.78rem; font-weight: 600; color: rgba(0,60,88,0.7); background: rgba(0,60,88,0.07); border-radius: 999px; padding: 2px 10px; }
+.falta-lista { flex: 1; align-self: stretch; display: grid; justify-content: center; align-content: center; gap: 4px; }
+.falta-centro { flex: 1; align-self: stretch; justify-content: center; align-items: center; }
+.falta-numero-grande { font-size: 2.6rem; line-height: 1; }
+
+/* Detalle por recinto y equipo */
 .detalle { border-top: 1px solid $color-borde; padding-top: 12px; }
 .detalle summary { cursor: pointer; font-weight: 700; color: $color-primario; font-size: 0.92rem; }
 .detalle-contenido { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.detalle-acciones { display: flex; justify-content: flex-end; gap: 14px; }
+.btn-texto { background: none; border: none; padding: 0; cursor: pointer; color: $color-primario; font-family: inherit; font-size: .85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; &:hover { text-decoration: underline; } }
 
 .res-recinto { border: 1px solid #e3ebf2; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
 .res-recinto-cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .res-recinto-nombre { font-weight: 700; color: $color-primario; font-size: 1.02rem; }
+.res-recinto-cuerpo { display: flex; flex-direction: column; gap: 8px; }
+.res-toggle { cursor: pointer; user-select: none; border-radius: 8px; padding: 2px 4px; margin: -2px -4px; &:hover { background: #f3f8fb; } }
+.res-chevron { font-size: .8rem; opacity: .6; margin-right: 6px; width: 12px; }
+.res-cuenta { margin-left: 8px; font-size: .8rem; font-weight: 600; color: rgba(0,60,88,0.6); }
 .res-linea { margin: 0; font-size: 0.92rem; color: $color-primario; }
 .res-gris { color: $color-texto-secundario; }
+.res-leyenda { margin: 0; font-size: 0.8rem; color: $color-texto-secundario; }
+
+.chip-alpha-wrap { display: inline-flex; align-items: center; }
 .chip-alpha { border-radius: 999px; padding: 4px 12px; font-size: 0.82rem; font-weight: 700; }
 .alpha-ok { background: #e6f4ea; color: #1e6b34; }
 .alpha-baja { background: #fff1db; color: #8a5300; }
 .alpha-cero { background: #fdecea; color: #b71c1c; }
-.aviso-en-resultado { margin: 0; }
 
 .tabla-scroll { overflow-x: auto; }
 .tabla-res { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 0.88rem; }
@@ -478,13 +499,4 @@ onMounted(() => {
 .tabla-res .fila-limita td { background: #fff7e6; font-weight: 700; }
 .tabla-res .fila-cambia td:last-child { color: #b86e00; font-weight: 700; }
 .check-todos { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: rgba(0,60,88,0.8); cursor: pointer; }
-
-/* Bloques del detalle que se abren y cierran */
-.detalle-acciones { display: flex; justify-content: flex-end; gap: 14px; }
-.btn-texto { background: none; border: none; padding: 0; cursor: pointer; color: $color-primario; font-family: inherit; font-size: .85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; &:hover { text-decoration: underline; } }
-.res-toggle { cursor: pointer; user-select: none; border-radius: 8px; padding: 2px 4px; margin: -2px -4px; &:hover { background: #f3f8fb; } }
-.res-chevron { font-size: .8rem; opacity: .6; margin-right: 6px; width: 12px; }
-.res-cuenta { margin-left: 8px; font-size: .8rem; font-weight: 600; color: rgba(0,60,88,0.6); }
-.res-recinto-cuerpo { display: flex; flex-direction: column; gap: 8px; }
-
 </style>

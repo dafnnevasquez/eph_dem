@@ -42,7 +42,7 @@
           </div>
         </header>
 
-        <div v-if="cargando" class="aviso-estado">Cargando…</div>
+        <div v-if="cargando" class="aviso-estado"><i class="fa-solid fa-spinner fa-spin"></i> Cargando prestaciones…</div>
         <div v-else-if="recintos.length === 0" class="aviso-estado">
           Este proyecto no tiene prestaciones seleccionadas. Elígelas primero en la pantalla de Prestaciones.
         </div>
@@ -80,7 +80,7 @@
                   <template v-if="masivo[recinto.id].participacion === 'puntual'">
                     <label class="campo-corto">e <input v-model.number="masivo[recinto.id].e" type="number" min="0" step="1" class="input-tp input-num" /> min</label>
                     <label class="campo-corto">f <input v-model.number="masivo[recinto.id].f" type="number" min="0" step="1" class="input-tp input-num" /> veces/día</label>
-                    <InfoTip titulo="e y f">e: minutos que dura cada intervención. <br><b>f:</b> cuántas veces al día interviene el perfil.</InfoTip>
+                    <InfoTip titulo="e y f"><b>e:</b> minutos que dura cada intervención.<br><b>f:</b> cuántas veces al día interviene el perfil.</InfoTip>
                   </template>
                   <button type="button" class="btn-aplicar" @click="aplicarATodas(recinto)">Aplicar</button>
                   <button type="button" class="btn-quitar-todas" @click="quitarDeTodas(recinto)">Quitar de todas</button>
@@ -150,9 +150,9 @@
           </button>
           <div class="acciones-derecha">
             <span v-if="haySinGuardar" class="sin-guardar">Hay cambios sin guardar</span>
-            <button class="btn-principal" type="button" :disabled="recintos.length === 0 || guardandoUI" @click="guardar(true)">
-              {{ guardandoUI ? 'Guardando…' : 'Guardar y ver resultados' }} <i class="fa-solid fa-arrow-right"></i>
-            </button>
+            <BotonGuardar class="btn-principal" :cargando="guardando" :disabled="recintos.length === 0" @click="guardar(true)">
+              Guardar y ver resultados <i class="fa-solid fa-arrow-right"></i>
+            </BotonGuardar>
           </div>
         </section>
       </main>
@@ -166,6 +166,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
 import InfoTip from '@/components/ui/InfoTip.vue'
+import BotonGuardar from '@/components/ui/BotonGuardar.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -182,7 +183,7 @@ const abiertos = ref({})     // recinto abierto o colapsado
 const masivo = ref({})       // valores de "Aplicar a todas", por recinto
 const cargando = ref(true)
 const guardadoComo = ref('') // lo último guardado, para saber si hay cambios
-const guardandoUI = ref(false) // muestra "Guardando…" en el botón
+const guardando = ref(false) // muestra "Guardando…" en el botón y evita el doble clic
 
 let uidSeq = 1
 
@@ -335,17 +336,15 @@ function primerError() {
   return null
 }
 
-let guardando = false
 async function guardar(calcular = false) {
   const uid = authStore.usuarioId
-  if (guardando) return
+  if (guardando.value) return
   if (!proyectoId.value || !uid) { alert('No hay un proyecto activo o una sesión iniciada.'); return }
   const error = primerError()
   if (error) { alert(error); return }
 
   const filas = filasParaGuardar()
-  guardando = true
-  guardandoUI.value = true
+  guardando.value = true
   try {
     const resp = await fetch(`${API}/rrhh.php?action=planilla_a_guardar`, {
       method: 'POST',
@@ -358,13 +357,12 @@ async function guardar(calcular = false) {
       return
     }
     guardadoComo.value = JSON.stringify(filas)
-    if (calcular) router.push(`/resultados-restriccion/${proyectoId.value}`)
+    if (calcular) await router.push(`/resultados-restriccion/${proyectoId.value}`)
     else alert('Tiempos por prestación guardados correctamente.')
   } catch (e) {
     alert('Error de conexión al guardar.')
   } finally {
-    guardando = false
-    guardandoUI.value = false
+    guardando.value = false
   }
 }
 
@@ -431,9 +429,12 @@ function cerrarSesion() {
 onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo') || 'Desconocido'
   proyectoId.value = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo')
-  await cargarPerfiles()
-  await cargarPlanilla()
-  cargando.value = false
+  try {
+    await cargarPerfiles()
+    await cargarPlanilla()
+  } finally {
+    cargando.value = false
+  }
 })
 </script>
 

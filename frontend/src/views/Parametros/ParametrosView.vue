@@ -15,6 +15,9 @@
         <div class="tooltip-flecha"></div>
       </div>
 
+      <!-- Pantalla de espera mientras se calcula -->
+      <PantallaEspera :visible="calculando" titulo="Calculando el equipamiento" mensaje="Calculando pabellones, boxes y equipos…" icono="fa-solid fa-hospital" />
+
       <main class="parametros-content">
         <header class="parametros-header">
           <div class="nav-bar">
@@ -83,7 +86,11 @@
           </div>
         </header>
 
-        <section v-if="filas.length === 0" class="panel-vacio">
+        <section v-if="cargandoFilas" class="panel-vacio panel-cargando">
+          <p><i class="fa-solid fa-spinner fa-spin"></i> Cargando prestaciones del proyecto…</p>
+        </section>
+
+        <section v-else-if="filas.length === 0" class="panel-vacio">
           <p>No hay prestaciones seleccionadas para parametrizar.</p>
           <button class="btn-secundario" @click="router.push('/prestaciones')">Volver a prestaciones</button>
         </section>
@@ -155,7 +162,9 @@
                 <i class="fa-solid fa-triangle-exclamation"></i> {{ errorValidacion }}
               </div>
             </transition>
-            <button class="btn-principal" @click="guardarYCalcular"><i class="fa-solid fa-calculator"></i> Guardar y calcular</button>
+            <BotonGuardar class="btn-principal" :cargando="calculando" texto-cargando="Calculando…" @click="guardarYCalcular">
+              <i class="fa-solid fa-calculator"></i> Guardar y calcular
+            </BotonGuardar>
           </div>
         </section>
       </main>
@@ -168,6 +177,8 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import AppLayout from '@/layouts/AppLayout.vue'
+import BotonGuardar from '@/components/ui/BotonGuardar.vue'
+import PantallaEspera from '@/components/ui/PantallaEspera.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -199,6 +210,8 @@ const nombreProyectoActivo = ref('')
 const mostrarCalculadora = ref(false)
 const calculadoraRef = ref(null)
 const calc = ref({ coeficienteTecnico: null, puac: null, promedioEstancia: null })
+const cargandoFilas = ref(true) // true hasta que se carguen las prestaciones del proyecto
+const calculando = ref(false)   // true mientras el servidor calcula
 
 // Fila "Mismo valor para todos"
 const masivo = ref({ demanda: null, diasAnuales: 365, tiempoProcedimiento: null, disponibilidad: 100, jornadaLaboral: 24 })
@@ -292,6 +305,7 @@ async function guardarYCalcular() {
   errorValidacion.value = ''
   const idProyectoActual = route.params.proyectoId || localStorage.getItem('ephdem_proyecto_activo')
   if (!idProyectoActual) { alert('No hay un proyecto activo.'); router.push('/crear-proyecto'); return }
+  if (calculando.value) return
   localStorage.setItem(PARAMETROS_STORAGE_KEY, JSON.stringify(filas.value))
 
   const payload = {
@@ -305,14 +319,17 @@ async function guardarYCalcular() {
       procedimiento_tiempo: Number(fila.tiempoProcedimiento),
     })),
   }
+  calculando.value = true
   try {
     const resp = await fetch(`${import.meta.env.VITE_API_BASE}/calcular_demanda.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     const data = await resp.json()
     if (!data.ok) { alert('Error al calcular: ' + (data.error || '')); return }
     localStorage.setItem('ephdem_resultado_calculo', JSON.stringify(data.datos))
-    router.push(`/resultados/${idProyectoActual}`)
+    await router.push(`/resultados/${idProyectoActual}`)
   } catch (error) {
     alert('No se pudo conectar con el servidor de cálculo.')
+  } finally {
+    calculando.value = false
   }
 }
 
@@ -361,13 +378,17 @@ async function cargarDesdeServidor(proyectoId) {
   } catch (e) { alert('Error de red al intentar cargar datos del proyecto.') }
 }
 
-onMounted(() => {
+onMounted(async () => {
   nombreProyectoActivo.value = localStorage.getItem('ephdem_nombre_proyecto_activo') || 'Desconocido'
-  if (route.params.proyectoId) {
-    if (localStorage.getItem('ephdem_origen_edicion') === 'prestaciones') { localStorage.removeItem('ephdem_origen_edicion'); cargarDatos() }
-    else { cargarDesdeServidor(route.params.proyectoId) }
-  } else { cargarDatos() }
   document.addEventListener('pointerdown', cerrarCalculadoraSiCorresponde)
+  try {
+    if (route.params.proyectoId) {
+      if (localStorage.getItem('ephdem_origen_edicion') === 'prestaciones') { localStorage.removeItem('ephdem_origen_edicion'); cargarDatos() }
+      else { await cargarDesdeServidor(route.params.proyectoId) }
+    } else { cargarDatos() }
+  } finally {
+    cargandoFilas.value = false
+  }
 })
 onBeforeUnmount(() => { document.removeEventListener('pointerdown', cerrarCalculadoraSiCorresponde) })
 </script>
@@ -423,6 +444,7 @@ onBeforeUnmount(() => { document.removeEventListener('pointerdown', cerrarCalcul
 
 .panel-vacio, .tabla-panel { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid $color-borde; box-shadow: 0 10px 22px $color-sombra-suave; }
 .panel-vacio { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.panel-cargando { justify-content: center; color: $color-texto-secundario; p { margin: 0; display: flex; align-items: center; gap: 8px; } }
 .tabla-scroll { overflow-x: auto; }
 .tabla-parametros { width: 100%; border-collapse: collapse; }
 .tabla-parametros th { background: #e9f1f6; color: $color-primario; font-size: 0.9rem; font-weight: 700; padding: 10px 8px; text-align: left; white-space: nowrap; position: sticky; top: 0; }
