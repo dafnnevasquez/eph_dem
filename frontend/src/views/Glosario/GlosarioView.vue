@@ -124,20 +124,20 @@ const categorias = [
 ]
 
 const terminos = [
-  // GENERALES
-  { categoria: 'General', termino: 'EPH', definicion: 'Estudio de Preinversión Hospitalaria. Desarrollo sistematizado y en profundidad de la detección y solución de las brechas y objetivos de gestión de un establecimiento de salud en su contexto de red, que define el tamaño nominal del proyecto y permite comparar alternativas de solución hasta seleccionar la más rentable técnica, económica y socialmente, para postulación a financiamiento.' },
-  { categoria: 'General', termino: 'SIGEM-UV', definicion: 'Sistema de Información y Gestión de Equipos Médicos de la Universidad de Valparaíso, plataforma institucional en la cual se aloja el módulo EPHDEM.' },
-  { categoria: 'General', termino: 'EPHDEM', definicion: 'Módulo de demanda de la plataforma SIGEM-UV destinado al cálculo del equipamiento médico requerido en un Estudio de Preinversión Hospitalaria (EPH), en función de la demanda de prestaciones y su relación con los equipos y recintos asociados.' },
-  { categoria: 'General', termino: 'Arancel MAI', definicion: 'Arancel de la Modalidad de Atención Institucional de FONASA, que codifica y valoriza las prestaciones del sistema público de salud.' },
-  { categoria: 'General', termino: 'Demanda', definicion: 'Número de prestaciones que una población determinada requiere, social y técnicamente, en un período establecido (generalmente considerado como 1 año en el marco de este proyecto).' },
-  { categoria: 'General', termino: 'Demanda compartida', definicion: 'Equipamiento cuya demanda proviene de prestaciones de más de un recinto base y cuya cantidad entera, por tanto, no puede repartirse entre recintos.' },
-  { categoria: 'General', termino: 'Disponibilidad', definicion: 'Proporción del tiempo en que una unidad de equipamiento o de recinto está efectivamente disponible para uso. Se expresa como decimal en el rango [0,1].' },
-  { categoria: 'General', termino: 'EEMM', definicion: 'Equipos y equipamiento médico. Designa también la fórmula de estimación de su demanda empleada en este trabajo.' },
-  { categoria: 'General', termino: 'Jornada efectiva', definicion: 'Horas diarias de funcionamiento efectivo consideradas para el cálculo de capacidad.' },
-  { categoria: 'General', termino: 'Prestación', definicion: 'Cualquier atención, servicio o procedimiento médico que recibe una persona para cuidar su bienestar (como consultas, exámenes y cirugías). Está identificada por un código del arancel, con un tiempo de procedimiento y un recinto asociados.' },
-  { categoria: 'General', termino: 'Producción Sanitaria', definicion: 'Número de prestaciones realizadas por un establecimiento asistencial en un período de tiempo determinado.' },
-  { categoria: 'General', termino: 'Requerimiento de Equipamiento', definicion: 'Cantidad de unidades de un equipo determinado que resulta necesaria para satisfacer la demanda proyectada de una prestación.' },
-  { categoria: 'General', termino: 'Tiempo de procedimiento (TP)', definicion: 'Duración en minutos de una prestación.' },
+// GENERALES
+  { categoria: 'General', termino: 'EPH', definicion: 'Estudio de Preinversión Hospitalaria. Análisis técnico, económico y social que identifica las brechas de un establecimiento de salud, define el tamaño del proyecto y selecciona la mejor alternativa para postular a financiamiento.' },
+  { categoria: 'General', termino: 'SIGEM-UV', definicion: 'Sistema de Información y Gestión de Equipos Médicos de la Universidad de Valparaíso; plataforma institucional que aloja el módulo EPHDEM.' },
+  { categoria: 'General', termino: 'EPHDEM', definicion: 'Módulo de la plataforma SIGEM-UV que calcula el equipamiento médico necesario para un EPH, cruzando la demanda de prestaciones con los equipos y recintos asociados.' },
+  { categoria: 'General', termino: 'Arancel MAI', definicion: 'Arancel de la Modalidad de Atención Institucional de FONASA que codifica y valoriza las prestaciones de la red pública de salud.' },
+  { categoria: 'General', termino: 'Demanda', definicion: 'Cantidad de prestaciones médicas que requiere una población en un período determinado (por lo general, un año).' },
+  { categoria: 'General', termino: 'Demanda compartida', definicion: 'Equipamiento utilizado por prestaciones de dos o más recintos base, por lo que su cantidad total no puede dividirse individualmente por recinto.' },
+  { categoria: 'General', termino: 'Disponibilidad', definicion: 'Proporción de tiempo en que un equipo o recinto está operativo para su uso, expresada como un decimal entre 0 y 1.' },
+  { categoria: 'General', termino: 'EEMM', definicion: 'Siglas correspondientes a Equipamiento Médico / Equipos Médicos' },
+  { categoria: 'General', termino: 'Jornada efectiva', definicion: 'Horas diarias reales de funcionamiento usadas para calcular la capacidad operativa.' },
+  { categoria: 'General', termino: 'Prestación', definicion: 'Atención, examen o procedimiento médico (como consultas o cirugías) identificado por un código de arancel, con un tiempo de duración y un recinto asociados.' },
+  { categoria: 'General', termino: 'Producción Sanitaria', definicion: 'Cantidad total de prestaciones realizadas por un establecimiento de salud en un período determinado.' },
+  { categoria: 'General', termino: 'Requerimiento de Equipamiento', definicion: 'Cantidad de unidades de un equipo necesarias para cubrir la demanda proyectada de una prestación.' },
+  { categoria: 'General', termino: 'Tiempo de procedimiento', definicion: 'Duración en minutos de una prestación.' },
 
   // TIPOS DE EQUIPAMIENTO
   { categoria: 'Tipología de clases de equipos médicos', termino: 'Tipología', definicion: 'Clasificación de equipamiento médico según su relación con la demanda, en base a esta clasificación se estructura el modelo matemático del módulo' },
@@ -150,7 +150,10 @@ const terminos = [
 
   // ATENCIÓN CERRADA
   { categoria: 'Atención cerrada', termino: 'Atención Cerrada', definicion: 'Modalidad de atención de salud que requiere la hospitalización del paciente para recibir y administrar las prestaciones necesarias.' },
-  { categoria: 'Atención cerrada', termino: 'Boxes / cubículos', definicion: 'Módulos de atención individuales de las Unidades de Paciente Crítico.' },
+  { categoria: 'Atención cerrada', termino: 'UPC', definicion: 'Unidad de Paciente Crítico. Unidad clínica destinada a la atención de pacientes en riesgo vital, que comprende las Unidades de Cuidados Intensivos (UCI) y de Tratamiento Intermedio (UTI).' },
+  { categoria: 'Atención cerrada', termino: 'Boxes / cubículos', definicion: 'Módulos de atención individuales de las Unidades de Paciente Crítico (UPC).' },
+  { categoria: 'Atención cerrada', termino: 'UCI / UTI', definicion: 'Unidad de Cuidados Intensivos y Unidad de Tratamiento Intermedio, respectivamente. Son los componentes que conforman la Unidad de Paciente Crítico (UPC).' },
+  { categoria: 'Atención cerrada', termino: 'URPA', definicion: 'Unidad de Recuperación Post-Anestésica.' },
   { categoria: 'Atención cerrada', termino: 'Día Cama', definicion: 'Unidad de medida que corresponde a la disponibilidad y ocupación de una cama censable hospitalaria durante 24 horas para la atención de un paciente.' },
   { categoria: 'Atención cerrada', termino: 'Kit de Recinto', definicion: 'Conjunto de equipos y su cantidad base asociados por defecto a un recinto estándar que todo recinto de un tipo dado posee, con independencia de la demanda específica o del equipamiento que pueda requerir cada prestación particular.' },
   { categoria: 'Atención cerrada', termino: 'Pabellón mayor / menor', definicion: 'Recintos quirúrgicos diferenciados por complejidad del procedimiento y tipo de anestesia.' },
@@ -158,9 +161,7 @@ const terminos = [
   { categoria: 'Atención cerrada', termino: 'Piso normativo', definicion: 'Cantidad mínima de un equipo garantizada por criterios de dotación fija, con independencia de la demanda calculada.' },
   { categoria: 'Atención cerrada', termino: 'Recinto base', definicion: 'Recinto donde se ejecuta una prestación y del cual esta hereda el kit de equipamiento correspondiente.' },
   { categoria: 'Atención cerrada', termino: 'Recinto Estándar', definicion: 'Catálogo de tipos de recintos hospitalarios considerados por el sistema (por ejemplo, cubículo UCI, cubículo UTI o pabellón), a los cuales se asocia un kit de equipamiento base.' },
-  { categoria: 'Atención cerrada', termino: 'UCI / UTI', definicion: 'Unidad de Cuidados Intensivos y Unidad de Tratamiento Intermedio, respectivamente. Son los componentes que conforman la Unidad de Paciente Crítico (UPC).' },
-  { categoria: 'Atención cerrada', termino: 'UPC', definicion: 'Unidad de Paciente Crítico. Unidad clínica destinada a la atención de pacientes en riesgo vital, que comprende las Unidades de Cuidados Intensivos (UCI) y de Tratamiento Intermedio (UTI).' },
-  { categoria: 'Atención cerrada', termino: 'URPA', definicion: 'Unidad de Recuperación Post-Anestésica.' },
+
 
   // ATENCIÓN ABIERTA
   { categoria: 'Atención abierta', termino: 'Atención Abierta', definicion: 'Modalidad de atención de salud que no requiere la hospitalización del paciente para recibir y administrar las prestaciones necesarias.' },
@@ -168,7 +169,6 @@ const terminos = [
   { categoria: 'Atención abierta', termino: 'Consulta médica', definicion: 'Prestación ambulatoria donde un profesional de salud evalúa, diagnostica o trata a un paciente sin requerir hospitalización.' },
   { categoria: 'Atención abierta', termino: 'Días laborales', definicion: 'Número de días efectivos de funcionamiento del establecimiento en un año. Puede ser 260 días hábiles o 365 días corridos.' },
   { categoria: 'Atención abierta', termino: 'N° de prestaciones simultáneas', definicion: 'Cantidad de procedimientos de un mismo tipo que pueden realizarse en paralelo con el mismo equipo.' },
-  { categoria: 'Atención abierta', termino: 'Tiempo de procedimiento', definicion: 'Duración estimada en minutos de una prestación ambulatoria, utilizada en la fórmula EEMM.' },
 ]
 
 function normalizar(texto) {
