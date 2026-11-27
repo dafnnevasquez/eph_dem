@@ -41,6 +41,44 @@
           </div>
         </header>
 
+        <!-- Dotación sugerida (referencia, se abre y cierra) -->
+        <section class="dotacion-sugerida">
+          <button type="button" class="dotacion-toggle" :aria-expanded="dotacionAbierta" @click="dotacionAbierta = !dotacionAbierta">
+            <span class="dotacion-icono"><i class="fa-solid fa-user-doctor"></i></span>
+            <span class="dotacion-texto">Dotación sugerida</span>
+            <i class="fa-solid dotacion-chevron" :class="dotacionAbierta ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </button>
+          <div v-show="dotacionAbierta" class="dotacion-panel">
+            <p class="dotacion-desc">Personal sugerido por especialidad y recinto, como referencia para completar la dotación. Los valores están redondeados al entero superior.</p>
+            <div class="tabla-scroll">
+              <table class="tabla-dotacion">
+                <thead>
+                  <tr>
+                    <th>Especialidad</th>
+                    <th>Recinto</th>
+                    <th class="col-num">Cirujanos</th>
+                    <th class="col-num">Anestesistas</th>
+                    <th class="col-num">Arsenaleras</th>
+                    <th class="col-num">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-for="esp in dotacionSugerida" :key="esp.especialidad">
+                    <tr v-for="(fila, i) in esp.filas" :key="esp.especialidad + fila.recinto">
+                      <td v-if="i === 0" :rowspan="esp.filas.length" class="td-especialidad">{{ esp.especialidad }}</td>
+                      <td>{{ fila.recinto }}</td>
+                      <td class="col-num">{{ entero(fila.cirujanos) }}</td>
+                      <td class="col-num">{{ entero(fila.anestesistas) }}</td>
+                      <td class="col-num">{{ entero(fila.arsenaleras) }}</td>
+                      <td class="col-num td-total">{{ entero(fila.cirujanos) + entero(fila.anestesistas) + entero(fila.arsenaleras) }}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         <div v-if="cargandoRecintos" class="aviso-estado"><i class="fa-solid fa-spinner fa-spin"></i> Cargando recintos…</div>
         <div v-else-if="recintos.length === 0" class="aviso-estado">
           Este proyecto no tiene prestaciones seleccionadas. Elígelas primero en la pantalla de Prestaciones.
@@ -190,6 +228,20 @@ const cargandoRecintos = ref(true)
 const dotacion = ref({})
 const masivo = ref({})
 const abiertos = ref({})
+// Dotación sugerida: valores del estudio por especialidad y recinto.
+// Se muestran como enteros, redondeados hacia arriba (1,86 → 2).
+const dotacionAbierta = ref(false)
+const dotacionSugerida = [
+  { especialidad: 'Oftalmología', filas: [
+    { recinto: 'Pabellón menor', cirujanos: 1.86, anestesistas: 0.91, arsenaleras: 0.98 },
+    { recinto: 'Pabellón mayor', cirujanos: 1.94, anestesistas: 0.97, arsenaleras: 1.00 },
+  ] },
+  { especialidad: 'Gastroenterología', filas: [
+    { recinto: 'Pabellón menor', cirujanos: 1.84, anestesistas: 0.95, arsenaleras: 1.00 },
+    { recinto: 'Pabellón mayor', cirujanos: 2.53, anestesistas: 1.00, arsenaleras: 0.99 },
+  ] },
+]
+function entero(x) { return Math.ceil(Number(x) - 1e-9) }
 
 function valoresMasivos() {
   return { personas: null, jornada: 44, semanas: SEMANAS_DEFECTO, porcentaje: PORCENTAJE_DEFECTO }
@@ -564,4 +616,23 @@ onMounted(async () => {
 
 .aviso-estado { background: #fff; border: 1px solid $color-borde; border-radius: 12px; padding: 24px; text-align: center; color: $color-texto-secundario; }
 
+/* Dotación sugerida */
+.dotacion-sugerida { display: flex; flex-direction: column; gap: 10px; }
+.dotacion-toggle {
+  display: flex; align-items: center; gap: 10px; align-self: flex-start;
+  padding: 10px 18px; border: 1.5px solid $color-primario; border-radius: 999px;
+  background: rgba(0,60,88,0.06); color: $color-primario; font-family: inherit; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  &:hover { background: rgba(0,60,88,0.12); }
+  &:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(42,159,214,0.3); }
+}
+.dotacion-icono { font-size: 1rem; }
+.dotacion-chevron { font-size: 0.8rem; opacity: 0.6; margin-left: 6px; }
+.dotacion-panel { background: #fff; border: 1px solid $color-borde; border-radius: 12px; padding: 16px 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; }
+.dotacion-desc { margin: 0; font-size: 0.88rem; color: $color-texto-secundario; }
+.tabla-dotacion { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.tabla-dotacion th { text-align: left; font-weight: 700; color: $color-primario; padding: 10px 12px; border-bottom: 2px solid #ddeaf4; }
+.tabla-dotacion td { padding: 10px 12px; border-bottom: 1px solid $color-borde; color: $color-primario; font-variant-numeric: tabular-nums; }
+.tabla-dotacion .col-num { text-align: center; }
+.tabla-dotacion td.td-especialidad { font-weight: 600; vertical-align: top; }
+.tabla-dotacion td.td-total { font-weight: 700; }
 </style>
